@@ -1,0 +1,36 @@
+{
+    "name": "nilportugues/json-api",
+    "type": "library",
+    "description": "Serializer transformers outputting valid API responses in JSON API and HAL+JSON API formats.",
+    "keywords": ["json", "api", "jsonapi", "hal", "hal+json", "serialize", "serializer"],
+    "homepage": "http://nilportugues.com",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Nil Portugués Calderó",
+            "email": "contact@nilportugues.com",
+            "role": "Project Lead Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.4.*",
+        "fabpot/php-cs-fixer": "^1.9",
+        "mmoreram/php-formatter": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "NilPortugues\\Api\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NilPortugues\\Api\\": "tests/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin/"
+    }
+}
