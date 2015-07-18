@@ -24,16 +24,6 @@ use NilPortugues\Tests\Api\Dummy\SimpleObject\Post as SimplePost;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @param $mappings
-     *
-     * @return Serializer
-     */
-    protected function getJsonApiSerializer($mappings)
-    {
-        return;
-    }
-
     public function testItWillSerializeToJsonApiAComplexObject()
     {
         $post = new Post(
