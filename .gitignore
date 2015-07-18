@@ -1,3 +1,4 @@
-bin
-.idea
-vendor
+bin/
+.idea/
+vendor/
+composer.lock

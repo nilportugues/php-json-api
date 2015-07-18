@@ -4,7 +4,7 @@
     "description": "Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.",
     "keywords": ["json", "api", "jsonapi", "hal", "hal json", "serialize", "serializer"],
     "homepage": "http://nilportugues.com",
-    "license": "GPLv3",
+    "license": "GPL-3.0",
     "authors": [
         {
             "name": "Nil Portugués Calderó",

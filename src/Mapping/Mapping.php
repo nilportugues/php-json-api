@@ -30,10 +30,6 @@ class Mapping
      */
     private $metaData = [];
 
-    /**
-     * @var string
-     */
-    private $resourceUrlTitlePattern = '';
 
     /**
      * @param       $className
