@@ -40,7 +40,7 @@ Given a PHP object, the JSON transformer will transform it to a valid JSON repre
 
 ```php
 use NilPortugues\Serializer\Serializer;
-use NilPortugues\Serializer\Transformer\Json\JsonTransformer;
+use NilPortugues\Api\Transformer\Json\JsonTransformer;
 
 $transformer = new JsonTransformer();
 $serializer = new Serializer($transformer);

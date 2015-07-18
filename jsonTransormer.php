@@ -1,9 +1,8 @@
 <?php
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\Json\JsonApiTransformer;
-use NilPortugues\Api\Transformer\Json\HalJsonTransformer;
-use NilPortugues\Api\Transformer\Json\JsonTransformer;
 use NilPortugues\Serializer\Serializer;
+use NilPortugues\Serializer\Transformer\Json\JsonTransformer;
 
 include 'vendor/autoload.php';
 
@@ -294,16 +293,3 @@ echo (new Serializer($serializer))->serialize($post);
 echo PHP_EOL;
 echo PHP_EOL;
 
-
-die();
-echo '-------------------------------------------------------------';
-echo 'JSON+HAL API Format';
-echo '-------------------------------------------------------------';
-echo PHP_EOL;
-echo PHP_EOL;
-
-$serializer = new HalJsonTransformer($apiMappingCollection);
-$serializer->setSelfUrl('/date_time/');
-$serializer->setNextUrl('/date_time/?page=2&amount=20');
-
-echo (new Serializer($serializer))->serialize($post);

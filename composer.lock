@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ede7b9823d275349f7d08fa6c3b697c2",
+    "hash": "b696f90c7449e3105247af0cfa758665",
     "packages": [
         {
             "name": "nilportugues/serializer",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/nilportugues/serializer.git",
-                "reference": "6912c2dbe819ed09638600d520cc106534d20c02"
+                "reference": "8168ddcab52d2ed2f2303043cdc2cc7b1b5a21c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nilportugues/serializer/zipball/6912c2dbe819ed09638600d520cc106534d20c02",
-                "reference": "6912c2dbe819ed09638600d520cc106534d20c02",
+                "url": "https://api.github.com/repos/nilportugues/serializer/zipball/8168ddcab52d2ed2f2303043cdc2cc7b1b5a21c3",
+                "reference": "8168ddcab52d2ed2f2303043cdc2cc7b1b5a21c3",
                 "shasum": ""
             },
             "require": {
@@ -31,8 +31,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "NilPortugues\\Serializer\\": "src/",
-                    "NilPortugues\\Api\\": "lib/"
+                    "NilPortugues\\Serializer\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -63,7 +62,7 @@
                 "serialize",
                 "serializer"
             ],
-            "time": "2015-07-17 20:55:59"
+            "time": "2015-07-17 21:44:44"
         }
     ],
     "packages-dev": [
