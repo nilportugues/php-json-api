@@ -180,7 +180,7 @@ JSON;
 
         for ($i = 1;$i <= 5; ++$i) {
             $userId = $i * 5;
-            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days");
+            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
             $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
         }
 
