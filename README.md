@@ -84,14 +84,40 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 
 ```php
 //Create the mappings for each class involved.
-$postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
-$postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
+$postMapping = new Mapping(
+   Post::class, 
+   'http://example.com/posts/{postId}',
+   ['postId']
+);
 
-$userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
-$userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
+$postIdMapping = new Mapping(
+   PostId::class, 
+   'http://example.com/posts/{postId}', 
+   ['postId']
+);
 
-$commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
-$commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}', ['commentId']);
+$userMapping = new Mapping(
+   User::class, 
+   'http://example.com/users/{userId}', 
+   ['userId']
+);
+
+$userIdMapping = new Mapping(
+   UserId::class,
+   'http://example.com/users/{userId}', 
+   ['userId']
+);
+
+$commentMapping = new Mapping(
+   Comment::class, 
+   'http://example.com/comments/{commentId}', 
+   ['commentId']
+);
+$commentIdMapping = new Mapping(
+   CommentId::class,
+   'http://example.com/comments/{commentId}',
+   ['commentId']
+);
 
 //Build the Mapping array
 $mappings = [
