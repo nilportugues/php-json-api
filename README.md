@@ -80,6 +80,146 @@ echo $serializer->serialize($post);
 ### JSON API
 Given a PHP Object, and a series of mappings, the JSON API transformer will represent the given data following the `http://jsonapi.org` specification.
 
+**Code:**
+
+```php
+//Create the mappings for each class involved.
+$postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
+$postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
+
+$userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
+$userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
+
+$commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
+$commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}', ['commentId']);
+
+//Build the Mapping array
+$mappings = [
+   $postMapping->getClassName() => $postMapping,
+   $postIdMapping->getClassName() => $postIdMapping,
+   $userMapping->getClassName() => $userMapping,
+   $userIdMapping->getClassName() => $userIdMapping,
+   $commentMapping->getClassName() => $commentMapping,
+   $commentIdMapping->getClassName() => $commentIdMapping,
+];
+
+//Build the JsonApi Transformer and set additional fields.
+$transformer = new JsonApiTransformer($mappings);
+$transformer->setApiVersion('1.0');
+$transformer->setSelfUrl('http://example.com/posts/1');
+$transformer->setFirstUrl('http://example.com/posts/1');
+$transformer->setNextUrl('http://example.com/posts/2');
+$transformer->addMeta(
+   'author', 
+   [
+      ['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']
+   ]
+);
+
+//Output transformation
+$serializer = new Serializer($transformer);
+echo $serializer->serialize($post);
+```
+
+**Output:**
+
+```json
+{
+    "data": {
+        "type": "post",
+        "id": "9",
+        "attributes": {
+            "title": "Hello World",
+            "content": "Your first post"
+        },
+        "links": {
+            "self": "http://example.com/posts/9"
+        },
+        "relationships": {
+            "author": {
+                "links": {
+                    "self": "http://example.com/users/1"
+                },
+                "data": {
+                    "type": "user",
+                    "id": "1"
+                }
+            }
+        }
+    },
+    "included": [
+        {
+            "type": "user",
+            "id": "1",
+            "attributes": {
+                "name": "Post Author"
+            },
+            "links": {
+                "self": "http://example.com/users/1"
+            },
+            "relationships": [
+
+            ]
+        },
+        {
+            "type": "user",
+            "id": "2",
+            "attributes": {
+                "name": "Barristan Selmy"
+            },
+            "links": {
+                "self": "http://example.com/users/2"
+            },
+            "relationships": [
+
+            ]
+        },
+        {
+            "type": "comment",
+            "id": "1000",
+            "attributes": {
+                "dates": {
+                    "created_at": "2015-07-18T13:43:48+02:00",
+                    "accepted_at": "2015-07-18T14:18:48+02:00"
+                },
+                "comment": "Have no fear, sers, your king is safe."
+            },
+            "links": {
+                "self": "http://example.com/comments/1000"
+            },
+            "relationships": {
+                "user": {
+                    "links": {
+                        "self": "http://example.com/users/2"
+                    },
+                    "data": {
+                        "user": {
+                            "type": "user",
+                            "id": "2"
+                        }
+                    }
+                }
+            }
+        }
+    ],
+    "links": {
+        "self": "http://example.com/posts/1",
+        "next": "http://example.com/posts/2"
+    },
+    "meta": {
+        "author": [
+            {
+                "name": "Nil Portugués Calderó",
+                "email": "contact@nilportugues.com"
+            }
+        ]
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}
+```
+
 ### HAL+JSON
 Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification.
 
