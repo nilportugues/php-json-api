@@ -7,7 +7,7 @@ use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
 use InvalidArgumentException;
 
-abstract class AbstractTransformer implements StrategyInterface
+abstract class Transformer implements StrategyInterface
 {
     /**
      * @var Mapping[]
