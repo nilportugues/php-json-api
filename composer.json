@@ -1,7 +1,7 @@
 {
     "name": "nilportugues/json-api",
     "type": "library",
-    "description": "Serializer transformers outputting valid API responses in JSON API and HAL+JSON API formats.",
+    "description": "Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.",
     "keywords": ["json", "api", "jsonapi", "hal", "hal json", "serialize", "serializer"],
     "homepage": "http://nilportugues.com",
     "license": "GPLv3",
