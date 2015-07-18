@@ -40,8 +40,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'Have no fear, sers, your king is safe.',
                     new User(new UserId(2), 'Barristan Selmy'),
                     [
-                        'created_at' => (new DateTime('2015/07/18 12:48:00 -35 minutes'))->format('c'),
-                        'accepted_at' => (new DateTime('2015/07/19 00:00:00'))->format('c'),
+                        'created_at' => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
+                        'accepted_at' => (new DateTime('2015-07-19T00:00:00+00:00'))->format('c'),
                     ]
                 ),
             ]
@@ -119,8 +119,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             "id": "1000",
             "attributes": {
                 "dates": {
-                    "created_at": "2015-07-18T12:13:00+02:00",
-                    "accepted_at": "2015-07-19T00:00:00+02:00"
+                    "created_at": "2015-07-18T12:13:00+00:00",
+                    "accepted_at": "2015-07-19T00:00:00+00:00"
                 },
                 "comment": "Have no fear, sers, your king is safe."
             },
