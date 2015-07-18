@@ -250,3 +250,19 @@ echo $serializer->serialize($post);
 Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification.
 
 
+## Quality Code
+Testing has been done using PHPUnit and [Travis-CI](https://travis-ci.org). All code has been tested to be compatible from PHP 5.5 and [HHVM](http://hhvm.com/).
+
+To run the test suite, you need [Composer](http://getcomposer.org):
+
+```bash
+    php composer.phar install
+    php bin/phpunit
+```
+
+
+## Author
+Nil Portugués Calderó
+
+ - <contact@nilportugues.com>
+ - [http://nilportugues.com](http://nilportugues.com)
