@@ -2,7 +2,8 @@
 
 namespace NilPortugues\Api\Transformer\Json;
 
-use NilPortugues\Api\Transformer\AbstractTransformer;
+use NilPortugues\Api\Transformer\Transformer;
+use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 
 /**
@@ -10,7 +11,7 @@ use NilPortugues\Serializer\Serializer;
  *
  * @link http://jsonapi.org/format/#document-structure
  */
-class JsonApiTransformer extends AbstractTransformer
+class JsonApiTransformer extends Transformer
 {
     const SELF_LINK = 'self';
     const TITLE = 'title';
@@ -48,14 +49,6 @@ class JsonApiTransformer extends AbstractTransformer
     private $relatedUrl = '';
 
     /**
-     * @return string
-     */
-    public function getRelatedUrl()
-    {
-        return $this->relatedUrl;
-    }
-
-    /**
      * @param string $relatedUrl
      *
      * @return $this
@@ -65,14 +58,6 @@ class JsonApiTransformer extends AbstractTransformer
         $this->relatedUrl = $relatedUrl;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getIncluded()
-    {
-        return $this->included;
     }
 
     /**
@@ -88,14 +73,6 @@ class JsonApiTransformer extends AbstractTransformer
     }
 
     /**
-     * @return array
-     */
-    public function getRelationships()
-    {
-        return $this->relationships;
-    }
-
-    /**
      * @param array $relationships
      *
      * @return $this
@@ -108,14 +85,6 @@ class JsonApiTransformer extends AbstractTransformer
     }
 
     /**
-     * @return string
-     */
-    public function getApiVersion()
-    {
-        return $this->apiVersion;
-    }
-
-    /**
      * @param string $apiVersion
      *
      * @return $this
@@ -125,14 +94,6 @@ class JsonApiTransformer extends AbstractTransformer
         $this->apiVersion = $apiVersion;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMeta()
-    {
-        return $this->meta;
     }
 
     /**
@@ -191,7 +152,7 @@ class JsonApiTransformer extends AbstractTransformer
         foreach (array_keys($value) as $propertyName) {
             if (in_array($propertyName, $this->getIdProperties($type), true)) {
                 $id = $this->getIdValue($value[$propertyName]);
-                $ids[] = (is_array($value[$propertyName])) ? implode(self::ID_SEPARATOR, $id) : $id;
+                $ids[] = (is_array($id)) ? implode(self::ID_SEPARATOR, $id) : $id;
             }
         }
 
@@ -208,6 +169,7 @@ class JsonApiTransformer extends AbstractTransformer
     private function getIdProperties($type)
     {
         $idProperties = [];
+
         if (!empty($this->mappings[$type])) {
             $idProperties = $this->mappings[$type]->getIdProperties();
         }
@@ -239,18 +201,67 @@ class JsonApiTransformer extends AbstractTransformer
     {
         $data = [];
         $attributes = [];
+        $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
+        $idProperties = $this->getIdProperties($type);
+
         foreach ($array as $propertyName => $value) {
-            if (is_array($value)
+            if (in_array($propertyName, $idProperties, true)) {
+                continue;
+            }
+
+            $keyName = $this->camelCaseToUnderscore($propertyName);
+
+            if ((is_array($value)
                 && array_key_exists(Serializer::SCALAR_TYPE, $value)
-                && array_key_exists(Serializer::SCALAR_VALUE, $value)
+                && array_key_exists(Serializer::SCALAR_VALUE, $value))
+                && empty($this->mappings[$value[Serializer::SCALAR_TYPE]])
             ) {
-                $attributes[$propertyName] = $value;
+                $attributes[$keyName] = $value;
+                continue;
+            }
+
+            if (is_array($value) && !array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+                if ($this->containsClassIdentifierKey($value)) {
+                    $attributes[$keyName] = $value;
+                }
             }
         }
 
         $data[self::ATTRIBUTES_KEY] = $attributes;
 
         return $data;
+    }
+
+    /**
+     * @param array $input
+     * @param bool  $foundIdentifierKey
+     *
+     * @return bool
+     */
+    private function containsClassIdentifierKey(array $input, $foundIdentifierKey = false)
+    {
+        if (!is_array($input)) {
+            return $foundIdentifierKey || false;
+        }
+
+        if (in_array(Serializer::CLASS_IDENTIFIER_KEY, $input, true)) {
+            return true;
+        } else {
+            if (!empty($input[Serializer::SCALAR_VALUE])) {
+                $input = $input[Serializer::SCALAR_VALUE];
+
+                if (is_array($input)) {
+                    foreach ($input as $value) {
+                        if (is_array($value)) {
+                            $foundIdentifierKey = $foundIdentifierKey
+                                || $this->containsClassIdentifierKey($value, $foundIdentifierKey);
+                        }
+                    }
+                }
+            }
+        }
+
+        return !$foundIdentifierKey;
     }
 
     /**
@@ -307,13 +318,27 @@ class JsonApiTransformer extends AbstractTransformer
     }
 
     /**
-     * @param $copy
+     * @param string $type
      *
-     * @return mixed
+     * @throws TransformerException
      */
-    private function removeTypeAndId($copy)
+    protected function hasMappingGuard($type)
+    {
+        if (empty($this->mappings[$type])) {
+            throw new TransformerException(sprintf('Provided type %s has no mapping.', $type));
+        }
+    }
+
+    /**
+     * @param array $copy
+     *
+     * @return array
+     */
+    private function removeTypeAndId(array $copy)
     {
         $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
+        $this->hasMappingGuard($type);
+
         foreach ($this->mappings[$type]->getIdProperties() as $propertyName) {
             unset($copy[$propertyName]);
         }

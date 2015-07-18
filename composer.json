@@ -28,7 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "NilPortugues\\Api\\": "tests/"
+            "NilPortugues\\Tests\\Api\\": "tests/"
         }
     },
     "config": {

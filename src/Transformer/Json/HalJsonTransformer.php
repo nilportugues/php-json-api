@@ -2,7 +2,7 @@
 
 namespace NilPortugues\Api\Transformer\Json;
 
-use NilPortugues\Api\Transformer\AbstractTransformer;
+use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
 
 /**
@@ -10,7 +10,7 @@ use NilPortugues\Serializer\Serializer;
  *
  * @link http://stateless.co/hal_specification.html
  */
-class HalJsonTransformer extends AbstractTransformer
+class HalJsonTransformer extends Transformer
 {
     /**
      * @var

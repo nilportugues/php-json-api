@@ -2,10 +2,10 @@
 
 namespace NilPortugues\Api\Transformer;
 
+use InvalidArgumentException;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
-use InvalidArgumentException;
 
 abstract class Transformer implements StrategyInterface
 {
