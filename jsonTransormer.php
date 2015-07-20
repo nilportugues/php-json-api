@@ -29,14 +29,18 @@ $post = new Post(
 );
 
 
-$postMapping = new Mapping('Post', 'http://example.com/posts/{postId}', ['postId']);
-$postIdMapping = new Mapping('PostId', 'http://example.com/posts/{postId}', ['postId']);
+$postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
+$postMapping->addRelationship('comments', ['href' => 'http://example.com/posts/{postId}/relationships/comments']);
 
-$userMapping = new Mapping('User', 'http://example.com/users/{userId}', ['userId']);
-$userIdMapping = new Mapping('UserId',  'http://example.com/users/{userId}', ['userId']);
+$postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
 
-$commentMapping = new Mapping('Comment', 'http://example.com/comments/{commentId}', ['commentId']);
-$commentIdMapping = new Mapping('CommentId', 'http://example.com/comments/{commentId}', ['commentId']);
+$userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
+$userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
+
+$commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
+$postMapping->addRelationship('users', ['href' => 'http://example.com/comments/{commentId}/relationships/users']);
+
+$commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}', ['commentId']);
 
 
 
