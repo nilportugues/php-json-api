@@ -32,6 +32,8 @@ $post = new Post(
 $postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
 $postMapping->addRelationship('comments', ['href' => 'http://example.com/posts/{postId}/relationships/comments']);
 
+print_r($postMapping); die();
+
 $postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
 
 $userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
