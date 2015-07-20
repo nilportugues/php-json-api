@@ -32,7 +32,6 @@ $post = new Post(
 $postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
 $postMapping->addRelationship('comments', ['href' => 'http://example.com/posts/{postId}/relationships/comments']);
 
-print_r($postMapping); die();
 
 $postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
 
@@ -57,7 +56,7 @@ $apiMappingCollection = [
 
 
 header('Content-Type: application/vnd.api+json; charset=utf-8');
-
+echo (new Serializer(new \NilPortugues\Api\Transformer\Json\JsonTransformer()))->serialize($post);
 
 $serializer = new JsonApiTransformer($apiMappingCollection);
 $serializer->setApiVersion('1.0');

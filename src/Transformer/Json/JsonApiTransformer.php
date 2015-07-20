@@ -40,10 +40,6 @@ class JsonApiTransformer extends Transformer
      */
     private $relationships = [];
     /**
-     * @var array
-     */
-    private $included = [];
-    /**
      * @var string
      */
     private $relatedUrl = '';
@@ -56,18 +52,6 @@ class JsonApiTransformer extends Transformer
     public function setRelatedUrl($relatedUrl)
     {
         $this->relatedUrl = $relatedUrl;
-
-        return $this;
-    }
-
-    /**
-     * @param array $included
-     *
-     * @return $this
-     */
-    public function setIncluded($included)
-    {
-        $this->included = $included;
 
         return $this;
     }

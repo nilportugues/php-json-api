@@ -210,6 +210,23 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * @param array $array
+     */
+    protected function recursiveSetKeysToUnderScore(array &$array)
+    {
+        $newArray = [];
+        foreach ($array as $key => &$value) {
+            $underscoreKey = $this->camelCaseToUnderscore($key);
+
+            $newArray[$underscoreKey] = $value;
+            if (is_array($value)) {
+                $this->recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
+            }
+        }
+        $array = $newArray;
+    }
+
+    /**
      * Array's type value becomes the key of the provided array.
      *
      * @param array $array
