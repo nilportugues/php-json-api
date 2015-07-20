@@ -5,7 +5,14 @@
 
 Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.
 
-## Usage: 
+## Installation
+The recommended way to install the Input Validator is through [Composer](http://getcomposer.org). Run the following command to install it:
+
+```sh
+php composer.phar require nilportugues/json-api
+```
+
+## Usage
 Given the following piece of code, defining a Blog Post and some Comments, we'll examine how each transformer works:
 
 ```php
