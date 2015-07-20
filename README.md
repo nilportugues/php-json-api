@@ -36,6 +36,8 @@ $post = new Post(
 ### JSON 
 Given a PHP object, the JSON transformer will transform it to a valid JSON representation. It will preserve the data structure given by the properties of the classes and arrays used by the PHP Object.
 
+Notice **all keys are normalized to under_score**. This differs from the `JsonTransformer` class provided by the `nilportugues/serializer` library.
+
 **Code:**
 
 ```php
@@ -50,25 +52,26 @@ echo $serializer->serialize($post);
 
 **Output:**
 
+
 ```json
 {
-    "postId": 9,
+    "post_id": 9,
     "title": "Hello World",
     "content": "Your first post",
     "author": {
-        "userId": 1,
+        "user_id": 1,
         "name": "Post Author"
     },
     "comments": [
         {
-            "commentId": 1000,
+            "comment_id": 1000,
             "dates": {
                 "created_at": "2015-07-18T13:34:55+02:00",
                 "accepted_at": "2015-07-18T14:09:55+02:00"
             },
             "comment": "Have no fear, sers, your king is safe.",
             "user": {
-                "userId": 2,
+                "user_id": 2,
                 "name": "Barristan Selmy"
             }
         }
