@@ -30,16 +30,23 @@ $post = new Post(
 
 
 $postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
-$postMapping->addRelationship('comments', ['href' => 'http://example.com/posts/{postId}/relationships/comments']);
+$postMapping->setClassAlias('Message');
+$postMapping->addPropertyAlias('title', 'headline');
+$postMapping->addPropertyAlias('content', 'body');
+$postMapping->addRelationship(User::class, 'http://example.com/posts/relationships/author/{userId}');
+$postMapping->hideProperty('comments');
+print_r($postMapping);
+
 
 
 $postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
+$postIdMapping->addRelationship(Comment::class, 'http://example.com/posts/{postId}/relationships/comments');
 
 $userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
 $userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
 
 $commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
-$postMapping->addRelationship('users', ['href' => 'http://example.com/comments/{commentId}/relationships/users']);
+$commentMapping->addRelationship(Post::class, 'http://example.com/posts/{postId}/relationships/comments');
 
 $commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}', ['commentId']);
 
@@ -56,7 +63,6 @@ $apiMappingCollection = [
 
 
 header('Content-Type: application/vnd.api+json; charset=utf-8');
-echo (new Serializer(new \NilPortugues\Api\Transformer\Json\JsonTransformer()))->serialize($post);
 
 $serializer = new JsonApiTransformer($apiMappingCollection);
 $serializer->setApiVersion('1.0');

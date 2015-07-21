@@ -7,6 +7,11 @@ use InvalidArgumentException;
 class Mapping
 {
     /**
+     * @var string
+     */
+    private $classAlias = '';
+
+    /**
      * @var array
      */
     private $aliasedProperties = [];
@@ -43,6 +48,25 @@ class Mapping
     }
 
     /**
+     * @param string $aliasedClass
+     *
+     * @return $this
+     */
+    public function setClassAlias($aliasedClass)
+    {
+        $this->classAlias = $aliasedClass;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassAlias()
+    {
+        return $this->classAlias;
+    }
+
+    /**
      * @return array
      */
     public function getIdProperties()
@@ -76,17 +100,9 @@ class Mapping
 
     /**
      * @param string $propertyName
-     *
-     * @throws InvalidArgumentException
      */
     public function hideProperty($propertyName)
     {
-        if (false === in_array($propertyName, $this->hiddenProperties, true)) {
-            throw new InvalidArgumentException(
-                sprintf('Property %s already to be hidden'),
-                $propertyName
-            );
-        }
         $this->hiddenProperties[] = $propertyName;
     }
 

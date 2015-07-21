@@ -295,8 +295,12 @@ class JsonApiTransformer extends Transformer
                         [self::DATA_KEY => $this->setResponseDataTypeAndId($value)]
                     );
                 }
+
             }
         }
+
+
+
 
         return $data;
     }
@@ -354,8 +358,11 @@ class JsonApiTransformer extends Transformer
 
                                 $relationships[$propertyName] = array_merge(
                                     $selfLink,
-                                    [self::DATA_KEY => [$propertyName => $this->setResponseDataTypeAndId($attribute)]]
+                                    [self::DATA_KEY => [$propertyName => $this->setResponseDataTypeAndId($attribute)]],
+                                    $this->mappings[$type]->getRelationships()
                                 );
+
+
 
                                 continue;
                             }
@@ -369,17 +376,18 @@ class JsonApiTransformer extends Transformer
                         if (array_key_exists(self::ID_KEY, $includedData) && !empty($includedData[self::ID_KEY])) {
                             $selfLink = $this->setResponseDataLinks($value);
 
-                            $data[self::INCLUDED_KEY][] = array_merge(
+                            $data[self::INCLUDED_KEY][] = array_filter(array_merge(
                                 [
                                     self::TYPE_KEY => $includedData[self::TYPE_KEY],
                                     self::ID_KEY => $includedData[self::ID_KEY],
                                     self::ATTRIBUTES_KEY => $attributes,
                                 ],
-                                $selfLink,
-                                [self::RELATIONSHIPS_KEY => $relationships]
-                            );
+                                $selfLink
+                            ));
                         }
                     }
+
+
 
                     continue;
                 }
