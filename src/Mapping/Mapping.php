@@ -2,15 +2,12 @@
 
 namespace NilPortugues\Api\Mapping;
 
-use InvalidArgumentException;
-
 class Mapping
 {
     /**
      * @var string
      */
     private $classAlias = '';
-
     /**
      * @var array
      */
@@ -19,21 +16,43 @@ class Mapping
      * @var array
      */
     private $hiddenProperties = [];
-
     /**
      * @var array
      */
     private $idProperties = [];
-
     /**
      * @var array
      */
     private $relationships = [];
-
     /**
      * @var array
      */
     private $metaData = [];
+    /**
+     * @var string
+     */
+    private $firstUrl = '';
+    /**
+     * @var string
+     */
+    private $lastUrl = '';
+    /**
+     * @var string
+     */
+    private $prevUrl = '';
+    /**
+     * @var string
+     */
+    private $nextUrl = '';
+    /**
+     * @var string
+     */
+    private $selfUrl = '';
+
+    /**
+     * @var string
+     */
+    private $relatedUrl = '';
 
     /**
      * @param       $className
@@ -48,6 +67,14 @@ class Mapping
     }
 
     /**
+     * @return string
+     */
+    public function getClassAlias()
+    {
+        return $this->classAlias;
+    }
+
+    /**
      * @param string $aliasedClass
      *
      * @return $this
@@ -55,15 +82,8 @@ class Mapping
     public function setClassAlias($aliasedClass)
     {
         $this->classAlias = $aliasedClass;
-        return $this;
-    }
 
-    /**
-     * @return string
-     */
-    public function getClassAlias()
-    {
-        return $this->classAlias;
+        return $this;
     }
 
     /**
@@ -113,6 +133,31 @@ class Mapping
     public function addPropertyAlias($propertyName, $propertyAlias)
     {
         $this->aliasedProperties[$propertyName] = $propertyAlias;
+
+        $this->updatePropertyMappings($propertyName, $propertyAlias);
+    }
+
+    /**
+     * @param $propertyName
+     * @param $propertyAlias
+     */
+    private function updatePropertyMappings($propertyName, $propertyAlias)
+    {
+        if (in_array($propertyName, $this->idProperties)) {
+            $position = array_search($propertyName, $this->idProperties, true);
+            $this->idProperties[$position] = $propertyAlias;
+        }
+
+        $search = sprintf('{%s}', $propertyName);
+        $replace = sprintf('{%s}', $propertyAlias);
+
+        $this->firstUrl = str_replace($search, $replace, $this->firstUrl);
+        $this->lastUrl = str_replace($search, $replace, $this->lastUrl);
+        $this->prevUrl = str_replace($search, $replace, $this->prevUrl);
+        $this->nextUrl = str_replace($search, $replace, $this->nextUrl);
+        $this->selfUrl = str_replace($search, $replace, $this->selfUrl);
+        $this->relatedUrl = str_replace($search, $replace, $this->relatedUrl);
+        $this->resourceUrlPattern = str_replace($search, $replace, $this->resourceUrlPattern);
     }
 
     /**
@@ -121,6 +166,10 @@ class Mapping
     public function setPropertyNameAliases(array $properties)
     {
         $this->aliasedProperties = array_merge($this->aliasedProperties, $properties);
+
+        foreach ($this->aliasedProperties as $propertyName => $propertyAlias) {
+            $this->updatePropertyMappings($propertyName, $propertyAlias);
+        }
     }
 
     /**
@@ -159,7 +208,7 @@ class Mapping
      */
     public function setHiddenProperties(array $hidden)
     {
-        $this->hiddenProperties = array_merge($this->hiddenProperties, array_values($hidden));
+        $this->hiddenProperties = array_merge($this->hiddenProperties, $hidden);
     }
 
     /**
@@ -186,6 +235,7 @@ class Mapping
     {
         $this->relationships[$key] = $value;
     }
+
     /**
      * @return array
      */
@@ -204,10 +254,118 @@ class Mapping
 
     /**
      * @param string $key
-     * @param $value
+     * @param        $value
      */
     public function addMetaData($key, $value)
     {
         $this->metaData[$key] = $value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSelfUrl()
+    {
+        return $this->selfUrl;
+    }
+
+    /**
+     * @param string $self
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setSelfUrl($self)
+    {
+        $this->selfUrl = (string) $self;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrevUrl()
+    {
+        return $this->prevUrl;
+    }
+
+    /**
+     * @param string $prevUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setPrevUrl($prevUrl)
+    {
+        $this->prevUrl = (string) $prevUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNextUrl()
+    {
+        return $this->nextUrl;
+    }
+
+    /**
+     * @param string $nextUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setNextUrl($nextUrl)
+    {
+        $this->nextUrl = (string) $nextUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastUrl()
+    {
+        return $this->lastUrl;
+    }
+
+    /**
+     * @param string $lastUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setLastUrl($lastUrl)
+    {
+        $this->lastUrl = (string) $lastUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstUrl()
+    {
+        return $this->firstUrl;
+    }
+
+    /**
+     * @param string $firstUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setFirstUrl($firstUrl)
+    {
+        $this->firstUrl = (string) $firstUrl;
+    }
+
+    /**
+     * @param string $relatedUrl
+     *
+     * @return $this
+     */
+    public function setRelatedUrl($relatedUrl)
+    {
+        $this->relatedUrl = (string) $relatedUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelatedUrl()
+    {
+        return $this->relatedUrl;
     }
 }

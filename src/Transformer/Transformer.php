@@ -13,26 +13,6 @@ abstract class Transformer implements StrategyInterface
      * @var Mapping[]
      */
     protected $mappings = [];
-    /**
-     * @var string
-     */
-    protected $firstUrl = '';
-    /**
-     * @var string
-     */
-    protected $lastUrl = '';
-    /**
-     * @var string
-     */
-    protected $prevUrl = '';
-    /**
-     * @var string
-     */
-    protected $nextUrl = '';
-    /**
-     * @var string
-     */
-    protected $selfUrl = '';
 
     /**
      * @param array $apiMappings
@@ -40,56 +20,6 @@ abstract class Transformer implements StrategyInterface
     public function __construct(array $apiMappings)
     {
         $this->mappings = $apiMappings;
-    }
-
-    /**
-     * @param string $self
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setSelfUrl($self)
-    {
-        $this->selfUrl = (string) $self;
-    }
-
-    /**
-     * @param string $firstUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setFirstUrl($firstUrl)
-    {
-        $this->firstUrl = (string) $firstUrl;
-    }
-
-    /**
-     * @param string $lastUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setLastUrl($lastUrl)
-    {
-        $this->lastUrl = (string) $lastUrl;
-    }
-
-    /**
-     * @param string $nextUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setNextUrl($nextUrl)
-    {
-        $this->nextUrl = (string) $nextUrl;
-    }
-
-    /**
-     * @param string $prevUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setPrevUrl($prevUrl)
-    {
-        $this->prevUrl = (string) $prevUrl;
     }
 
     /**
@@ -191,45 +121,66 @@ abstract class Transformer implements StrategyInterface
     /**
      * Renames a sets if keys for a given class using recursion.
      *
-     * @param array  $array      Array with data
-     * @param string $typeKey    Scope to do the replacement.
-     * @param array  $replaceMap Array holding the value to replace
+     * @param array  $array   Array with data
+     * @param string $typeKey Scope to do the replacement.
      */
-    protected function recursiveRenameKeyValue(array &$array, $typeKey, array &$replaceMap)
+    protected function recursiveRenameKeyValue(array &$array, $typeKey)
     {
-        $newArray = [];
-        foreach ($array as $key => &$value) {
-            if (!empty($replaceMap[$key]) && $typeKey == $value[Serializer::CLASS_IDENTIFIER_KEY]) {
-                $key = $replaceMap[$key];
+        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
+            $newArray = [];
+            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
+
+            if ($type === $typeKey) {
+                $replacements = $this->mappings[$typeKey]->getAliasedProperties();
+                if (!empty($replacements)) {
+                    foreach ($array as $key => &$value) {
+                        $key = (!empty($replacements[$key])) ? $replacements[$key] : $key;
+                        $newArray[$key] = $value;
+
+                        if (is_array($newArray[$key])) {
+                            $this->recursiveRenameKeyValue($newArray[$key], $typeKey);
+                        }
+                    }
+                }
             }
 
-            if (is_array($value)) {
-                $this->recursiveRenameKeyValue($newArray[$key], $typeKey, $replaceMap);
+            if (!empty($newArray)) {
+                $array = $newArray;
             }
         }
-        $array = $newArray;
     }
 
     /**
      * Removes a sets if keys for a given class using recursion.
      *
-     * @param array  $array        Array with data
-     * @param string $typeKey      Scope to do the replacement.
-     * @param array  $keysToDelete Array holding the value to hide
+     * @param array  $array   Array with data
+     * @param string $typeKey Scope to do the replacement.
      */
-    protected function recursiveDeleteKeyValue(array &$array, $typeKey, array &$keysToDelete)
+    protected function recursiveDeleteKeyValue(array &$array, $typeKey)
     {
-        $newArray = [];
-        foreach ($array as $key => &$value) {
-            if (empty($keysToDelete[$key]) && $typeKey == $value[Serializer::CLASS_IDENTIFIER_KEY]) {
-                $newArray[$key] = $value;
+        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
+            $newArray = [];
+            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
+
+            if ($type === $typeKey) {
+                $deletions = $this->mappings[$typeKey]->getHiddenProperties();
+
+                if (!empty($deletions)) {
+                    foreach ($array as $key => &$value) {
+                        if (!in_array($key, $deletions, true)) {
+                            $newArray[$key] = $value;
+                            if (is_array($newArray[$key])) {
+                                $this->recursiveDeleteKeyValue($newArray[$key], $typeKey);
+                            }
+                        }
+                    }
+                }
             }
 
-            if (is_array($value)) {
-                $this->recursiveRenameKeyValue($newArray[$key], $typeKey, $keysToDelete);
+            if (!empty($newArray)) {
+                $array = $newArray;
             }
         }
-        $array = $newArray;
     }
 
     /**

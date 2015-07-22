@@ -8,9 +8,11 @@ use NilPortugues\Tests\Api\Dummy\ComplexObject\User;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\CommentId;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\PostId;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\UserId;
+use NilPortugues\Tests\Api\Dummy\SimpleObject\Post as SimplePost;
 
 include 'vendor/autoload.php';
 
+/*
 $comment1 = new Comment(
     new CommentId(1000),
     "Have no fear, sers, your king is safe.",
@@ -71,3 +73,22 @@ $serializer->setNextUrl('http://example.com/posts/2');
 $serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 echo (new Serializer($serializer))->serialize($post);
+*/
+
+
+$post = new SimplePost(1, 'post title', 'post body', 2);
+
+for ($i = 1;$i <= 5; ++$i) {
+    $userId = $i * 5;
+    $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
+    $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
+}
+
+$postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+$postMapping->setPropertyNameAliases(['title' => 'headline', 'body' => 'post']);
+$jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+
+header('Content-Type: application/vnd.api+json; charset=utf-8');
+
+echo (new Serializer($jsonApiSerializer))->serialize($post);

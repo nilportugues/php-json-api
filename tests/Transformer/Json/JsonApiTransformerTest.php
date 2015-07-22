@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Tests\Api\Transformer\Json;
 
 use DateTime;
@@ -25,6 +24,9 @@ use NilPortugues\Tests\Api\Dummy\SimpleObject\Post as SimplePost;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     *
+     */
     public function testItWillSerializeToJsonApiAComplexObject()
     {
         $post = new Post(
@@ -49,6 +51,10 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         );
 
         $postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
+        $postMapping->setSelfUrl('http://example.com/posts/1');
+        $postMapping->setFirstUrl('http://example.com/posts/1');
+        $postMapping->setNextUrl('http://example.com/posts/2');
+
         $postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
         $userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
         $userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
@@ -97,10 +103,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             },
             "links": {
                 "self": "http://example.com/users/1"
-            },
-            "relationships": [
-
-            ]
+            }
         },
         {
             "type": "user",
@@ -110,10 +113,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             },
             "links": {
                 "self": "http://example.com/users/2"
-            },
-            "relationships": [
-
-            ]
+            }
         },
         {
             "type": "comment",
@@ -127,19 +127,6 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             },
             "links": {
                 "self": "http://example.com/comments/1000"
-            },
-            "relationships": {
-                "user": {
-                    "links": {
-                        "self": "http://example.com/users/2"
-                    },
-                    "data": {
-                        "user": {
-                            "type": "user",
-                            "id": "2"
-                        }
-                    }
-                }
             }
         }
     ],
@@ -164,9 +151,6 @@ JSON;
 
         $transformer = new JsonApiTransformer($mappings);
         $transformer->setApiVersion('1.0');
-        $transformer->setSelfUrl('http://example.com/posts/1');
-        $transformer->setFirstUrl('http://example.com/posts/1');
-        $transformer->setNextUrl('http://example.com/posts/2');
         $transformer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
         $this->assertEquals(
@@ -175,6 +159,9 @@ JSON;
         );
     }
 
+    /**
+     *
+     */
     public function testItWillSerializeToJsonApiASimpleObject()
     {
         $post = new SimplePost(1, 'post title', 'post body', 2);
@@ -246,6 +233,153 @@ JSON;
         );
     }
 
+    /**
+     *
+     */
+    public function testItWillRenamePropertiesFromClass()
+    {
+        $post = new SimplePost(1, 'post title', 'post body', 2);
+
+        for ($i = 1;$i <= 5; ++$i) {
+            $userId = $i * 5;
+            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
+            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
+        }
+
+        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setPropertyNameAliases(['title' => 'headline', 'body' => 'post', 'postId' => 'someId']);
+        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $expected = <<<JSON
+{
+    "data": {
+        "type": "post",
+        "id": "1",
+        "attributes": {
+            "headline": "post title",
+            "post": "post body",
+            "author_id": 2,
+            "comments": [
+                {
+                    "comment_id": 10,
+                    "comment": "I am writing comment no. 1",
+                    "user_id": "User 5",
+                    "created_at": "2015-07-19T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 20,
+                    "comment": "I am writing comment no. 2",
+                    "user_id": "User 10",
+                    "created_at": "2015-07-20T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 30,
+                    "comment": "I am writing comment no. 3",
+                    "user_id": "User 15",
+                    "created_at": "2015-07-21T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 40,
+                    "comment": "I am writing comment no. 4",
+                    "user_id": "User 20",
+                    "created_at": "2015-07-22T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 50,
+                    "comment": "I am writing comment no. 5",
+                    "user_id": "User 25",
+                    "created_at": "2015-07-23T12:48:00+02:00"
+                }
+            ]
+        },
+        "links": {
+            "self": "/post/1"
+        },
+        "relationships": [
+
+        ]
+    }
+}
+JSON;
+
+        $this->assertEquals(
+            json_decode($expected, true),
+            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+        );
+    }
+
+    /**
+     *
+     */
+    public function testItWillHidePropertiesFromClass()
+    {
+        $post = new SimplePost(1, 'post title', 'post body', 2);
+
+        for ($i = 1;$i <= 5; ++$i) {
+            $userId = $i * 5;
+            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
+            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
+        }
+
+        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setHiddenProperties(['title', 'body']);
+        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $expected = <<<JSON
+{
+    "data": {
+        "type": "post",
+        "id": "1",
+        "attributes": {
+            "author_id": 2,
+            "comments": [
+                {
+                    "comment_id": 10,
+                    "comment": "I am writing comment no. 1",
+                    "user_id": "User 5",
+                    "created_at": "2015-07-19T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 20,
+                    "comment": "I am writing comment no. 2",
+                    "user_id": "User 10",
+                    "created_at": "2015-07-20T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 30,
+                    "comment": "I am writing comment no. 3",
+                    "user_id": "User 15",
+                    "created_at": "2015-07-21T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 40,
+                    "comment": "I am writing comment no. 4",
+                    "user_id": "User 20",
+                    "created_at": "2015-07-22T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 50,
+                    "comment": "I am writing comment no. 5",
+                    "user_id": "User 25",
+                    "created_at": "2015-07-23T12:48:00+02:00"
+                }
+            ]
+        },
+        "links": {
+            "self": "/post/1"
+        },
+        "relationships": [
+
+        ]
+    }
+}
+JSON;
+
+        $this->assertEquals(
+            json_decode($expected, true),
+            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+        );
+    }
 /*
     public function testItWillSerializeToJsonApiAnArrayOfObjects()
     {
