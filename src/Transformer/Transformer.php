@@ -73,7 +73,7 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * @param $nextUrl
+     * @param string $nextUrl
      *
      * @throws \InvalidArgumentException
      */
@@ -83,7 +83,7 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * @param $prevUrl
+     * @param string $prevUrl
      *
      * @throws \InvalidArgumentException
      */
@@ -93,6 +93,8 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * Represents the provided $value as a serialized value in string format.
+     *
      * @param mixed $value
      *
      * @return string
@@ -100,11 +102,13 @@ abstract class Transformer implements StrategyInterface
     abstract public function serialize($value);
 
     /**
-     * @param $value
+     * Unserialization will fail. This is a transformer.
+     *
+     * @param string $value
      *
      * @throws InvalidArgumentException
      *
-     * @return array
+     *  @return array
      */
     public function unserialize($value)
     {
@@ -112,7 +116,7 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * Converts a underscore string to camelCase.
+     * Converts a under_score string to camelCase.
      *
      * @param string $string
      *
@@ -124,6 +128,8 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * Removes array keys matching the $unwatedKeys array by using recursion.
+     *
      * @param array $array
      * @param array $unwantedKey
      */
@@ -143,6 +149,8 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * Replaces the Serializer array structure representing scalar values to the actual scalar value using recursion.
+     *
      * @param array $array
      */
     protected function recursiveSetValues(array &$array)
@@ -161,6 +169,8 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * Simplifies the data structure by removing an array level if data is scalar and has one element in array.
+     *
      * @param array $array
      */
     protected function recursiveFlattenOneElementObjectsToScalarType(array &$array)
@@ -179,37 +189,52 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * @param array $array
-     * @param array $replaceMap
-     */
-    protected function recursiveChangeKeyNames(array &$array, array $replaceMap)
-    {
-    }
-
-    /**
-     * Renames a key in an array.
+     * Renames a sets if keys for a given class using recursion.
      *
-     * @param array    $array    Array with data
-     * @param string   $typeKey  Scope to do the replacement.
-     * @param string   $key      Name of the key holding the value to replace
-     * @param \Closure $callable Callable with replacement logic
+     * @param array  $array      Array with data
+     * @param string $typeKey    Scope to do the replacement.
+     * @param array  $replaceMap Array holding the value to replace
      */
-    protected function recursiveChangeKeyValue(array &$array, $typeKey, $key, \Closure $callable)
+    protected function recursiveRenameKeyValue(array &$array, $typeKey, array &$replaceMap)
     {
+        $newArray = [];
+        foreach ($array as $key => &$value) {
+            if (!empty($replaceMap[$key]) && $typeKey == $value[Serializer::CLASS_IDENTIFIER_KEY]) {
+                $key = $replaceMap[$key];
+            }
+
+            if (is_array($value)) {
+                $this->recursiveRenameKeyValue($newArray[$key], $typeKey, $replaceMap);
+            }
+        }
+        $array = $newArray;
     }
 
     /**
-     * Adds a value to an existing identifiable entity containing @type.
+     * Removes a sets if keys for a given class using recursion.
      *
-     * @param array $array
-     * @param       $typeKey
-     * @param array $value
+     * @param array  $array        Array with data
+     * @param string $typeKey      Scope to do the replacement.
+     * @param array  $keysToDelete Array holding the value to hide
      */
-    protected function recursiveAddValue(array &$array, $typeKey, array $value)
+    protected function recursiveDeleteKeyValue(array &$array, $typeKey, array &$keysToDelete)
     {
+        $newArray = [];
+        foreach ($array as $key => &$value) {
+            if (empty($keysToDelete[$key]) && $typeKey == $value[Serializer::CLASS_IDENTIFIER_KEY]) {
+                $newArray[$key] = $value;
+            }
+
+            if (is_array($value)) {
+                $this->recursiveRenameKeyValue($newArray[$key], $typeKey, $keysToDelete);
+            }
+        }
+        $array = $newArray;
     }
 
     /**
+     * Changes all array keys to under_score format using recursion.
+     *
      * @param array $array
      */
     protected function recursiveSetKeysToUnderScore(array &$array)
@@ -227,7 +252,7 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * Array's type value becomes the key of the provided array.
+     * Array's type value becomes the key of the provided array using recursion.
      *
      * @param array $array
      */
@@ -247,7 +272,9 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * @param $key
+     * Given a class name will return its name without the namespace and in under_score to be used as a key in an array.
+     *
+     * @param string $key
      *
      * @return string
      */
@@ -260,7 +287,9 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * @param        $camel
+     * Transforms a given string from camelCase to under_score style.
+     *
+     * @param string $camel
      * @param string $splitter
      *
      * @return string
