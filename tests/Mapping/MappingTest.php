@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\Api\Mapping;
 
 use NilPortugues\Api\Mapping\Mapping;
@@ -25,11 +26,7 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->mapping = new Mapping(
-            Post::class,
-            'http://example.com/posts/{postId}',
-            ['postId']
-        );
+        $this->mapping = new Mapping(Post::class,  'http://example.com/posts/{postId}', ['postId']);
     }
 
     /**
@@ -56,8 +53,10 @@ class MappingTest extends \PHPUnit_Framework_TestCase
     public function testAliasedProperties()
     {
         $this->mapping->setPropertyNameAliases(['oldName' => 'newName']);
-
         $this->assertEquals(['oldName' => 'newName'], $this->mapping->getAliasedProperties());
+
+        $this->mapping->addPropertyAlias('oldName2', 'newName2');
+        $this->assertEquals(['oldName' => 'newName', 'oldName2' => 'newName2'], $this->mapping->getAliasedProperties());
     }
 
     /**
@@ -66,8 +65,10 @@ class MappingTest extends \PHPUnit_Framework_TestCase
     public function testHiddenProperties()
     {
         $this->mapping->setHiddenProperties(['propertyName']);
-
         $this->assertEquals(['propertyName'], $this->mapping->getHiddenProperties());
+
+        $this->mapping->hideProperty('secondProperty');
+        $this->assertEquals(['propertyName', 'secondProperty'], $this->mapping->getHiddenProperties());
     }
 
     /**
@@ -76,6 +77,9 @@ class MappingTest extends \PHPUnit_Framework_TestCase
     public function testIdProperties()
     {
         $this->assertEquals(['postId'], $this->mapping->getIdProperties());
+
+        $this->mapping->addIdProperty('userId');
+        $this->assertEquals(['postId', 'userId'], $this->mapping->getIdProperties());
     }
 
     /**
@@ -83,6 +87,13 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testRelationships()
     {
+        $this->mapping->setRelationships(['friends' => '/api/user/{userId}/friends']);
+        $this->mapping->addRelationship('family', '/api/user/{userId}/family');
+
+        $this->assertEquals(
+            ['friends' => '/api/user/{userId}/friends', 'family' => '/api/user/{userId}/family'],
+            $this->mapping->getRelationships()
+        );
     }
 
     /**
@@ -90,6 +101,13 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testMetaData()
     {
+        $this->mapping->setMetaData(['author' => 'Nil Portugués']);
+        $this->mapping->addMetaData('created_in', '0.00001232 seconds');
+
+        $this->assertEquals(
+            ['author' => 'Nil Portugués', 'created_in' => '0.00001232 seconds'],
+            $this->mapping->getMetaData()
+        );
     }
 
     /**

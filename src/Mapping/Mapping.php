@@ -95,27 +95,11 @@ class Mapping
     }
 
     /**
-     * @param array $idProperties
-     */
-    public function setIdProperties(array $idProperties)
-    {
-        $this->idProperties = array_merge($this->idProperties, $idProperties);
-    }
-
-    /**
      * @param $idProperty
      */
     public function addIdProperty($idProperty)
     {
         $this->idProperties[] = (string) $idProperty;
-    }
-
-    /**
-     * @param string $resourceUrlPattern
-     */
-    public function setResourceUrlPattern($resourceUrlPattern)
-    {
-        $this->resourceUrlPattern = (string) $resourceUrlPattern;
     }
 
     /**
