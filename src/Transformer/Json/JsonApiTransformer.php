@@ -40,10 +40,6 @@ class JsonApiTransformer extends Transformer
      */
     private $relationships = [];
     /**
-     * @var array
-     */
-    private $included = [];
-    /**
      * @var string
      */
     private $relatedUrl = '';
@@ -56,18 +52,6 @@ class JsonApiTransformer extends Transformer
     public function setRelatedUrl($relatedUrl)
     {
         $this->relatedUrl = $relatedUrl;
-
-        return $this;
-    }
-
-    /**
-     * @param array $included
-     *
-     * @return $this
-     */
-    public function setIncluded($included)
-    {
-        $this->included = $included;
 
         return $this;
     }
@@ -111,9 +95,67 @@ class JsonApiTransformer extends Transformer
     /**
      * @param array $value
      *
+     * @throws \NilPortugues\Api\Transformer\TransformerException
+     *
      * @return string
      */
     public function serialize($value)
+    {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
+
+        if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
+            $data = [];
+            unset($value[Serializer::MAP_TYPE]);
+            foreach ($value[Serializer::SCALAR_VALUE] as $v) {
+                $data[] = $this->serializeObject($v);
+            }
+        } else {
+            $data = $this->serializeObject($value);
+        }
+
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function serializeObject(array $value)
+    {
+        $value = $this->preSerialization($value);
+        $data = $this->serialization($value);
+
+        return $this->postSerialization($data);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function preSerialization(array $value)
+    {
+        /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
+        foreach ($this->mappings as $class => $mapping) {
+            $this->recursiveDeletePropertiesNotInFilter($value, $class);
+            $this->recursiveDeleteProperties($value, $class);
+            $this->recursiveRenameKeyValue($value, $class);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function serialization(array &$value)
     {
         $data = [
             self::DATA_KEY => array_merge(
@@ -127,14 +169,11 @@ class JsonApiTransformer extends Transformer
         $copy = $this->removeTypeAndId($value);
 
         $this->setResponseDataIncluded($copy, $data);
-        $this->setResponseLinks($data);
+        $this->setResponseLinks($value, $data);
         $this->setResponseMeta($data);
         $this->setResponseVersion($data);
 
-        $this->recursiveSetValues($data);
-        $this->recursiveUnset($data, [Serializer::CLASS_IDENTIFIER_KEY]);
-
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $data;
     }
 
     /**
@@ -144,9 +183,8 @@ class JsonApiTransformer extends Transformer
      */
     private function setResponseDataTypeAndId(array &$value)
     {
-        $data = [];
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-        $data[self::TYPE_KEY] = $this->namespaceAsArrayKey($type);
+        $finalType = ($this->mappings[$type]->getClassAlias()) ? $this->mappings[$type]->getClassAlias() : $type;
 
         $ids = [];
         foreach (array_keys($value) as $propertyName) {
@@ -156,9 +194,10 @@ class JsonApiTransformer extends Transformer
             }
         }
 
-        $data[self::ID_KEY] = implode(self::ID_SEPARATOR, $ids);
-
-        return $data;
+        return [
+            self::TYPE_KEY => $this->namespaceAsArrayKey($finalType),
+            self::ID_KEY => implode(self::ID_SEPARATOR, $ids),
+        ];
     }
 
     /**
@@ -199,7 +238,6 @@ class JsonApiTransformer extends Transformer
      */
     private function setResponseDataAttributes(array &$array)
     {
-        $data = [];
         $attributes = [];
         $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
         $idProperties = $this->getIdProperties($type);
@@ -212,8 +250,8 @@ class JsonApiTransformer extends Transformer
             $keyName = $this->camelCaseToUnderscore($propertyName);
 
             if ((is_array($value)
-                && array_key_exists(Serializer::SCALAR_TYPE, $value)
-                && array_key_exists(Serializer::SCALAR_VALUE, $value))
+                    && array_key_exists(Serializer::SCALAR_TYPE, $value)
+                    && array_key_exists(Serializer::SCALAR_VALUE, $value))
                 && empty($this->mappings[$value[Serializer::SCALAR_TYPE]])
             ) {
                 $attributes[$keyName] = $value;
@@ -227,9 +265,7 @@ class JsonApiTransformer extends Transformer
             }
         }
 
-        $data[self::ATTRIBUTES_KEY] = $attributes;
-
-        return $data;
+        return [self::ATTRIBUTES_KEY => $attributes];
     }
 
     /**
@@ -277,6 +313,7 @@ class JsonApiTransformer extends Transformer
         if (!empty($this->mappings[$type])) {
             $idValues = [];
             $idProperties = $this->getIdProperties($type);
+
             foreach ($idProperties as &$propertyName) {
                 $idValues[] = $this->getIdValue($value[$propertyName]);
                 $propertyName = sprintf('{%s}', $propertyName);
@@ -318,18 +355,6 @@ class JsonApiTransformer extends Transformer
     }
 
     /**
-     * @param string $type
-     *
-     * @throws TransformerException
-     */
-    protected function hasMappingGuard($type)
-    {
-        if (empty($this->mappings[$type])) {
-            throw new TransformerException(sprintf('Provided type %s has no mapping.', $type));
-        }
-    }
-
-    /**
      * @param array $copy
      *
      * @return array
@@ -345,6 +370,18 @@ class JsonApiTransformer extends Transformer
         unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $copy;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @throws TransformerException
+     */
+    protected function hasMappingGuard($type)
+    {
+        if (empty($this->mappings[$type])) {
+            throw new TransformerException(sprintf('Provided type %s has no mapping.', $type));
+        }
     }
 
     /**
@@ -370,7 +407,8 @@ class JsonApiTransformer extends Transformer
 
                                 $relationships[$propertyName] = array_merge(
                                     $selfLink,
-                                    [self::DATA_KEY => [$propertyName => $this->setResponseDataTypeAndId($attribute)]]
+                                    [self::DATA_KEY => [$propertyName => $this->setResponseDataTypeAndId($attribute)]],
+                                    $this->mappings[$type]->getRelationships()
                                 );
 
                                 continue;
@@ -385,14 +423,15 @@ class JsonApiTransformer extends Transformer
                         if (array_key_exists(self::ID_KEY, $includedData) && !empty($includedData[self::ID_KEY])) {
                             $selfLink = $this->setResponseDataLinks($value);
 
-                            $data[self::INCLUDED_KEY][] = array_merge(
-                                [
-                                    self::TYPE_KEY => $includedData[self::TYPE_KEY],
-                                    self::ID_KEY => $includedData[self::ID_KEY],
-                                    self::ATTRIBUTES_KEY => $attributes,
-                                ],
-                                $selfLink,
-                                [self::RELATIONSHIPS_KEY => $relationships]
+                            $data[self::INCLUDED_KEY][] = array_filter(
+                                array_merge(
+                                    [
+                                        self::TYPE_KEY => $includedData[self::TYPE_KEY],
+                                        self::ID_KEY => $includedData[self::ID_KEY],
+                                        self::ATTRIBUTES_KEY => $attributes,
+                                    ],
+                                    $selfLink
+                                )
                             );
                         }
                     }
@@ -424,26 +463,28 @@ class JsonApiTransformer extends Transformer
     }
 
     /**
+     * @param array $value
      * @param array $data
      */
-    private function setResponseLinks(array &$data)
+    private function setResponseLinks(array $value, array &$data)
     {
-        if (!empty($this->selfUrl)
-            || !empty($this->firstUrl)
-            || !empty($this->lastUrl)
-            || !empty($this->prevUrl)
-            || !empty($this->nextUrl)
-            || !empty($this->relatedUrl)
-        ) {
-            $data[self::LINKS_KEY] = [
-                self::SELF_LINK => $this->selfUrl,
-                'first' => $this->firstUrl,
-                'last' => $this->lastUrl,
-                'prev' => $this->prevUrl,
-                'next' => $this->nextUrl,
-                'related' => $this->relatedUrl,
-            ];
-            $data[self::LINKS_KEY] = array_filter($data[self::LINKS_KEY]);
+        if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
+            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+
+            $links = array_filter(
+                [
+                    self::SELF_LINK => $this->mappings[$type]->getSelfUrl(),
+                    'first' => $this->mappings[$type]->getFirstUrl(),
+                    'last' => $this->mappings[$type]->getLastUrl(),
+                    'prev' => $this->mappings[$type]->getPrevUrl(),
+                    'next' => $this->mappings[$type]->getNextUrl(),
+                    'related' => $this->mappings[$type]->getRelatedUrl(),
+                ]
+            );
+
+            if ($links) {
+                $data[self::LINKS_KEY] = $links;
+            }
         }
     }
 
@@ -465,6 +506,19 @@ class JsonApiTransformer extends Transformer
         if (!empty($this->apiVersion)) {
             $response[self::JSON_API_KEY][self::VERSION_KEY] = $this->apiVersion;
         }
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    private function postSerialization(array $data)
+    {
+        $this->recursiveSetValues($data);
+        $this->recursiveUnset($data, [Serializer::CLASS_IDENTIFIER_KEY]);
+
+        return $data;
     }
 
     /**

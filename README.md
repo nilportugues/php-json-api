@@ -5,6 +5,14 @@
 
 Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.
 
+## Purpose
+
+Web APIs are quick becoming the centerpiece of today entreprises and business, big or small, and allow us **to connect anything and everything**. By exposing data and application functionality to external applications **any organization can remake its business into an extensible platform**. 
+
+API are a mandated requirement for today's modern enterprise, **enabling interactions with customers** over new mobility and social channels and evolving ways to **reach new customers through partner and third party applications**.
+
+The provided **JSON API package** will allow you to **accomplish this goal in no time**.
+
 ## Installation
 The recommended way to install the  JSON API Transformers is through [Composer](http://getcomposer.org). Run the following command to install it:
 
@@ -43,6 +51,8 @@ $post = new Post(
 ### JSON 
 Given a PHP object, the JSON transformer will transform it to a valid JSON representation. It will preserve the data structure given by the properties of the classes and arrays used by the PHP Object.
 
+Notice **all keys are normalized to under_score**. This differs from the `JsonTransformer` class provided by the `nilportugues/serializer` library.
+
 **Code:**
 
 ```php
@@ -57,25 +67,26 @@ echo $serializer->serialize($post);
 
 **Output:**
 
+
 ```json
 {
-    "postId": 9,
+    "post_id": 9,
     "title": "Hello World",
     "content": "Your first post",
     "author": {
-        "userId": 1,
+        "user_id": 1,
         "name": "Post Author"
     },
     "comments": [
         {
-            "commentId": 1000,
+            "comment_id": 1000,
             "dates": {
                 "created_at": "2015-07-18T13:34:55+02:00",
                 "accepted_at": "2015-07-18T14:09:55+02:00"
             },
             "comment": "Have no fear, sers, your king is safe.",
             "user": {
-                "userId": 2,
+                "user_id": 2,
                 "name": "Barristan Selmy"
             }
         }
@@ -258,7 +269,7 @@ Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will 
 
 
 ## Quality Code
-Testing has been done using PHPUnit and [Travis-CI](https://travis-ci.org). All code has been tested to be compatible from PHP 5.5 and [HHVM](http://hhvm.com/).
+Testing has been done using PHPUnit and [Travis-CI](https://travis-ci.org). All code has been tested to be compatible from PHP 5.5 and above, plus [HHVM](http://hhvm.com/).
 
 To run the test suite, you need [Composer](http://getcomposer.org):
 
@@ -267,6 +278,9 @@ To run the test suite, you need [Composer](http://getcomposer.org):
     php bin/phpunit
 ```
 
+
+## Questions?
+Drop me an e-mail or get in touch with me using [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nilportugues/json-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Author
 Nil Portugués Calderó
