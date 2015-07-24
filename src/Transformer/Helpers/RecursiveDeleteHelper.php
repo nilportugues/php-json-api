@@ -25,11 +25,7 @@ final class RecursiveDeleteHelper
      */
     public static function deleteKeys(array &$array, array $unwantedKey)
     {
-        foreach ($unwantedKey as $key) {
-            if (array_key_exists($key, $array)) {
-                unset($array[$key]);
-            }
-        }
+        self::unsetKeys($array, $unwantedKey);
 
         foreach ($array as &$value) {
             if (is_array($value)) {
@@ -95,6 +91,19 @@ final class RecursiveDeleteHelper
             $deletions = $mappings[$typeKey]->getHiddenProperties();
             if (!empty($deletions)) {
                 self::deleteNextLevelProperties($mappings, $array, $typeKey, $deletions, $newArray);
+            }
+        }
+    }
+
+    /**
+     * @param array $array
+     * @param array $unwantedKey
+     */
+    private static function unsetKeys(array &$array, array &$unwantedKey)
+    {
+        foreach ($unwantedKey as $key) {
+            if (array_key_exists($key, $array)) {
+                unset($array[$key]);
             }
         }
     }

@@ -21,16 +21,10 @@ final class RecursiveFormatterHelper
      */
     public static function formatScalarValues(array &$array)
     {
-        if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
-            $array = $array[Serializer::SCALAR_VALUE];
-        }
+        $array = self::arrayToScalarValue($array);
 
         if (is_array($array) && !array_key_exists(Serializer::SCALAR_VALUE, $array)) {
-            foreach ($array as &$value) {
-                if (is_array($value)) {
-                    self::formatScalarValues($value);
-                }
-            }
+            self::loopScalarValues($array, 'formatScalarValues');
         }
     }
 
@@ -46,10 +40,33 @@ final class RecursiveFormatterHelper
         }
 
         if (is_array($array)) {
-            foreach ($array as &$value) {
-                if (is_array($value)) {
-                    self::flattenObjectsWithSingleKeyScalars($value);
-                }
+            self::loopScalarValues($array, 'flattenObjectsWithSingleKeyScalars');
+        }
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private static function arrayToScalarValue(array &$array)
+    {
+        if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
+            $array = $array[Serializer::SCALAR_VALUE];
+        }
+
+        return $array;
+    }
+
+    /**
+     * @param array  $array
+     * @param string $method
+     */
+    private static function loopScalarValues(array &$array, $method)
+    {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                self::$method($value);
             }
         }
     }
