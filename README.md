@@ -5,6 +5,14 @@
 
 Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.
 
+## Purpose
+
+Web APIs are quick becoming the centerpiece of today entreprises and business, big or small, and allow us **to connect anything and everything**. By exposing data and application functionality to external applications **any organization can remake its business into an extensible platform**. 
+
+API Management is a mandated requirement for today's modern enterprise, **enabling interactions with customers** over new mobility and social channels and evolving ways to **reach new customers through partner and third party applications**.
+
+The provided **JSON API package** will allow you to **accomplish this goal in no time**.
+
 ## Installation
 The recommended way to install the  JSON API Transformers is through [Composer](http://getcomposer.org). Run the following command to install it:
 
