@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Tests\Api\Transformer\Json;
 
 use DateTime;
@@ -165,13 +164,7 @@ JSON;
      */
     public function testItWillSerializeToJsonApiASimpleObject()
     {
-        $post = new SimplePost(1, 'post title', 'post body', 2);
-
-        for ($i = 1;$i <= 5; ++$i) {
-            $userId = $i * 5;
-            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
-            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
-        }
+        $post = $this->createSimplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
@@ -239,13 +232,7 @@ JSON;
      */
     public function testItWillRenamePropertiesFromClass()
     {
-        $post = new SimplePost(1, 'post title', 'post body', 2);
-
-        for ($i = 1;$i <= 5; ++$i) {
-            $userId = $i * 5;
-            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
-            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
-        }
+        $post = $this->createSimplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setPropertyNameAliases(['title' => 'headline', 'body' => 'post', 'postId' => 'someId']);
@@ -314,13 +301,7 @@ JSON;
      */
     public function testItWillHidePropertiesFromClass()
     {
-        $post = new SimplePost(1, 'post title', 'post body', 2);
-
-        for ($i = 1;$i <= 5; ++$i) {
-            $userId = $i * 5;
-            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
-            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
-        }
+        $post = $this->createSimplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setHiddenProperties(['title', 'body']);
@@ -381,9 +362,93 @@ JSON;
             json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
-/*
-    public function testItWillSerializeToJsonApiAnArrayOfObjects()
-    {
 
-    }*/
+    public function testTypeValueIsChangedByClassAlias()
+    {
+        $post = $this->createSimplePost();
+
+        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setClassAlias('Message');
+
+        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $expected = <<<JSON
+{
+    "data": {
+        "type": "message",
+        "id": "1",
+        "attributes": {
+            "title": "post title",
+            "body": "post body",
+            "author_id": 2,
+            "comments": [
+                {
+                    "comment_id": 10,
+                    "comment": "I am writing comment no. 1",
+                    "user_id": "User 5",
+                    "created_at": "2015-07-19T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 20,
+                    "comment": "I am writing comment no. 2",
+                    "user_id": "User 10",
+                    "created_at": "2015-07-20T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 30,
+                    "comment": "I am writing comment no. 3",
+                    "user_id": "User 15",
+                    "created_at": "2015-07-21T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 40,
+                    "comment": "I am writing comment no. 4",
+                    "user_id": "User 20",
+                    "created_at": "2015-07-22T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 50,
+                    "comment": "I am writing comment no. 5",
+                    "user_id": "User 25",
+                    "created_at": "2015-07-23T12:48:00+02:00"
+                }
+            ]
+        },
+        "links": {
+            "self": "/post/1"
+        },
+        "relationships": [
+
+        ]
+    }
+}
+JSON;
+
+        $this->assertEquals(
+            json_decode($expected, true),
+            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+        );
+    }
+
+    /**
+     * @return SimplePost
+     */
+    private function createSimplePost()
+    {
+        $post = new SimplePost(1, 'post title', 'post body', 2);
+
+        for ($i = 1; $i <= 5; ++$i) {
+            $userId = $i * 5;
+            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
+            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
+        }
+
+        return $post;
+    }
+
+    /*
+        public function testItWillSerializeToJsonApiAnArrayOfObjects()
+        {
+
+        }*/
 }

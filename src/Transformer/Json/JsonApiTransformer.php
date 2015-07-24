@@ -163,9 +163,8 @@ class JsonApiTransformer extends Transformer
      */
     private function setResponseDataTypeAndId(array &$value)
     {
-        $data = [];
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-        $data[self::TYPE_KEY] = $this->namespaceAsArrayKey($type);
+        $finalType = ($this->mappings[$type]->getClassAlias()) ? $this->mappings[$type]->getClassAlias() : $type;
 
         $ids = [];
         foreach (array_keys($value) as $propertyName) {
@@ -175,9 +174,10 @@ class JsonApiTransformer extends Transformer
             }
         }
 
-        $data[self::ID_KEY] = implode(self::ID_SEPARATOR, $ids);
-
-        return $data;
+        return [
+            self::TYPE_KEY => $this->namespaceAsArrayKey($finalType),
+            self::ID_KEY => implode(self::ID_SEPARATOR, $ids),
+        ];
     }
 
     /**
@@ -218,7 +218,6 @@ class JsonApiTransformer extends Transformer
      */
     private function setResponseDataAttributes(array &$array)
     {
-        $data = [];
         $attributes = [];
         $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
         $idProperties = $this->getIdProperties($type);
@@ -246,9 +245,7 @@ class JsonApiTransformer extends Transformer
             }
         }
 
-        $data[self::ATTRIBUTES_KEY] = $attributes;
-
-        return $data;
+        return [self::ATTRIBUTES_KEY => $attributes];
     }
 
     /**
