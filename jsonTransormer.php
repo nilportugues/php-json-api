@@ -66,39 +66,9 @@ $apiMappingCollection = [
 
 
 header('Content-Type: application/vnd.api+json; charset=utf-8');
-/*
 $serializer = new JsonApiTransformer($apiMappingCollection);
 $serializer->setApiVersion('1.0');
 
 $serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 echo (new Serializer($serializer))->serialize($post);
-
-*/
-/**
- * @return SimplePost
- */
-function createSimplePost()
-{
-    $post = new SimplePost(1, 'post title', 'post body', 2);
-
-    for ($i = 1; $i <= 5; ++$i) {
-        $userId = $i * 5;
-        $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
-        $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
-    }
-
-    return $post;
-}
-
-$postArray = [
-    createSimplePost(),
-    createSimplePost(),
-];
-
-$postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
-$postMapping->setFilterKeys(['body', 'title']);
-
-$jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
-
-echo ((new Serializer($jsonApiSerializer))->serialize($postArray));

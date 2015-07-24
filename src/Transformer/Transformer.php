@@ -4,6 +4,7 @@ namespace NilPortugues\Api\Transformer;
 
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Serializer\Serializer;
@@ -97,7 +98,7 @@ abstract class Transformer implements StrategyInterface
      */
     protected function recursiveDeletePropertiesNotInFilter(array &$array, $typeKey)
     {
-        RecursiveDeleteHelper::deletePropertiesNotInFilter($this->mappings, $array, $typeKey);
+        RecursiveFilterHelper::deletePropertiesNotInFilter($this->mappings, $array, $typeKey);
     }
 
     /**

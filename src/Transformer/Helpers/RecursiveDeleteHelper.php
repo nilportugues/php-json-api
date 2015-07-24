@@ -39,39 +39,25 @@ final class RecursiveDeleteHelper
     }
 
     /**
-     * Delete all keys except the ones considered identifier keys or defined in the filter.
-     *
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $array
-     * @param $typeKey
+     * @param string                              $typeKey
+     * @param array                               $deletions
+     * @param array                               $newArray
      */
-    public static function deletePropertiesNotInFilter(array &$mappings, array &$array, $typeKey)
-    {
-        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
-            $newArray = [];
-            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
-
-            if ($type === $typeKey) {
-                $keepKeys = $mappings[$typeKey]->getFilterKeys();
-                $idProperties = $mappings[$typeKey]->getIdProperties();
-
-                if (!empty($keepKeys)) {
-                    foreach ($array as $key => &$value) {
-                        if ($key == Serializer::CLASS_IDENTIFIER_KEY
-                            || (in_array($key, $keepKeys, true)
-                                || in_array($key, $idProperties, true))
-                        ) {
-                            $newArray[$key] = $value;
-                            if (is_array($newArray[$key])) {
-                                self::deletePropertiesNotInFilter($mappings, $newArray[$key], $typeKey);
-                            }
-                        }
-                    }
+    private static function deleteNextLevelProperties(
+        array &$mappings,
+        array &$array,
+        $typeKey,
+        array &$deletions,
+        array &$newArray
+    ) {
+        foreach ($array as $key => &$value) {
+            if (!in_array($key, $deletions, true)) {
+                $newArray[$key] = $value;
+                if (is_array($newArray[$key])) {
+                    self::deleteProperties($mappings, $newArray[$key], $typeKey);
                 }
-            }
-
-            if (!empty($newArray)) {
-                $array = $newArray;
             }
         }
     }
@@ -87,25 +73,28 @@ final class RecursiveDeleteHelper
     {
         if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
             $newArray = [];
-            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if ($type === $typeKey) {
-                $deletions = $mappings[$typeKey]->getHiddenProperties();
-
-                if (!empty($deletions)) {
-                    foreach ($array as $key => &$value) {
-                        if (!in_array($key, $deletions, true)) {
-                            $newArray[$key] = $value;
-                            if (is_array($newArray[$key])) {
-                                self::deleteProperties($mappings, $newArray[$key], $typeKey);
-                            }
-                        }
-                    }
-                }
-            }
+            self::deleteMatchedClassProperties($mappings, $array, $typeKey, $newArray);
 
             if (!empty($newArray)) {
                 $array = $newArray;
+            }
+        }
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param array                               $array
+     * @param string                              $typeKey
+     * @param array                               $newArray
+     */
+    private static function deleteMatchedClassProperties(array &$mappings, array &$array, $typeKey, array &$newArray)
+    {
+        $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
+        if ($type === $typeKey) {
+            $deletions = $mappings[$typeKey]->getHiddenProperties();
+            if (!empty($deletions)) {
+                self::deleteNextLevelProperties($mappings, $array, $typeKey, $deletions, $newArray);
             }
         }
     }
