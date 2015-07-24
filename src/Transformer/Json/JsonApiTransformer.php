@@ -336,7 +336,7 @@ class JsonApiTransformer extends Transformer
      */
     private function setResponseDataRelationship(array &$array)
     {
-        $data[self::RELATIONSHIPS_KEY] = [];
+        $data = [self::RELATIONSHIPS_KEY => []];
 
         foreach ($array as $propertyName => $value) {
             if (is_array($value) && array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
@@ -482,7 +482,7 @@ class JsonApiTransformer extends Transformer
                 ]
             );
 
-            if ($links) {
+            if (!empty($links)) {
                 $data[self::LINKS_KEY] = $links;
             }
         }

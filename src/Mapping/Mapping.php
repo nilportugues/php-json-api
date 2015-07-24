@@ -189,7 +189,7 @@ class Mapping
      */
     public function getHiddenProperties()
     {
-        return $this->hiddenProperties;
+        return (array) $this->hiddenProperties;
     }
 
     /**
