@@ -279,6 +279,9 @@ To run the test suite, you need [Composer](http://getcomposer.org):
 ```
 
 
+## Questions?
+Drop me an e-mail or get in touch with me using [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nilportugues/json-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 ## Author
 Nil Portugués Calderó
 
