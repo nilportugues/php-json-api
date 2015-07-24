@@ -3,6 +3,9 @@
 namespace NilPortugues\Api\Transformer;
 
 use NilPortugues\Api\Mapping\Mapping;
+use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
 
@@ -37,7 +40,7 @@ abstract class Transformer implements StrategyInterface
      *
      * @throws TransformerException
      *
-     *  @return array
+     * @return array
      */
     public function unserialize($value)
     {
@@ -52,17 +55,7 @@ abstract class Transformer implements StrategyInterface
      */
     protected function recursiveUnset(array &$array, array $unwantedKey)
     {
-        foreach ($unwantedKey as $key) {
-            if (array_key_exists($key, $array)) {
-                unset($array[$key]);
-            }
-        }
-
-        foreach ($array as &$value) {
-            if (is_array($value)) {
-                $this->recursiveUnset($value, $unwantedKey);
-            }
-        }
+        RecursiveDeleteHelper::deleteKeys($array, $unwantedKey);
     }
 
     /**
@@ -72,17 +65,7 @@ abstract class Transformer implements StrategyInterface
      */
     protected function recursiveSetValues(array &$array)
     {
-        if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
-            $array = $array[Serializer::SCALAR_VALUE];
-        }
-
-        if (is_array($array) && !array_key_exists(Serializer::SCALAR_VALUE, $array)) {
-            foreach ($array as &$value) {
-                if (is_array($value)) {
-                    $this->recursiveSetValues($value);
-                }
-            }
-        }
+        RecursiveFormatterHelper::formatScalarValues($array);
     }
 
     /**
@@ -92,17 +75,7 @@ abstract class Transformer implements StrategyInterface
      */
     protected function recursiveFlattenOneElementObjectsToScalarType(array &$array)
     {
-        if (1 === count($array) && is_scalar(end($array))) {
-            $array = array_pop($array);
-        }
-
-        if (is_array($array)) {
-            foreach ($array as &$value) {
-                if (is_array($value)) {
-                    $this->recursiveFlattenOneElementObjectsToScalarType($value);
-                }
-            }
-        }
+        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($array);
     }
 
     /**
@@ -113,65 +86,18 @@ abstract class Transformer implements StrategyInterface
      */
     protected function recursiveRenameKeyValue(array &$array, $typeKey)
     {
-        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
-            $newArray = [];
-            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
-
-            if ($type === $typeKey) {
-                $replacements = $this->mappings[$typeKey]->getAliasedProperties();
-                if (!empty($replacements)) {
-                    foreach ($array as $key => &$value) {
-                        $key = (!empty($replacements[$key])) ? $replacements[$key] : $key;
-                        $newArray[$key] = $value;
-
-                        if (is_array($newArray[$key])) {
-                            $this->recursiveRenameKeyValue($newArray[$key], $typeKey);
-                        }
-                    }
-                }
-            }
-
-            if (!empty($newArray)) {
-                $array = $newArray;
-            }
-        }
+        RecursiveRenamerHelper::renameKeyValue($this->mappings, $array, $typeKey);
     }
 
     /**
      * Delete all keys except the ones considered identifier keys or defined in the filter.
      *
      * @param array $array
-     * @param $typeKey
+     * @param       $typeKey
      */
-    protected function recursiveDeleteKeyIfNotInFilter(array &$array, $typeKey)
+    protected function recursiveDeletePropertiesNotInFilter(array &$array, $typeKey)
     {
-        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
-            $newArray = [];
-            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
-
-            if ($type === $typeKey) {
-                $keepKeys = $this->mappings[$typeKey]->getFilterKeys();
-                $idProperties = $this->mappings[$typeKey]->getIdProperties();
-
-                if (!empty($keepKeys)) {
-                    foreach ($array as $key => &$value) {
-                        if ($key == Serializer::CLASS_IDENTIFIER_KEY
-                            || (in_array($key, $keepKeys, true)
-                                || in_array($key, $idProperties, true))
-                        ) {
-                            $newArray[$key] = $value;
-                            if (is_array($newArray[$key])) {
-                                $this->recursiveDeleteKeyIfNotInFilter($newArray[$key], $typeKey);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!empty($newArray)) {
-                $array = $newArray;
-            }
-        }
+        RecursiveDeleteHelper::deletePropertiesNotInFilter($this->mappings, $array, $typeKey);
     }
 
     /**
@@ -180,31 +106,9 @@ abstract class Transformer implements StrategyInterface
      * @param array  $array   Array with data
      * @param string $typeKey Scope to do the replacement.
      */
-    protected function recursiveDeleteKeyValue(array &$array, $typeKey)
+    protected function recursiveDeleteProperties(array &$array, $typeKey)
     {
-        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
-            $newArray = [];
-            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
-
-            if ($type === $typeKey) {
-                $deletions = $this->mappings[$typeKey]->getHiddenProperties();
-
-                if (!empty($deletions)) {
-                    foreach ($array as $key => &$value) {
-                        if (!in_array($key, $deletions, true)) {
-                            $newArray[$key] = $value;
-                            if (is_array($newArray[$key])) {
-                                $this->recursiveDeleteKeyValue($newArray[$key], $typeKey);
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!empty($newArray)) {
-                $array = $newArray;
-            }
-        }
+        RecursiveDeleteHelper::deleteProperties($this->mappings, $array, $typeKey);
     }
 
     /**
@@ -224,6 +128,25 @@ abstract class Transformer implements StrategyInterface
             }
         }
         $array = $newArray;
+    }
+
+    /**
+     * Transforms a given string from camelCase to under_score style.
+     *
+     * @param string $camel
+     * @param string $splitter
+     *
+     * @return string
+     */
+    protected function camelCaseToUnderscore($camel, $splitter = '_')
+    {
+        $camel = preg_replace(
+            '/(?!^)[[:upper:]][[:lower:]]/',
+            '$0',
+            preg_replace('/(?!^)[[:upper:]]+/', $splitter.'$0', $camel)
+        );
+
+        return strtolower($camel);
     }
 
     /**
@@ -259,24 +182,5 @@ abstract class Transformer implements StrategyInterface
         $className = end($keys);
 
         return $this->camelCaseToUnderscore($className);
-    }
-
-    /**
-     * Transforms a given string from camelCase to under_score style.
-     *
-     * @param string $camel
-     * @param string $splitter
-     *
-     * @return string
-     */
-    protected function camelCaseToUnderscore($camel, $splitter = '_')
-    {
-        $camel = preg_replace(
-            '/(?!^)[[:upper:]][[:lower:]]/',
-            '$0',
-            preg_replace('/(?!^)[[:upper:]]+/', $splitter.'$0', $camel)
-        );
-
-        return strtolower($camel);
     }
 }

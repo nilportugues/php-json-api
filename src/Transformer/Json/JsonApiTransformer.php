@@ -107,11 +107,30 @@ class JsonApiTransformer extends Transformer
             );
         }
 
-        $value = $this->preSerialization($value);
-        $data = $this->serialization($value);
-        $data = $this->postSerialization($data);
+        if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
+            $data = [];
+            unset($value[Serializer::MAP_TYPE]);
+            foreach ($value[Serializer::SCALAR_VALUE] as $v) {
+                $data[] = $this->serializeObject($v);
+            }
+        } else {
+            $data = $this->serializeObject($value);
+        }
 
         return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function serializeObject(array $value)
+    {
+        $value = $this->preSerialization($value);
+        $data = $this->serialization($value);
+
+        return $this->postSerialization($data);
     }
 
     /**
@@ -123,8 +142,8 @@ class JsonApiTransformer extends Transformer
     {
         /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
         foreach ($this->mappings as $class => $mapping) {
-            $this->recursiveDeleteKeyIfNotInFilter($value, $class);
-            $this->recursiveDeleteKeyValue($value, $class);
+            $this->recursiveDeletePropertiesNotInFilter($value, $class);
+            $this->recursiveDeleteProperties($value, $class);
             $this->recursiveRenameKeyValue($value, $class);
         }
 

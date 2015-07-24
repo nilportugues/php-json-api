@@ -479,9 +479,58 @@ JSON;
         return $post;
     }
 
-    /*
-        public function testItWillSerializeToJsonApiAnArrayOfObjects()
-        {
+    public function testItWillSerializeToJsonApiAnArrayOfObjects()
+    {
+        $postArray = [
+            new SimplePost(1, 'post title 1', 'post body 1', 4),
+            new SimplePost(2, 'post title 2', 'post body 2', 5),
+        ];
 
-        }*/
+        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setFilterKeys(['body', 'title']);
+
+        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $expected = <<<JSON
+[
+    {
+        "data": {
+            "type": "post",
+            "id": "1",
+            "attributes": {
+                "title": "post title 1",
+                "body": "post body 1"
+            },
+            "links": {
+                "self": "/post/1"
+            },
+            "relationships": [
+
+            ]
+        }
+    },
+    {
+        "data": {
+            "type": "post",
+            "id": "2",
+            "attributes": {
+                "title": "post title 2",
+                "body": "post body 2"
+            },
+            "links": {
+                "self": "/post/2"
+            },
+            "relationships": [
+
+            ]
+        }
+    }
+]
+JSON;
+
+        $this->assertEquals(
+            json_decode($expected, true),
+            json_decode((new Serializer($jsonApiSerializer))->serialize($postArray), true)
+        );
+    }
 }
