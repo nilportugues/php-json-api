@@ -269,7 +269,7 @@ Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will 
 
 
 ## Quality Code
-Testing has been done using PHPUnit and [Travis-CI](https://travis-ci.org). All code has been tested to be compatible from PHP 5.5 and [HHVM](http://hhvm.com/).
+Testing has been done using PHPUnit and [Travis-CI](https://travis-ci.org). All code has been tested to be compatible from PHP 5.5 and above, plus [HHVM](http://hhvm.com/).
 
 To run the test suite, you need [Composer](http://getcomposer.org):
 
@@ -278,6 +278,9 @@ To run the test suite, you need [Composer](http://getcomposer.org):
     php bin/phpunit
 ```
 
+
+## Questions?
+Drop me an e-mail or get in touch with me using [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nilportugues/json-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Author
 Nil Portugués Calderó
