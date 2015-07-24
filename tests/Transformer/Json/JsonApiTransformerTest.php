@@ -430,6 +430,39 @@ JSON;
         );
     }
 
+    public function testItIfFilteringOutKeys()
+    {
+        $post = $this->createSimplePost();
+
+        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setFilterKeys(['body']);
+
+        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $expected = <<<JSON
+{
+    "data": {
+        "type": "post",
+        "id": "1",
+        "attributes": {
+            "body": "post body"
+        },
+        "links": {
+            "self": "/post/1"
+        },
+        "relationships": [
+
+        ]
+    }
+}
+JSON;
+
+        $this->assertEquals(
+            json_decode($expected, true),
+            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+        );
+    }
+
     /**
      * @return SimplePost
      */

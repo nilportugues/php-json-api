@@ -123,6 +123,7 @@ class JsonApiTransformer extends Transformer
     {
         /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
         foreach ($this->mappings as $class => $mapping) {
+            $this->recursiveDeleteKeyIfNotInFilter($value, $class);
             $this->recursiveDeleteKeyValue($value, $class);
             $this->recursiveRenameKeyValue($value, $class);
         }
@@ -451,14 +452,16 @@ class JsonApiTransformer extends Transformer
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-            $links = array_filter([
-                self::SELF_LINK => $this->mappings[$type]->getSelfUrl(),
-                'first' => $this->mappings[$type]->getFirstUrl(),
-                'last' => $this->mappings[$type]->getLastUrl(),
-                'prev' => $this->mappings[$type]->getPrevUrl(),
-                'next' => $this->mappings[$type]->getNextUrl(),
-                'related' => $this->mappings[$type]->getRelatedUrl(),
-            ]);
+            $links = array_filter(
+                [
+                    self::SELF_LINK => $this->mappings[$type]->getSelfUrl(),
+                    'first' => $this->mappings[$type]->getFirstUrl(),
+                    'last' => $this->mappings[$type]->getLastUrl(),
+                    'prev' => $this->mappings[$type]->getPrevUrl(),
+                    'next' => $this->mappings[$type]->getNextUrl(),
+                    'related' => $this->mappings[$type]->getRelatedUrl(),
+                ]
+            );
 
             if ($links) {
                 $data[self::LINKS_KEY] = $links;

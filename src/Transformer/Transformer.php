@@ -2,7 +2,6 @@
 
 namespace NilPortugues\Api\Transformer;
 
-use InvalidArgumentException;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
@@ -36,29 +35,17 @@ abstract class Transformer implements StrategyInterface
      *
      * @param string $value
      *
-     * @throws InvalidArgumentException
+     * @throws TransformerException
      *
      *  @return array
      */
     public function unserialize($value)
     {
-        throw new InvalidArgumentException(sprintf('%s does not perform unserializations.', __CLASS__));
+        throw new TransformerException(sprintf('%s does not perform unserializations.', __CLASS__));
     }
 
     /**
-     * Converts a under_score string to camelCase.
-     *
-     * @param string $string
-     *
-     * @return string
-     */
-    protected function underscoreToCamelCase($string)
-    {
-        return str_replace(' ', '', ucwords(strtolower(str_replace(['_', '-'], ' ', $string))));
-    }
-
-    /**
-     * Removes array keys matching the $unwatedKeys array by using recursion.
+     * Removes array keys matching the $unwantedKey array by using recursion.
      *
      * @param array $array
      * @param array $unwantedKey
@@ -139,6 +126,43 @@ abstract class Transformer implements StrategyInterface
 
                         if (is_array($newArray[$key])) {
                             $this->recursiveRenameKeyValue($newArray[$key], $typeKey);
+                        }
+                    }
+                }
+            }
+
+            if (!empty($newArray)) {
+                $array = $newArray;
+            }
+        }
+    }
+
+    /**
+     * Delete all keys except the ones considered identifier keys or defined in the filter.
+     *
+     * @param array $array
+     * @param $typeKey
+     */
+    protected function recursiveDeleteKeyIfNotInFilter(array &$array, $typeKey)
+    {
+        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $array)) {
+            $newArray = [];
+            $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
+
+            if ($type === $typeKey) {
+                $keepKeys = $this->mappings[$typeKey]->getFilterKeys();
+                $idProperties = $this->mappings[$typeKey]->getIdProperties();
+
+                if (!empty($keepKeys)) {
+                    foreach ($array as $key => &$value) {
+                        if ($key == Serializer::CLASS_IDENTIFIER_KEY
+                            || (in_array($key, $keepKeys, true)
+                                || in_array($key, $idProperties, true))
+                        ) {
+                            $newArray[$key] = $value;
+                            if (is_array($newArray[$key])) {
+                                $this->recursiveDeleteKeyIfNotInFilter($newArray[$key], $typeKey);
+                            }
                         }
                     }
                 }

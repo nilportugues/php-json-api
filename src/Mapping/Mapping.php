@@ -55,6 +55,11 @@ class Mapping
     private $relatedUrl = '';
 
     /**
+     * @var array
+     */
+    private $filterKeys = [];
+
+    /**
      * @param       $className
      * @param null  $resourceUrlPattern
      * @param array $idProperties
@@ -91,7 +96,7 @@ class Mapping
      */
     public function getIdProperties()
     {
-        return $this->idProperties;
+        return (array) $this->idProperties;
     }
 
     /**
@@ -351,5 +356,21 @@ class Mapping
     public function getRelatedUrl()
     {
         return $this->relatedUrl;
+    }
+
+    /**
+     * @param array $filterKeys
+     */
+    public function setFilterKeys(array $filterKeys)
+    {
+        $this->filterKeys = $filterKeys;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilterKeys()
+    {
+        return (array) $this->filterKeys;
     }
 }
