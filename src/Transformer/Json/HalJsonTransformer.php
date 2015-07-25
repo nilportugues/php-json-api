@@ -34,6 +34,14 @@ class HalJsonTransformer extends Transformer
     }
 
     /**
+     * @return mixed
+     */
+    public function getCuries()
+    {
+        return $this->curies;
+    }
+
+    /**
      * @param mixed $value
      *
      * @return string
