@@ -102,22 +102,47 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 
 ```php
 //Create the mappings for each class involved.
-$post = new (Post::class, 'http://example.com/posts/{postId}', ['postId']);
+$post = new Mapping(
+ Post::class, 
+ 'http://example.com/posts/{postId}', 
+ ['postId']
+);
+
 $post->setClassAlias('Message');
 $post->addPropertyAlias('title', 'headline');
 $post->addPropertyAlias('content', 'body');
 $post->setRelatedUrl("http://example.com/posts/{postId}/author");
 $post->setRelationshipUrl("http://example.com/posts/{postId}/relationships/author");
 
-$postId = new (PostId::class,  'http://example.com/posts/{postId}', ['postId']);
+$postId = new Mapping(
+ PostId::class, 
+ 'http://example.com/posts/{postId}', 
+ ['postId']
+);
 
-$user = new (User::class, 'http://example.com/users/{userId}', ['userId']);
+$user = new Mapping(
+ User::class, 
+ 'http://example.com/users/{userId}', 
+ ['userId']
+);
 
-$userId = new (UserId::class, 'http://example.com/users/{userId}', ['userId']);
+$userId = new Mapping(
+ UserId::class, 
+ 'http://example.com/users/{userId}',
+ ['userId']
+);
 
-$comment = new (Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
+$comment = new Mapping(
+ Comment::class,
+ 'http://example.com/comments/{commentId}',
+ ['commentId']
+);
 
-$commentId = new (CommentId::class, 'http://example.com/comments/{commentId}',['commentId']);
+$commentId = new Mapping(
+ CommentId::class, 
+ 'http://example.com/comments/{commentId}',
+ ['commentId']
+);
 
 //Build the  array
 $mappings = [
