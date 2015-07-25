@@ -52,8 +52,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 
         $postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
         $postMapping->setSelfUrl('http://example.com/posts/1');
-        $postMapping->setFirstUrl('http://example.com/posts/1');
-        $postMapping->setNextUrl('http://example.com/posts/2');
+        $postMapping->setRelatedUrl('http://api.example.com/posts/{postId}/author');
+        $postMapping->setRelationshipUrl('http://api.example.com/posts/{postId}/relationships/author');
 
         $postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
         $userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
@@ -85,7 +85,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         "relationships": {
             "author": {
                 "links": {
-                    "self": "http://example.com/users/1"
+                    "self": "http://api.example.com/posts/9/relationships/author",
+                    "related": "http://api.example.com/posts/9/author"
                 },
                 "data": {
                     "type": "user",
@@ -131,9 +132,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         }
     ],
     "links": {
-        "self": "http://example.com/posts/1",
+        "self": "http://example.com/posts/9",
         "first": "http://example.com/posts/1",
-        "next": "http://example.com/posts/2"
+        "next": "http://example.com/posts/10"
     },
     "meta": {
         "author": [
@@ -152,6 +153,9 @@ JSON;
         $transformer = new JsonApiTransformer($mappings);
         $transformer->setApiVersion('1.0');
         $transformer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+        $transformer->setSelfUrl('http://example.com/posts/9');
+        $transformer->setFirstUrl('http://example.com/posts/1');
+        $transformer->setNextUrl('http://example.com/posts/10');
 
         $this->assertEquals(
             json_decode($expected, true),

@@ -86,8 +86,8 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testRelationships()
     {
-        $this->mapping->setRelationships(['friends' => '/api/user/{userId}/friends']);
-        $this->mapping->addRelationship('family', '/api/user/{userId}/family');
+        $this->mapping->addAdditionalRelationships(['friends' => '/api/user/{userId}/friends']);
+        $this->mapping->addAdditionalRelationship('family', '/api/user/{userId}/family');
 
         $this->assertEquals(
             ['friends' => '/api/user/{userId}/friends', 'family' => '/api/user/{userId}/family'],
@@ -107,42 +107,6 @@ class MappingTest extends \PHPUnit_Framework_TestCase
             ['author' => 'Nil Portugués', 'created_in' => '0.00001232 seconds'],
             $this->mapping->getMetaData()
         );
-    }
-
-    /**
-     *
-     */
-    public function testFirstUrl()
-    {
-        $this->mapping->setFirstUrl('/api/post?page=1');
-        $this->assertEquals('/api/post?page=1', $this->mapping->getFirstUrl());
-    }
-
-    /**
-     *
-     */
-    public function testLastUrl()
-    {
-        $this->mapping->setLastUrl('/api/post?page=10');
-        $this->assertEquals('/api/post?page=10', $this->mapping->getLastUrl());
-    }
-
-    /**
-     *
-     */
-    public function testPrevUrl()
-    {
-        $this->mapping->setPrevUrl('/api/post?page=2');
-        $this->assertEquals('/api/post?page=2', $this->mapping->getPrevUrl());
-    }
-
-    /**
-     *
-     */
-    public function testNextUrl()
-    {
-        $this->mapping->setNextUrl('/api/post?page=3');
-        $this->assertEquals('/api/post?page=3', $this->mapping->getNextUrl());
     }
 
     /**

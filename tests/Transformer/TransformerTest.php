@@ -15,10 +15,61 @@ use NilPortugues\Tests\Api\Dummy\DummyTransformer;
 
 class TransformerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var DummyTransformer
+     */
+    private $transformer;
+
+    /**
+     *
+     */
+    protected function setUp()
+    {
+        $this->transformer = new DummyTransformer([]);
+    }
+
+    /**
+     *
+     */
     public function testUnserializeThrowsException()
     {
         $this->setExpectedException(TransformerException::class);
-        $transformer = new DummyTransformer([]);
-        $transformer->unserialize(new \DateTime());
+        $this->transformer->unserialize(new \DateTime());
+    }
+
+    /**
+     *
+     */
+    public function testFirstUrl()
+    {
+        $this->transformer->setFirstUrl('/api/post?page=1');
+        $this->assertEquals('/api/post?page=1', $this->transformer->getFirstUrl());
+    }
+
+    /**
+     *
+     */
+    public function testLastUrl()
+    {
+        $this->transformer->setLastUrl('/api/post?page=10');
+        $this->assertEquals('/api/post?page=10', $this->transformer->getLastUrl());
+    }
+
+    /**
+     *
+     */
+    public function testPrevUrl()
+    {
+        $this->transformer->setPrevUrl('/api/post?page=2');
+        $this->assertEquals('/api/post?page=2', $this->transformer->getPrevUrl());
+    }
+
+    /**
+     *
+     */
+    public function testNextUrl()
+    {
+        $this->transformer->setNextUrl('/api/post?page=3');
+        $this->assertEquals('/api/post?page=3', $this->transformer->getNextUrl());
     }
 }
