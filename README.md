@@ -102,31 +102,31 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 
 ```php
 //Create the mappings for each class involved.
-$postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
-$postMapping->setClassAlias('Message');
-$postMapping->addPropertyAlias('title', 'headline');
-$postMapping->addPropertyAlias('content', 'body');
-$postMapping->setRelatedUrl("http://example.com/posts/{postId}/author");
-$postMapping->setRelationshipUrl("http://example.com/posts/{postId}/relationships/author");
+$post = new (Post::class, 'http://example.com/posts/{postId}', ['postId']);
+$post->setClassAlias('Message');
+$post->addPropertyAlias('title', 'headline');
+$post->addPropertyAlias('content', 'body');
+$post->setRelatedUrl("http://example.com/posts/{postId}/author");
+$post->setRelationshipUrl("http://example.com/posts/{postId}/relationships/author");
 
-$postIdMapping = new Mapping(PostId::class,  'http://example.com/posts/{postId}', ['postId']);
+$postId = new (PostId::class,  'http://example.com/posts/{postId}', ['postId']);
 
-$userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
+$user = new (User::class, 'http://example.com/users/{userId}', ['userId']);
 
-$userIdMapping = new Mapping(UserId::class, 'http://example.com/users/{userId}', ['userId']);
+$userId = new (UserId::class, 'http://example.com/users/{userId}', ['userId']);
 
-$commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
+$comment = new (Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
 
-$commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}',['commentId']);
+$commentId = new (CommentId::class, 'http://example.com/comments/{commentId}',['commentId']);
 
-//Build the Mapping array
+//Build the  array
 $mappings = [
-   $postMapping->getClassName() => $postMapping,
-   $postIdMapping->getClassName() => $postIdMapping,
-   $userMapping->getClassName() => $userMapping,
-   $userIdMapping->getClassName() => $userIdMapping,
-   $commentMapping->getClassName() => $commentMapping,
-   $commentIdMapping->getClassName() => $commentIdMapping,
+   $post->getClassName() => $post,
+   $postId->getClassName() => $postId,
+   $user->getClassName() => $user,
+   $userId->getClassName() => $userId,
+   $comment->getClassName() => $comment,
+   $commentId->getClassName() => $commentId,
 ];
 
 //Build the JsonApi Transformer and set additional fields.
