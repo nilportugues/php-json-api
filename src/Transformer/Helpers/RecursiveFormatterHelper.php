@@ -70,4 +70,23 @@ final class RecursiveFormatterHelper
             }
         }
     }
+
+    /**
+     * Transforms a given string from camelCase to under_score style.
+     *
+     * @param string $camel
+     * @param string $splitter
+     *
+     * @return string
+     */
+    public static function camelCaseToUnderscore($camel, $splitter = '_')
+    {
+        $camel = preg_replace(
+            '/(?!^)[[:upper:]][[:lower:]]/',
+            '$0',
+            preg_replace('/(?!^)[[:upper:]]+/', $splitter.'$0', $camel)
+        );
+
+        return strtolower($camel);
+    }
 }
