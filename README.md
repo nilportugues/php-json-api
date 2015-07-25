@@ -13,6 +13,16 @@ API are a mandated requirement for today's modern enterprise, **enabling interac
 
 The provided **JSON API package** will allow you to **accomplish this goal in no time**.
 
+## Features
+
+- Transform to JSON, JSONAPI and HAL+JSON format using mappings. 
+- Supports nested classes, no matter its complexity.
+- Allows renaming of classes and properties.
+- Allows hiding properties.
+- Completely decoupled from any framework.
+- Fully tested and high quality code.
+- Actively supported and maintained.
+
 ## Installation
 The recommended way to install the  JSON API Transformers is through [Composer](http://getcomposer.org). Run the following command to install it:
 
