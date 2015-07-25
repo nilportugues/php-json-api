@@ -16,6 +16,27 @@ abstract class Transformer implements StrategyInterface
      * @var Mapping[]
      */
     protected $mappings = [];
+    /**
+     * @var string
+     */
+    protected $firstUrl = '';
+    /**
+     * @var string
+     */
+    protected $lastUrl = '';
+    /**
+     * @var string
+     */
+    protected $prevUrl = '';
+    /**
+     * @var string
+     */
+    protected $nextUrl = '';
+
+    /**
+     * @var string
+     */
+    protected $selfUrl = '';
 
     /**
      * @param array $apiMappings
@@ -183,5 +204,97 @@ abstract class Transformer implements StrategyInterface
         $className = end($keys);
 
         return $this->camelCaseToUnderscore($className);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrevUrl()
+    {
+        return $this->prevUrl;
+    }
+
+    /**
+     * @param string $prevUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setPrevUrl($prevUrl)
+    {
+        $this->prevUrl = (string) $prevUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNextUrl()
+    {
+        return $this->nextUrl;
+    }
+
+    /**
+     * @param string $nextUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setNextUrl($nextUrl)
+    {
+        $this->nextUrl = (string) $nextUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastUrl()
+    {
+        return $this->lastUrl;
+    }
+
+    /**
+     * @param string $lastUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setLastUrl($lastUrl)
+    {
+        $this->lastUrl = (string) $lastUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstUrl()
+    {
+        return $this->firstUrl;
+    }
+
+    /**
+     * @param string $firstUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setFirstUrl($firstUrl)
+    {
+        $this->firstUrl = (string) $firstUrl;
+    }
+
+    /**
+     * @param string $selfUrl
+     *
+     * @return $this
+     */
+    public function setSelfUrl($selfUrl)
+    {
+        $this->selfUrl = $selfUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSelfUrl()
+    {
+        return $this->selfUrl;
     }
 }

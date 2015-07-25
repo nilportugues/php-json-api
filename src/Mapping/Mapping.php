@@ -31,28 +31,17 @@ class Mapping
     /**
      * @var string
      */
-    private $firstUrl = '';
-    /**
-     * @var string
-     */
-    private $lastUrl = '';
-    /**
-     * @var string
-     */
-    private $prevUrl = '';
-    /**
-     * @var string
-     */
-    private $nextUrl = '';
-    /**
-     * @var string
-     */
     private $selfUrl = '';
 
     /**
      * @var string
      */
     private $relatedUrl = '';
+
+    /**
+     * @var string
+     */
+    private $relationshipSelfUrl = '';
 
     /**
      * @var array
@@ -140,10 +129,6 @@ class Mapping
         $search = sprintf('{%s}', $propertyName);
         $replace = sprintf('{%s}', $propertyAlias);
 
-        $this->firstUrl = str_replace($search, $replace, $this->firstUrl);
-        $this->lastUrl = str_replace($search, $replace, $this->lastUrl);
-        $this->prevUrl = str_replace($search, $replace, $this->prevUrl);
-        $this->nextUrl = str_replace($search, $replace, $this->nextUrl);
         $this->selfUrl = str_replace($search, $replace, $this->selfUrl);
         $this->relatedUrl = str_replace($search, $replace, $this->relatedUrl);
         $this->resourceUrlPattern = str_replace($search, $replace, $this->resourceUrlPattern);
@@ -211,7 +196,7 @@ class Mapping
     /**
      * @param array $relationships
      */
-    public function setRelationships(array $relationships)
+    public function addAdditionalRelationships(array $relationships)
     {
         $this->relationships = $relationships;
     }
@@ -220,7 +205,7 @@ class Mapping
      * @param $key
      * @param $value
      */
-    public function addRelationship($key, $value)
+    public function addAdditionalRelationship($key, $value)
     {
         $this->relationships[$key] = $value;
     }
@@ -269,81 +254,8 @@ class Mapping
     }
 
     /**
-     * @return string
-     */
-    public function getPrevUrl()
-    {
-        return $this->prevUrl;
-    }
-
-    /**
-     * @param string $prevUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setPrevUrl($prevUrl)
-    {
-        $this->prevUrl = (string) $prevUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getNextUrl()
-    {
-        return $this->nextUrl;
-    }
-
-    /**
-     * @param string $nextUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setNextUrl($nextUrl)
-    {
-        $this->nextUrl = (string) $nextUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLastUrl()
-    {
-        return $this->lastUrl;
-    }
-
-    /**
-     * @param string $lastUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setLastUrl($lastUrl)
-    {
-        $this->lastUrl = (string) $lastUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFirstUrl()
-    {
-        return $this->firstUrl;
-    }
-
-    /**
-     * @param string $firstUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setFirstUrl($firstUrl)
-    {
-        $this->firstUrl = (string) $firstUrl;
-    }
-
-    /**
-     * @param string $relatedUrl
-     *
-     * @return $this
+     * @param $type
+     * @param $relatedUrl
      */
     public function setRelatedUrl($relatedUrl)
     {
@@ -372,5 +284,25 @@ class Mapping
     public function getFilterKeys()
     {
         return (array) $this->filterKeys;
+    }
+
+    /**
+     * @param string $relationshipSelfUrl
+     *
+     * @return $this
+     */
+    public function setRelationshipUrl($relationshipSelfUrl)
+    {
+        $this->relationshipSelfUrl = $relationshipSelfUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelationshipSelfUrl()
+    {
+        return $this->relationshipSelfUrl;
     }
 }

@@ -26,6 +26,11 @@ class JsonApiTransformer extends Transformer
     const ATTRIBUTES_KEY = 'attributes';
     const ID_KEY = 'id';
     const ID_SEPARATOR = '.';
+    const RELATED_LINK = 'related';
+    const FIRST_LINK = 'first';
+    const LAST_LINK = 'last';
+    const PREV_LINK = 'prev';
+    const NEXT_LINK = 'next';
 
     /**
      * @var array
@@ -162,13 +167,11 @@ class JsonApiTransformer extends Transformer
                 $this->setResponseDataTypeAndId($value),
                 $this->setResponseDataAttributes($value),
                 $this->setResponseDataLinks($value),
-                $this->setResponseDataRelationship($value)
+                $this->setResponseDataRelationship($value, $value)
             ),
         ];
 
-        $copy = $this->removeTypeAndId($value);
-
-        $this->setResponseDataIncluded($copy, $data);
+        $this->setResponseDataIncluded($this->removeTypeAndId($value), $data);
         $this->setResponseLinks($value, $data);
         $this->setResponseMeta($data);
         $this->setResponseVersion($data);
@@ -329,12 +332,38 @@ class JsonApiTransformer extends Transformer
         return $data;
     }
 
+    private function setResponseDataRelationshipSelfLinks(array &$parent)
+    {
+        $data = [];
+        $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
+
+        if (!empty($this->mappings[$parentType])) {
+            $idValues = [];
+            $idProperties = $this->getIdProperties($parentType);
+
+            foreach ($idProperties as &$propertyName) {
+                $idValues[] = $this->getIdValue($parent[$propertyName]);
+                $propertyName = sprintf('{%s}', $propertyName);
+            }
+            $this->recursiveFlattenOneElementObjectsToScalarType($idValues);
+
+            $selfLink = $this->mappings[$parentType]->getRelationshipSelfUrl();
+
+            if (!empty($selfLink)) {
+                $data[self::SELF_LINK] = str_replace($idProperties, $idValues, $selfLink);
+            }
+        }
+
+        return $data;
+    }
+
     /**
      * @param array $array
+     * @param array $parent
      *
      * @return mixed
      */
-    private function setResponseDataRelationship(array &$array)
+    private function setResponseDataRelationship(array &$array, array $parent)
     {
         $data = [self::RELATIONSHIPS_KEY => []];
 
@@ -342,11 +371,30 @@ class JsonApiTransformer extends Transformer
             if (is_array($value) && array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
                 $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
+                //Relationship:links:self
                 if (!in_array($propertyName, $this->getIdProperties($type), true)) {
                     $data[self::RELATIONSHIPS_KEY][$propertyName] = array_merge(
-                        $this->setResponseDataLinks($value),
+                        array_filter([self::LINKS_KEY => $this->setResponseDataRelationshipSelfLinks($parent)]),
                         [self::DATA_KEY => $this->setResponseDataTypeAndId($value)]
                     );
+                }
+
+                //Relationship:links:related
+                if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[self::RELATIONSHIPS_KEY][$propertyName])) {
+                    $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
+                    $relatedUrl = $this->mappings[$parentType]->getRelatedUrl();
+                    if (!empty($relatedUrl)) {
+                        $idValues = [];
+                        $idProperties = $this->getIdProperties($parentType);
+
+                        foreach ($idProperties as &$name) {
+                            $idValues[] = $this->getIdValue($parent[$name]);
+                            $name = sprintf('{%s}', $name);
+                        }
+                        $this->recursiveFlattenOneElementObjectsToScalarType($idValues);
+
+                        $data[self::RELATIONSHIPS_KEY][$propertyName][self::LINKS_KEY][self::RELATED_LINK] = str_replace($idProperties, $idValues, $relatedUrl);
+                    }
                 }
             }
         }
@@ -469,16 +517,13 @@ class JsonApiTransformer extends Transformer
     private function setResponseLinks(array $value, array &$data)
     {
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
-            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-
             $links = array_filter(
                 [
-                    self::SELF_LINK => $this->mappings[$type]->getSelfUrl(),
-                    'first' => $this->mappings[$type]->getFirstUrl(),
-                    'last' => $this->mappings[$type]->getLastUrl(),
-                    'prev' => $this->mappings[$type]->getPrevUrl(),
-                    'next' => $this->mappings[$type]->getNextUrl(),
-                    'related' => $this->mappings[$type]->getRelatedUrl(),
+                    self::SELF_LINK => $this->getSelfUrl(),
+                    self::FIRST_LINK => $this->getFirstUrl(),
+                    self::LAST_LINK => $this->getLastUrl(),
+                    self::PREV_LINK => $this->getPrevUrl(),
+                    self::NEXT_LINK => $this->getNextUrl(),
                 ]
             );
 

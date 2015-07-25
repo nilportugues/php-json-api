@@ -8,7 +8,6 @@ use NilPortugues\Tests\Api\Dummy\ComplexObject\User;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\CommentId;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\PostId;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\UserId;
-use NilPortugues\Tests\Api\Dummy\SimpleObject\Post as SimplePost;
 
 include 'vendor/autoload.php';
 
@@ -30,28 +29,26 @@ $post = new Post(
 );
 
 
-$postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
+$postMapping = new Mapping(Post::class, 'http://api.example.com/posts/{postId}', ['postId']);
 $postMapping->setClassAlias('Message');
 $postMapping->addPropertyAlias('title', 'headline');
 $postMapping->addPropertyAlias('content', 'body');
-$postMapping->addRelationship(User::class, 'http://example.com/posts/relationships/author/{userId}');
-$postMapping->hideProperty('comments');
-$postMapping->setSelfUrl('http://example.com/posts/1');
-$postMapping->setNextUrl('http://example.com/posts/2');
+$postMapping->setRelatedUrl("http://api.example.com/posts/{postId}/author");
+$postMapping->setRelationshipUrl("http://api.example.com/posts/{postId}/relationships/author");
 
 
 
 
-$postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
-$postIdMapping->addRelationship(Comment::class, 'http://example.com/posts/{postId}/relationships/comments');
+$postIdMapping = new Mapping(PostId::class, 'http://api.example.com/posts/{postId}', ['postId']);
+$postIdMapping->addAdditionalRelationship(Comment::class, 'http://api.example.com/posts/{postId}/relationships/comments');
 
-$userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
-$userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
+$userMapping = new Mapping(User::class, 'http://api.example.com/users/{userId}', ['userId']);
+$userIdMapping = new Mapping(UserId::class,  'http://api.example.com/users/{userId}', ['userId']);
 
-$commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
-$commentMapping->addRelationship(Post::class, 'http://example.com/posts/{postId}/relationships/comments');
+$commentMapping = new Mapping(Comment::class, 'http://api.example.com/comments/{commentId}', ['commentId']);
+$commentMapping->addAdditionalRelationship(Post::class, 'http://api.example.com/posts/{postId}/relationships/comments');
 
-$commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}', ['commentId']);
+$commentIdMapping = new Mapping(CommentId::class, 'http://api.example.com/comments/{commentId}', ['commentId']);
 
 
 
@@ -68,6 +65,9 @@ $apiMappingCollection = [
 header('Content-Type: application/vnd.api+json; charset=utf-8');
 $serializer = new JsonApiTransformer($apiMappingCollection);
 $serializer->setApiVersion('1.0');
+
+$serializer->setSelfUrl('http://api.example.com/posts/9');
+$serializer->setNextUrl('http://api.example.com/posts/10');
 
 $serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
