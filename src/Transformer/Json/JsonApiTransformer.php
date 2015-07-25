@@ -48,38 +48,6 @@ class JsonApiTransformer extends Transformer
      * @var string
      */
     private $apiVersion = '';
-    /**
-     * @var array
-     */
-    private $relationships = [];
-    /**
-     * @var string
-     */
-    private $relatedUrl = '';
-
-    /**
-     * @param string $relatedUrl
-     *
-     * @return $this
-     */
-    public function setRelatedUrl($relatedUrl)
-    {
-        $this->relatedUrl = $relatedUrl;
-
-        return $this;
-    }
-
-    /**
-     * @param array $relationships
-     *
-     * @return $this
-     */
-    public function setRelationships($relationships)
-    {
-        $this->relationships = $relationships;
-
-        return $this;
-    }
 
     /**
      * @param string $apiVersion
