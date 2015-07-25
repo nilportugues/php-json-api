@@ -102,40 +102,22 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 
 ```php
 //Create the mappings for each class involved.
-$postMapping = new Mapping(
-   Post::class, 
-   'http://example.com/posts/{postId}',
-   ['postId']
-);
+$postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
+$postMapping->setClassAlias('Message');
+$postMapping->addPropertyAlias('title', 'headline');
+$postMapping->addPropertyAlias('content', 'body');
+$postMapping->setRelatedUrl("http://example.com/posts/{postId}/author");
+$postMapping->setRelationshipUrl("http://example.com/posts/{postId}/relationships/author");
 
-$postIdMapping = new Mapping(
-   PostId::class, 
-   'http://example.com/posts/{postId}', 
-   ['postId']
-);
+$postIdMapping = new Mapping(PostId::class,  'http://example.com/posts/{postId}', ['postId']);
 
-$userMapping = new Mapping(
-   User::class, 
-   'http://example.com/users/{userId}', 
-   ['userId']
-);
+$userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
 
-$userIdMapping = new Mapping(
-   UserId::class,
-   'http://example.com/users/{userId}', 
-   ['userId']
-);
+$userIdMapping = new Mapping(UserId::class, 'http://example.com/users/{userId}', ['userId']);
 
-$commentMapping = new Mapping(
-   Comment::class, 
-   'http://example.com/comments/{commentId}', 
-   ['commentId']
-);
-$commentIdMapping = new Mapping(
-   CommentId::class,
-   'http://example.com/comments/{commentId}',
-   ['commentId']
-);
+$commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
+
+$commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}',['commentId']);
 
 //Build the Mapping array
 $mappings = [
@@ -150,9 +132,8 @@ $mappings = [
 //Build the JsonApi Transformer and set additional fields.
 $transformer = new JsonApiTransformer($mappings);
 $transformer->setApiVersion('1.0');
-$transformer->setSelfUrl('http://example.com/posts/1');
-$transformer->setFirstUrl('http://example.com/posts/1');
-$transformer->setNextUrl('http://example.com/posts/2');
+$transformer->setSelfUrl('http://example.com/posts/9');
+$transformer->setNextUrl('http://example.com/posts/10');
 $transformer->addMeta(
    'author', 
    [
@@ -162,6 +143,7 @@ $transformer->addMeta(
 
 //Output transformation
 $serializer = new Serializer($transformer);
+
 echo $serializer->serialize($post);
 ```
 
@@ -170,11 +152,11 @@ echo $serializer->serialize($post);
 ```json
 {
     "data": {
-        "type": "post",
+        "type": "message",
         "id": "9",
         "attributes": {
-            "title": "Hello World",
-            "content": "Your first post"
+            "headline": "Hello World",
+            "body": "Your first post"
         },
         "links": {
             "self": "http://example.com/posts/9"
@@ -182,7 +164,8 @@ echo $serializer->serialize($post);
         "relationships": {
             "author": {
                 "links": {
-                    "self": "http://example.com/users/1"
+                    "self": "http://example.com/posts/9/relationships/author",
+                    "related": "http://example.com/posts/9/author"
                 },
                 "data": {
                     "type": "user",
@@ -200,10 +183,7 @@ echo $serializer->serialize($post);
             },
             "links": {
                 "self": "http://example.com/users/1"
-            },
-            "relationships": [
-
-            ]
+            }
         },
         {
             "type": "user",
@@ -213,42 +193,26 @@ echo $serializer->serialize($post);
             },
             "links": {
                 "self": "http://example.com/users/2"
-            },
-            "relationships": [
-
-            ]
+            }
         },
         {
             "type": "comment",
             "id": "1000",
             "attributes": {
                 "dates": {
-                    "created_at": "2015-07-18T13:43:48+02:00",
-                    "accepted_at": "2015-07-18T14:18:48+02:00"
+                    "created_at": "2015-07-25T22:54:11+02:00",
+                    "accepted_at": "2015-07-25T23:29:11+02:00"
                 },
                 "comment": "Have no fear, sers, your king is safe."
             },
             "links": {
                 "self": "http://example.com/comments/1000"
-            },
-            "relationships": {
-                "user": {
-                    "links": {
-                        "self": "http://example.com/users/2"
-                    },
-                    "data": {
-                        "user": {
-                            "type": "user",
-                            "id": "2"
-                        }
-                    }
-                }
             }
         }
     ],
     "links": {
-        "self": "http://example.com/posts/1",
-        "next": "http://example.com/posts/2"
+        "self": "http://example.com/posts/9",
+        "next": "http://example.com/posts/10"
     },
     "meta": {
         "author": [
