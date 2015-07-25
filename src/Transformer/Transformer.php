@@ -3,6 +3,7 @@
 namespace NilPortugues\Api\Transformer;
 
 use NilPortugues\Api\Mapping\Mapping;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
 
@@ -74,9 +75,9 @@ abstract class Transformer implements StrategyInterface
     {
         $newArray = [];
         foreach ($array as $key => &$value) {
-            $underscoreKey = $this->camelCaseToUnderscore($key);
-
+            $underscoreKey = RecursiveFormatterHelper::camelCaseToUnderscore($key);
             $newArray[$underscoreKey] = $value;
+
             if (is_array($value)) {
                 $this->recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
             }
@@ -84,24 +85,6 @@ abstract class Transformer implements StrategyInterface
         $array = $newArray;
     }
 
-    /**
-     * Transforms a given string from camelCase to under_score style.
-     *
-     * @param string $camel
-     * @param string $splitter
-     *
-     * @return string
-     */
-    protected function camelCaseToUnderscore($camel, $splitter = '_')
-    {
-        $camel = preg_replace(
-            '/(?!^)[[:upper:]][[:lower:]]/',
-            '$0',
-            preg_replace('/(?!^)[[:upper:]]+/', $splitter.'$0', $camel)
-        );
-
-        return strtolower($camel);
-    }
 
     /**
      * Array's type value becomes the key of the provided array using recursion.
@@ -135,7 +118,7 @@ abstract class Transformer implements StrategyInterface
         $keys = explode('\\', $key);
         $className = end($keys);
 
-        return $this->camelCaseToUnderscore($className);
+        return RecursiveFormatterHelper::camelCaseToUnderscore($className);
     }
 
     /**
