@@ -3,10 +3,6 @@
 namespace NilPortugues\Api\Transformer;
 
 use NilPortugues\Api\Mapping\Mapping;
-use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
-use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
-use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
-use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
 
@@ -67,70 +63,6 @@ abstract class Transformer implements StrategyInterface
     public function unserialize($value)
     {
         throw new TransformerException(sprintf('%s does not perform unserializations.', __CLASS__));
-    }
-
-    /**
-     * Removes array keys matching the $unwantedKey array by using recursion.
-     *
-     * @param array $array
-     * @param array $unwantedKey
-     */
-    protected function recursiveUnset(array &$array, array $unwantedKey)
-    {
-        RecursiveDeleteHelper::deleteKeys($array, $unwantedKey);
-    }
-
-    /**
-     * Replaces the Serializer array structure representing scalar values to the actual scalar value using recursion.
-     *
-     * @param array $array
-     */
-    protected function recursiveSetValues(array &$array)
-    {
-        RecursiveFormatterHelper::formatScalarValues($array);
-    }
-
-    /**
-     * Simplifies the data structure by removing an array level if data is scalar and has one element in array.
-     *
-     * @param array $array
-     */
-    protected function recursiveFlattenOneElementObjectsToScalarType(array &$array)
-    {
-        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($array);
-    }
-
-    /**
-     * Renames a sets if keys for a given class using recursion.
-     *
-     * @param array  $array   Array with data
-     * @param string $typeKey Scope to do the replacement.
-     */
-    protected function recursiveRenameKeyValue(array &$array, $typeKey)
-    {
-        RecursiveRenamerHelper::renameKeyValue($this->mappings, $array, $typeKey);
-    }
-
-    /**
-     * Delete all keys except the ones considered identifier keys or defined in the filter.
-     *
-     * @param array $array
-     * @param       $typeKey
-     */
-    protected function recursiveDeletePropertiesNotInFilter(array &$array, $typeKey)
-    {
-        RecursiveFilterHelper::deletePropertiesNotInFilter($this->mappings, $array, $typeKey);
-    }
-
-    /**
-     * Removes a sets if keys for a given class using recursion.
-     *
-     * @param array  $array   Array with data
-     * @param string $typeKey Scope to do the replacement.
-     */
-    protected function recursiveDeleteProperties(array &$array, $typeKey)
-    {
-        RecursiveDeleteHelper::deleteProperties($this->mappings, $array, $typeKey);
     }
 
     /**

@@ -10,6 +10,8 @@
  */
 namespace NilPortugues\Api\Transformer\Json;
 
+use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
 
@@ -30,9 +32,9 @@ class JsonTransformer extends Transformer
      */
     public function serialize($value)
     {
-        $this->recursiveSetValues($value);
-        $this->recursiveUnset($value, [Serializer::CLASS_IDENTIFIER_KEY]);
-        $this->recursiveFlattenOneElementObjectsToScalarType($value);
+        RecursiveFormatterHelper::formatScalarValues($value);
+        RecursiveDeleteHelper::deleteKeys($value, [Serializer::CLASS_IDENTIFIER_KEY]);
+        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);
         $this->recursiveSetKeysToUnderScore($value);
 
         return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
