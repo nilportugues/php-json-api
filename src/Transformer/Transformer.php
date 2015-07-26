@@ -85,7 +85,6 @@ abstract class Transformer implements StrategyInterface
         $array = $newArray;
     }
 
-
     /**
      * Array's type value becomes the key of the provided array using recursion.
      *

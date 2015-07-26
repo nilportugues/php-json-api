@@ -15,9 +15,9 @@ use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 
 /**
- * This Transformer follows the http://jsonapi.org specification.
+ * This Transformer follows the http://JsonApi.org specification.
  *
- * @link http://jsonapi.org/format/#document-structure
+ * @link http://JsonApi.org/format/#document-structure
  */
 class JsonApiTransformer extends Transformer
 {
@@ -154,7 +154,6 @@ class JsonApiTransformer extends Transformer
 
         return $data;
     }
-
 
     /**
      * @param array $copy

@@ -217,10 +217,7 @@ JSON;
         },
         "links": {
             "self": "/post/1"
-        },
-        "relationships": [
-
-        ]
+        }
     }
 }
 JSON;
@@ -286,10 +283,7 @@ JSON;
         },
         "links": {
             "self": "/post/1"
-        },
-        "relationships": [
-
-        ]
+        }
     }
 }
 JSON;
@@ -353,10 +347,7 @@ JSON;
         },
         "links": {
             "self": "/post/1"
-        },
-        "relationships": [
-
-        ]
+        }
     }
 }
 JSON;
@@ -420,10 +411,7 @@ JSON;
         },
         "links": {
             "self": "/post/1"
-        },
-        "relationships": [
-
-        ]
+        }
     }
 }
 JSON;
@@ -453,10 +441,7 @@ JSON;
         },
         "links": {
             "self": "/post/1"
-        },
-        "relationships": [
-
-        ]
+        }
     }
 }
 JSON;
@@ -507,10 +492,7 @@ JSON;
             },
             "links": {
                 "self": "/post/1"
-            },
-            "relationships": [
-
-            ]
+            }
         }
     },
     {
@@ -523,10 +505,7 @@ JSON;
             },
             "links": {
                 "self": "/post/2"
-            },
-            "relationships": [
-
-            ]
+            }
         }
     }
 ]

@@ -202,15 +202,6 @@ class Mapping
     }
 
     /**
-     * @param $key
-     * @param $value
-     */
-    public function addAdditionalRelationship($key, $value)
-    {
-        $this->relationships[$key] = $value;
-    }
-
-    /**
      * @return array
      */
     public function getMetaData()

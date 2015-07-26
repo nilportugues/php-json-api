@@ -86,8 +86,12 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testRelationships()
     {
-        $this->mapping->addAdditionalRelationships(['friends' => '/api/user/{userId}/friends']);
-        $this->mapping->addAdditionalRelationship('family', '/api/user/{userId}/family');
+        $this->mapping->addAdditionalRelationships(
+            [
+                'friends' => '/api/user/{userId}/friends',
+                'family' => '/api/user/{userId}/family',
+            ]
+        );
 
         $this->assertEquals(
             ['friends' => '/api/user/{userId}/friends', 'family' => '/api/user/{userId}/family'],
