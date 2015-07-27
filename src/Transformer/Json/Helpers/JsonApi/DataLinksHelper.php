@@ -55,16 +55,16 @@ final class DataLinksHelper
      */
     private static function getPropertyAndValues(array &$mappings, array &$value, $type)
     {
-        $idValues = [];
+        $values = [];
         $idProperties = PropertyHelper::getIdProperties($mappings, $type);
 
         foreach ($idProperties as &$propertyName) {
-            $idValues[] = PropertyHelper::getIdValue($value[$propertyName]);
+            $values[] = PropertyHelper::getIdValue($value[$propertyName]);
             $propertyName = sprintf('{%s}', $propertyName);
         }
-        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($idValues);
+        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($values);
 
-        return [$idValues, $idProperties];
+        return [$values, $idProperties];
     }
 
     /**

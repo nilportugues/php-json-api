@@ -10,8 +10,10 @@
  */
 namespace NilPortugues\Api\Transformer\Json;
 
+use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
 
@@ -20,9 +22,14 @@ use NilPortugues\Serializer\Serializer;
  */
 class JsonTransformer extends Transformer
 {
-    public function __construct()
+    /**
+     * @param Mapper $mapper
+     */
+    public function __construct(Mapper $mapper = null)
     {
-        //overwriting default constructor.
+        if (null !== $mapper) {
+            $this->mappings = $mapper->getClassMap();
+        }
     }
 
     /**
@@ -32,6 +39,14 @@ class JsonTransformer extends Transformer
      */
     public function serialize($value)
     {
+        if (null !== $this->mappings) {
+            /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
+            foreach ($this->mappings as $class => $mapping) {
+                RecursiveDeleteHelper::deleteProperties($this->mappings, $value, $class);
+                RecursiveRenamerHelper::renameKeyValue($this->mappings, $value, $class);
+            }
+        }
+
         RecursiveFormatterHelper::formatScalarValues($value);
         RecursiveDeleteHelper::deleteKeys($value, [Serializer::CLASS_IDENTIFIER_KEY]);
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);

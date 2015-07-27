@@ -21,7 +21,8 @@
         "fabpot/php-cs-fixer": "^1.9",
         "mmoreram/php-formatter": "dev-master",
         "psr/http-message": "~1.0",
-        "zendframework/zend-diactoros": "^1.1.0"
+        "zendframework/zend-diactoros": "^1.1.0",
+        "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
         "psr-4": {

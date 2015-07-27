@@ -177,8 +177,8 @@ echo $serializer->serialize($post);
 ```json
 {
     "post_id": 9,
-    "title": "Hello World",
-    "content": "Your first post",
+    "headline": "Hello World",
+    "body": "Your first post",
     "author": {
         "user_id": 1,
         "name": "Post Author"
@@ -187,8 +187,8 @@ echo $serializer->serialize($post);
         {
             "comment_id": 1000,
             "dates": {
-                "created_at": "2015-07-18T13:34:55+02:00",
-                "accepted_at": "2015-07-18T14:09:55+02:00"
+                "created_at": "2015-07-27T20:59:45+02:00",
+                "accepted_at": "2015-07-27T21:34:45+02:00"
             },
             "comment": "Have no fear, sers, your king is safe.",
             "user": {
