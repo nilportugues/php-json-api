@@ -165,11 +165,14 @@ Notice **all keys are normalized to under_score**. This differs from the `JsonTr
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Api\Transformer\Json\JsonTransformer;
 
-$transformer = new JsonTransformer();
+$transformer = new JsonTransformer($mapper);
 $serializer = new Serializer($transformer);
 
 echo $serializer->serialize($post);
 ```
+
+**Note:** `JsonTransformer` **optionally** requires the `Mapper`. If none is provided, class will be transformed to JSON but no other transformations will be applied.
+
 
 **Output:**
 
