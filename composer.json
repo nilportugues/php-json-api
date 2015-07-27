@@ -1,5 +1,5 @@
 {
-    "name": "nilportugues/Json-api",
+    "name": "nilportugues/json-api",
     "type": "library",
     "description": "Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.",
     "keywords": ["json", "api", "JsonApi", "hal", "hal Json", "serialize", "serializer"],
