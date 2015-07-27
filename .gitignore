@@ -4,3 +4,4 @@ vendor/
 composer.lock
 build/
 jsonTransormer.php
+.coveralls.yml
