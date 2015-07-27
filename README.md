@@ -210,9 +210,8 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 **Code:**
 
 ```php
-
 //Build the JsonApi Transformer and set additional fields.
-$transformer = new JsonApiTransformer($mappings);
+$transformer = new JsonApiTransformer($mapper);
 $transformer->setApiVersion('1.0');
 $transformer->setSelfUrl('http://example.com/posts/9');
 $transformer->setNextUrl('http://example.com/posts/10');
