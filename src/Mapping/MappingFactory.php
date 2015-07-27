@@ -10,8 +10,6 @@
  */
 namespace NilPortugues\Api\Mapping;
 
-use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\PropertyHelper;
-
 /**
  * Class MappingFactory.
  */
@@ -30,11 +28,7 @@ class MappingFactory
 
         $mapping = new Mapping($className, $resourceUrl, $idProperties);
 
-        if (false === empty($mappedClass['alias'])) {
-            $mapping->setClassAlias($mappedClass['alias']);
-        } else {
-            $mapping->setClassAlias(PropertyHelper::namespaceAsArrayKey($className));
-        }
+        $mapping->setClassAlias((empty($mappedClass['alias'])) ? $className : $mappedClass['alias']);
 
         if (false === empty($mappedClass['aliased_properties'])) {
             $mapping->setPropertyNameAliases($mappedClass['aliased_properties']);
@@ -88,7 +82,7 @@ class MappingFactory
      */
     private static function getSelfUrl(array &$mappedClass)
     {
-        if (empty($mappedClass['class'])) {
+        if (empty($mappedClass['urls']['self'])) {
             throw new MappingException(
                 'Could not find "self" property under "urls". This is required in order to make the resource to be reachable.'
             );
@@ -106,7 +100,7 @@ class MappingFactory
      */
     private static function getIdProperties(array &$mappedClass)
     {
-        if (empty($mappedClass['class'])) {
+        if (empty($mappedClass['id_properties'])) {
             throw new MappingException(
                 'Could not find "id_properties" property with data . This is required in order to make the resource to be reachable.'
             );

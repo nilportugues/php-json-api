@@ -11,8 +11,10 @@
 namespace NilPortugues\Tests\Api\Transformer\Json;
 
 use DateTime;
+use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\Json\JsonApiTransformer;
+use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\Comment;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\Post;
@@ -24,6 +26,18 @@ use NilPortugues\Tests\Api\Dummy\SimpleObject\Post as SimplePost;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     *
+     */
+    public function testItWillThrowExceptionIfNoMappingsAreProvided()
+    {
+        $mapper = new Mapper();
+        $mapper->setClassMap([]);
+
+        $this->setExpectedException(TransformerException::class);
+        (new Serializer(new JsonApiTransformer($mapper)))->serialize(new \stdClass());
+    }
+
     /**
      *
      */
@@ -137,12 +151,11 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         "next": "http://example.com/posts/10"
     },
     "meta": {
-        "author": [
-            {
-                "name": "Nil Portugués Calderó",
-                "email": "contact@nilportugues.com"
-            }
-        ]
+        "author": {
+            "name": "Nil Portugués Calderó",
+            "email": "contact@nilportugues.com"
+        },
+        "is_devel" : true
     },
     "jsonapi": {
         "version": "1.0"
@@ -150,9 +163,20 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 }
 JSON;
 
-        $transformer = new JsonApiTransformer($mappings);
+        $mapper = new Mapper();
+        $mapper->setClassMap($mappings);
+
+        $transformer = new JsonApiTransformer($mapper);
         $transformer->setApiVersion('1.0');
-        $transformer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+        $transformer->setMeta(
+            [
+                'author' => [
+                    'name' => 'Nil Portugués Calderó',
+                    'email' => 'contact@nilportugues.com',
+                ],
+            ]
+        );
+        $transformer->addMeta('is_devel', true);
         $transformer->setSelfUrl('http://example.com/posts/9');
         $transformer->setFirstUrl('http://example.com/posts/1');
         $transformer->setNextUrl('http://example.com/posts/10');
@@ -171,7 +195,11 @@ JSON;
         $post = $this->createSimplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
-        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -237,7 +265,11 @@ JSON;
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setPropertyNameAliases(['title' => 'headline', 'body' => 'post', 'postId' => 'someId']);
-        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -303,7 +335,11 @@ JSON;
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setHiddenProperties(['title', 'body']);
-        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -365,7 +401,10 @@ JSON;
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setClassAlias('Message');
 
-        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -429,7 +468,10 @@ JSON;
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setFilterKeys(['body']);
 
-        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -468,6 +510,9 @@ JSON;
         return $post;
     }
 
+    /**
+     *
+     */
     public function testItWillSerializeToJsonApiAnArrayOfObjects()
     {
         $postArray = [
@@ -478,7 +523,10 @@ JSON;
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setFilterKeys(['body', 'title']);
 
-        $jsonApiSerializer = new JsonApiTransformer([$postMapping->getClassName() => $postMapping]);
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 [

@@ -10,6 +10,7 @@
  */
 namespace NilPortugues\Tests\Api\Transformer;
 
+use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Tests\Api\Dummy\DummyTransformer;
 
@@ -25,7 +26,7 @@ class TransformerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->transformer = new DummyTransformer([]);
+        $this->transformer = new DummyTransformer(new Mapper());
     }
 
     /**

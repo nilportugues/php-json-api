@@ -98,7 +98,7 @@ class JsonApiTransformer extends Transformer
             $data = $this->serializeObject($value);
         }
 
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -170,18 +170,6 @@ class JsonApiTransformer extends Transformer
         unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $copy;
-    }
-
-    /**
-     * @param string $type
-     *
-     * @throws TransformerException
-     */
-    protected function hasMappingGuard($type)
-    {
-        if (empty($this->mappings[$type])) {
-            throw new TransformerException(sprintf('Provided type %s has no mapping.', $type));
-        }
     }
 
     /**

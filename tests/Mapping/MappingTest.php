@@ -41,9 +41,9 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassAlias()
     {
-        $this->mapping->setClassAlias('Message');
+        $this->mapping->setClassAlias('NewMessage');
 
-        $this->assertEquals('Message', $this->mapping->getClassAlias());
+        $this->assertEquals('new_message', $this->mapping->getClassAlias());
     }
 
     /**

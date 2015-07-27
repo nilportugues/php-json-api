@@ -29,20 +29,30 @@ class Mapper
      *
      * @throws MappingException
      */
-    public function __construct(array &$mappings)
+    public function __construct(array &$mappings = null)
     {
-        foreach ($mappings as $mappedClass) {
-            $mapping = MappingFactory::fromArray($mappedClass);
+        if (is_array($mappings)) {
+            foreach ($mappings as $mappedClass) {
+                $mapping = MappingFactory::fromArray($mappedClass);
 
-            if (false === empty($this->aliasMap[$mapping->getClassAlias()])) {
-                throw new MappingException(
-                    'Class with the same name already present. Please add an alias or change an existing one.'
-                );
+                if (false === empty($this->aliasMap[$mapping->getClassAlias()])) {
+                    throw new MappingException(
+                        'Class with the same name already present. Please add an alias or change an existing one.'
+                    );
+                }
+
+                $this->classMap[$mapping->getClassName()] = $mapping;
+                $this->aliasMap[$mapping->getClassAlias()] = $mapping->getClassName();
             }
-
-            $this->classMap[$mapping->getClassName()] = $mapping;
-            $this->aliasMap[$mapping->getClassAlias()] = $mapping->getClassName();
         }
+    }
+
+    /**
+     * @param array $array
+     */
+    public function setClassMap(array $array)
+    {
+        $this->classMap = $array;
     }
 
     /**

@@ -123,7 +123,7 @@ $mapper = new Mapper($mappings);
 //echo '<pre>'; print_r($apiMappingCollection); die();
 
 
-$serializer = new JsonApiTransformer($mapper->getClassMap());
+$serializer = new JsonApiTransformer($mapper);
 $serializer->setApiVersion('1.0');
 $serializer->setSelfUrl('http://example.com/posts/9');
 $serializer->setNextUrl('http://example.com/posts/10');
@@ -132,4 +132,4 @@ $serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' =>
 $response = (new Serializer($serializer))->serialize($post);
 
 header('Content-Type: application/vnd.api+json; charset=utf-8');
-echo $response;
+echo json_encode(json_decode($response, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
