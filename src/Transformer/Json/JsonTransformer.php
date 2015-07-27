@@ -37,6 +37,6 @@ class JsonTransformer extends Transformer
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);
         $this->recursiveSetKeysToUnderScore($value);
 
-        return json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 }

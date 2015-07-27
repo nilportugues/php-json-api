@@ -72,7 +72,7 @@ final class DataLinksHelper
      * @param array                               $array
      * @param array                               $parent
      *
-     * @return mixed
+     * @return array
      */
     public static function setResponseDataRelationship(array &$mappings, array &$array, array $parent)
     {
@@ -87,7 +87,7 @@ final class DataLinksHelper
             }
         }
 
-        return $data;
+        return (array) array_filter($data);
     }
 
     /**

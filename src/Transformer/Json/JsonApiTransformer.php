@@ -15,9 +15,9 @@ use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 
 /**
- * This Transformer follows the http://jsonapi.org specification.
+ * This Transformer follows the http://JsonApi.org specification.
  *
- * @link http://jsonapi.org/format/#document-structure
+ * @link http://JsonApi.org/format/#document-structure
  */
 class JsonApiTransformer extends Transformer
 {
@@ -98,7 +98,7 @@ class JsonApiTransformer extends Transformer
             $data = $this->serializeObject($value);
         }
 
-        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -155,7 +155,6 @@ class JsonApiTransformer extends Transformer
         return $data;
     }
 
-
     /**
      * @param array $copy
      *
@@ -171,18 +170,6 @@ class JsonApiTransformer extends Transformer
         unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $copy;
-    }
-
-    /**
-     * @param string $type
-     *
-     * @throws TransformerException
-     */
-    protected function hasMappingGuard($type)
-    {
-        if (empty($this->mappings[$type])) {
-            throw new TransformerException(sprintf('Provided type %s has no mapping.', $type));
-        }
     }
 
     /**

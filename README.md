@@ -31,7 +31,7 @@ php composer.phar require nilportugues/json-api
 ```
 
 ## Usage
-Given the following piece of code, defining a Blog Post and some Comments, we'll examine how each transformer works:
+Given the following piece of code, defining a Blog Post and some Comments:
 
 ```php
 $post = new Post(
@@ -55,6 +55,102 @@ $post = new Post(
   ]
 );
 ```
+
+An a Mapping array for all the involved classes:
+
+```php
+$mappings = [
+    [
+        'class' => Post::class,
+        'alias' => 'Message',
+        'aliased_properties' => [
+            'title' => 'headline',
+            'content' => 'body',
+        ],
+        'hide_properties' => [],
+        'id_properties' => [
+            'postId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/posts/{postId}',
+            'related' => 'http://example.com/posts/{postId}/author',
+            'relationships' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/author',
+            ],
+        ],
+    ],
+    [
+        'class' => PostId::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'postId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/posts/{postId}',
+            'relationships' => [
+                Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
+            ],
+        ],
+    ],
+    [
+        'class' => User::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'userId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/users/{userId}',
+        ],
+    ],
+    [
+        'class' => UserId::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'userId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/users/{userId}',
+        ],
+    ],
+    [
+        'class' => Comment::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'commentId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/comments/{commentId}',
+            'relationships' => [
+                Post::class => 'http://example.com/posts/{postId}/relationships/comments',
+            ],
+        ],
+    ],
+    [
+        'class' => CommentId::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'commentId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/comments/{commentId}',
+        ],
+    ],
+];
+
+$mapper = new Mapper($mappings);
+```
+
+We'll see how the mapping works and outputs.
 
 
 
@@ -111,58 +207,6 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 **Code:**
 
 ```php
-//Create the mappings for each class involved.
-$post = new Mapping(
- Post::class, 
- 'http://example.com/posts/{postId}', 
- ['postId']
-);
-
-$post->setClassAlias('Message');
-$post->addPropertyAlias('title', 'headline');
-$post->addPropertyAlias('content', 'body');
-$post->setRelatedUrl("http://example.com/posts/{postId}/author");
-$post->setRelationshipUrl("http://example.com/posts/{postId}/relationships/author");
-
-$postId = new Mapping(
- PostId::class, 
- 'http://example.com/posts/{postId}', 
- ['postId']
-);
-
-$user = new Mapping(
- User::class, 
- 'http://example.com/users/{userId}', 
- ['userId']
-);
-
-$userId = new Mapping(
- UserId::class, 
- 'http://example.com/users/{userId}',
- ['userId']
-);
-
-$comment = new Mapping(
- Comment::class,
- 'http://example.com/comments/{commentId}',
- ['commentId']
-);
-
-$commentId = new Mapping(
- CommentId::class, 
- 'http://example.com/comments/{commentId}',
- ['commentId']
-);
-
-//Build the  array
-$mappings = [
-   $post->getClassName() => $post,
-   $postId->getClassName() => $postId,
-   $user->getClassName() => $user,
-   $userId->getClassName() => $userId,
-   $comment->getClassName() => $comment,
-   $commentId->getClassName() => $commentId,
-];
 
 //Build the JsonApi Transformer and set additional fields.
 $transformer = new JsonApiTransformer($mappings);
@@ -235,8 +279,8 @@ echo $serializer->serialize($post);
             "id": "1000",
             "attributes": {
                 "dates": {
-                    "created_at": "2015-07-25T22:54:11+02:00",
-                    "accepted_at": "2015-07-25T23:29:11+02:00"
+                    "created_at": "2015-07-27T19:33:44+02:00",
+                    "accepted_at": "2015-07-27T20:08:44+02:00"
                 },
                 "comment": "Have no fear, sers, your king is safe."
             },
@@ -263,7 +307,7 @@ echo $serializer->serialize($post);
 }
 ```
 
-### HAL+JSON
+### (WIP) HAL+JSON
 Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification.
 
 

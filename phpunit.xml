@@ -35,6 +35,7 @@
         <whitelist>
             <directory>./src/</directory>
             <exclude>
+                <directory>./example/</directory>
                 <directory>./vendor/</directory>
             </exclude>
         </whitelist>

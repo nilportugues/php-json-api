@@ -2,6 +2,9 @@
 
 namespace NilPortugues\Api\Mapping;
 
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
+use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\PropertyHelper;
+
 class Mapping
 {
     /**
@@ -75,7 +78,9 @@ class Mapping
      */
     public function setClassAlias($aliasedClass)
     {
-        $this->classAlias = $aliasedClass;
+        $this->classAlias = RecursiveFormatterHelper::camelCaseToUnderscore(
+            PropertyHelper::namespaceAsArrayKey($aliasedClass)
+        );
 
         return $this;
     }
@@ -199,15 +204,6 @@ class Mapping
     public function addAdditionalRelationships(array $relationships)
     {
         $this->relationships = $relationships;
-    }
-
-    /**
-     * @param $key
-     * @param $value
-     */
-    public function addAdditionalRelationship($key, $value)
-    {
-        $this->relationships[$key] = $value;
     }
 
     /**

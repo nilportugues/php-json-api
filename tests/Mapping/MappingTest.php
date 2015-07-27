@@ -41,9 +41,9 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testClassAlias()
     {
-        $this->mapping->setClassAlias('Message');
+        $this->mapping->setClassAlias('NewMessage');
 
-        $this->assertEquals('Message', $this->mapping->getClassAlias());
+        $this->assertEquals('new_message', $this->mapping->getClassAlias());
     }
 
     /**
@@ -86,8 +86,12 @@ class MappingTest extends \PHPUnit_Framework_TestCase
      */
     public function testRelationships()
     {
-        $this->mapping->addAdditionalRelationships(['friends' => '/api/user/{userId}/friends']);
-        $this->mapping->addAdditionalRelationship('family', '/api/user/{userId}/family');
+        $this->mapping->addAdditionalRelationships(
+            [
+                'friends' => '/api/user/{userId}/friends',
+                'family' => '/api/user/{userId}/family',
+            ]
+        );
 
         $this->assertEquals(
             ['friends' => '/api/user/{userId}/friends', 'family' => '/api/user/{userId}/family'],

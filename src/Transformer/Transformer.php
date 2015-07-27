@@ -2,6 +2,7 @@
 
 namespace NilPortugues\Api\Transformer;
 
+use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Serializer\Serializer;
@@ -36,11 +37,11 @@ abstract class Transformer implements StrategyInterface
     protected $selfUrl = '';
 
     /**
-     * @param array $apiMappings
+     * @param Mapper $mapper
      */
-    public function __construct(array $apiMappings)
+    public function __construct(Mapper $mapper)
     {
-        $this->mappings = $apiMappings;
+        $this->mappings = $mapper->getClassMap();
     }
 
     /**
@@ -84,7 +85,6 @@ abstract class Transformer implements StrategyInterface
         }
         $array = $newArray;
     }
-
 
     /**
      * Array's type value becomes the key of the provided array using recursion.
