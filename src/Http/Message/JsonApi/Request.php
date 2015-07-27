@@ -1,19 +1,19 @@
 <?php
+
 /**
  * Author: Nil Portugués Calderó <contact@nilportugues.com>
  * Date: 7/26/15
- * Time: 1:41 AM
+ * Time: 1:41 AM.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-namespace NilPortugues\Example\Api\JsonApi;
+namespace NilPortugues\Api\Http\Message\JsonApi;
 
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Class Request
+ * Class Request.
  */
 final class Request implements RequestInterface
 {
@@ -58,22 +58,21 @@ final class Request implements RequestInterface
      */
     private function setIncludedRelationships()
     {
-        $relationshipNames = explode(",", $this->getQueryParam("include", ""));
-
+        $relationshipNames = explode(',', $this->getQueryParam('include', ''));
 
         foreach ($relationshipNames as $relationship) {
             $relationship = ".$relationship.";
-            $length       = strlen($relationship);
-            $dot1         = 0;
+            $length = strlen($relationship);
+            $dot1 = 0;
             while ($dot1 < $length - 1) {
-                $dot2 = strpos($relationship, ".", $dot1 + 1);
+                $dot2 = strpos($relationship, '.', $dot1 + 1);
                 $path = substr($relationship, 1, $dot1 > 0 ? $dot1 - 1 : 0);
                 $name = substr($relationship, $dot1 + 1, $dot2 - $dot1 - 1);
                 if (isset($this->relationships[$path]) === false) {
                     $this->relationships[$path] = [];
                 }
                 $this->relationships[$path][$name] = $name;
-                $dot1                                      = $dot2;
+                $dot1 = $dot2;
             };
         }
     }
@@ -94,8 +93,8 @@ final class Request implements RequestInterface
      */
     private function setIncludedFields()
     {
-        foreach ($this->getQueryParam("fields", []) as $resourceType => $fields) {
-            $this->includedFields[$resourceType] = array_flip(explode(",", $fields));
+        foreach ($this->getQueryParam('fields', []) as $resourceType => $fields) {
+            $this->includedFields[$resourceType] = array_flip(explode(',', $fields));
         }
     }
 
@@ -104,7 +103,7 @@ final class Request implements RequestInterface
      */
     private function setSorting()
     {
-        $this->sorting = explode(",", $this->getQueryParam("sort", ""));
+        $this->sorting = explode(',', $this->getQueryParam('sort', ''));
     }
 
     /**
@@ -126,7 +125,6 @@ final class Request implements RequestInterface
     {
         return (isset($this->relationships[$baseRelationshipPath])) ? $this->relationships[$baseRelationshipPath] : [];
     }
-
 
     /**
      * @return array
@@ -162,4 +160,4 @@ final class Request implements RequestInterface
     {
         return $this->request->getAttribute($name, $default);
     }
-} 
+}
