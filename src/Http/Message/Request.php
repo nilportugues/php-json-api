@@ -10,18 +10,32 @@
  */
 namespace  NilPortugues\Api\Http\Message;
 
+use Psr\Http\Message\RequestInterface;
+
 /**
  * Class RequestInterface.
  */
-interface RequestInterface
+abstract class Request
 {
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @param RequestInterface $request
+     */
+    public function __construct(RequestInterface $request)
+    {
+        $this->request = $request;
+    }
     /**
      * @return array
      */
-    public function getSorting();
+    abstract public function getSorting();
 
     /**
      * @return array|null
      */
-    public function getPagination();
+    abstract public function getPagination();
 }
