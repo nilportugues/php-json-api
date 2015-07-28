@@ -10,7 +10,7 @@
  */
 namespace NilPortugues\Api\Http\Message\HalJson;
 
-class Response extends \NilPortugues\Api\Http\Message\Response
+class Response extends \NilPortugues\Api\Http\Message\AbstractResponse
 {
     /**
      * A HAL Document uses the format described in [RFC4627] and has the media type "application/hal+json".

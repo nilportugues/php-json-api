@@ -15,12 +15,12 @@ use Psr\Http\Message\RequestInterface;
 /**
  * Class RequestInterface.
  */
-abstract class Request
+abstract class AbstractRequest
 {
     /**
      * @var RequestInterface
      */
-    private $request;
+    protected $request;
 
     /**
      * @param RequestInterface $request

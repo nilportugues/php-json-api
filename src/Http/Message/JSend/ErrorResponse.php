@@ -10,12 +10,12 @@
  */
 namespace NilPortugues\Api\Http\Message\JSend;
 
-use NilPortugues\Api\Http\Message\Response;
+use NilPortugues\Api\Http\Message\AbstractResponse;
 
 /**
- * Class JSendErrorResponse.
+ * Class ErrorResponse.
  */
-class JSendErrorResponse extends Response
+class ErrorResponse extends AbstractResponse
 {
     /**
      * @param string $message

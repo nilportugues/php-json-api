@@ -13,14 +13,10 @@ namespace NilPortugues\Api\Http\Message\JsonApi;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Class Request.
+ * Class AbstractRequest.
  */
-final class Request implements RequestInterface
+final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
 {
-    /**
-     * @var \Psr\Http\Message\ServerRequestInterface
-     */
-    private $request;
     /**
      * @var array
      */

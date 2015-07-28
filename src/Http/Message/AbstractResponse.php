@@ -14,10 +14,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
 /**
- * Class Response.
+ * Class AbstractResponse.
  */
-abstract class Response implements ResponseInterface
+abstract class AbstractResponse implements ResponseInterface
 {
+    protected $httpCode = 0;
+
     /**
      * @var \Zend\Diactoros\Response
      */
@@ -30,10 +32,18 @@ abstract class Response implements ResponseInterface
 
     /**
      * @param string $body
+     */
+    public function __construct($body)
+    {
+        $this->response = self::instance($body, $this->httpCode, $this->headers);
+    }
+
+    /**
+     * @param string $body
      * @param int    $status
      * @param array  $headers
      *
-     * @return Response
+     * @return AbstractResponse
      */
     protected function instance($body, $status = 200, array $headers = [])
     {
