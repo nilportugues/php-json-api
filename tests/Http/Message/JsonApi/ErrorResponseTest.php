@@ -10,6 +10,15 @@
  */
 namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
+use NilPortugues\Api\Http\Message\JsonApi\ErrorResponse;
+
 class ErrorResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testResponse()
+    {
+        $response = new ErrorResponse('Internal Server Error', 400);
+
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+    }
 }

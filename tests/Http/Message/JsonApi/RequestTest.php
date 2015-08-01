@@ -12,4 +12,7 @@ namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
+    public function testResponse()
+    {
+    }
 }

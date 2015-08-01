@@ -10,6 +10,16 @@
  */
 namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
+use NilPortugues\Api\Http\Message\JsonApi\UnsupportedActionResponse;
+
 class UnsupportedActionResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testResponse()
+    {
+        $json = json_encode([]);
+        $response = new UnsupportedActionResponse($json);
+
+        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+    }
 }

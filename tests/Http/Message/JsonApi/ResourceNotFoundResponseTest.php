@@ -10,6 +10,16 @@
  */
 namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
+use NilPortugues\Api\Http\Message\JsonApi\ResourceNotFoundResponse;
+
 class ResourceNotFoundResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testResponse()
+    {
+        $json = json_encode([]);
+        $response = new ResourceNotFoundResponse($json);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+    }
 }

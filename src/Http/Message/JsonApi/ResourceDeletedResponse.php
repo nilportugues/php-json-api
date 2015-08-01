@@ -22,6 +22,6 @@ class ResourceDeletedResponse extends AbstractResponse
      */
     public function __construct()
     {
-        $this->response = self::instance([], $this->httpCode, $this->headers);
+        $this->response = self::instance('', $this->httpCode, $this->headers);
     }
 }

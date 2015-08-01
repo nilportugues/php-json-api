@@ -15,7 +15,7 @@ namespace NilPortugues\Api\Http\Message\JsonApi;
  */
 class ErrorResponse extends AbstractResponse
 {
-    private $httpCode = 400;
+    protected $httpCode = 400;
 
     /**
      * Error as defined in http://jsonapi.org/format/#error-objects;.

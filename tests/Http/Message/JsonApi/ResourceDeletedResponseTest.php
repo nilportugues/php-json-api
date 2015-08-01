@@ -10,6 +10,16 @@
  */
 namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
+use NilPortugues\Api\Http\Message\JsonApi\ResourceDeletedResponse;
+
 class ResourceDeletedResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testResponse()
+    {
+        $response = new ResourceDeletedResponse();
+
+        $this->assertEquals('', $response->getBody());
+        $this->assertEquals(204, $response->getStatusCode());
+        $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+    }
 }

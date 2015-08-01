@@ -10,6 +10,16 @@
  */
 namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
+use NilPortugues\Api\Http\Message\JsonApi\ResourceProcessingResponse;
+
 class ResourceProcessingResponseTest extends \PHPUnit_Framework_TestCase
 {
+    public function testResponse()
+    {
+        $json = json_encode([]);
+        $response = new ResourceProcessingResponse($json);
+
+        $this->assertEquals(202, $response->getStatusCode());
+        $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+    }
 }
