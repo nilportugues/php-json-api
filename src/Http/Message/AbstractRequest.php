@@ -29,13 +29,39 @@ abstract class AbstractRequest
     {
         $this->request = $request;
     }
+
     /**
      * @return array
      */
-    abstract public function getSorting();
+    abstract public function getSortFields();
 
     /**
-     * @return array|null
+     * @return array
      */
-    abstract public function getPagination();
+    abstract public function getSortDirection();
+
+    /**
+     * @return int|null
+     */
+    abstract public function getPageNumber();
+
+    /**
+     * @return int|null
+     */
+    abstract public function getPageLimit();
+
+    /**
+     * @return int|null
+     */
+    abstract public function getPageOffset();
+
+    /**
+     * @return int|null
+     */
+    abstract public function getPageSize();
+
+    /**
+     * @return string|null
+     */
+    abstract public function getPageCursor();
 }

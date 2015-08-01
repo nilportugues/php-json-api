@@ -18,6 +18,9 @@ use Psr\Http\Message\StreamInterface;
  */
 abstract class AbstractResponse implements ResponseInterface
 {
+    /**
+     * @var int
+     */
     protected $httpCode = 0;
 
     /**

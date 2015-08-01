@@ -18,59 +18,26 @@ use Psr\Http\Message\ServerRequestInterface;
 final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
 {
     /**
-     * @var array
-     */
-    private $includedFields = [];
-    /**
-     * @var array
-     */
-    private $relationships = [];
-    /**
-     * @var array
-     */
-    private $sorting = [];
-    /**
-     * @var array
-     */
-    private $pagination = [];
-    /**
-     * @var array
-     */
-    private $filters = [];
-
-    /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      */
     public function __construct(ServerRequestInterface $request)
     {
         $this->request = $request;
-        $this->setIncludedRelationships();
-        $this->setIncludedFields();
-        $this->setSorting();
     }
 
     /**
+     * @param string $resourceType
+     *
      * @return array
      */
-    private function setIncludedRelationships()
+    public function getIncludedFields($resourceType)
     {
-        $relationshipNames = explode(',', $this->getQueryParam('include', ''));
-
-        foreach ($relationshipNames as $relationship) {
-            $relationship = ".$relationship.";
-            $length = strlen($relationship);
-            $dot1 = 0;
-            while ($dot1 < $length - 1) {
-                $dot2 = strpos($relationship, '.', $dot1 + 1);
-                $path = substr($relationship, 1, $dot1 > 0 ? $dot1 - 1 : 0);
-                $name = substr($relationship, $dot1 + 1, $dot2 - $dot1 - 1);
-                if (isset($this->relationships[$path]) === false) {
-                    $this->relationships[$path] = [];
-                }
-                $this->relationships[$path][$name] = $name;
-                $dot1 = $dot2;
-            };
+        $includedFields = [];
+        foreach ($this->getQueryParam('fields', []) as $resourceType => $fields) {
+            $includedFields[$resourceType] = array_flip(explode(',', $fields));
         }
+
+        return isset($includedFields[$resourceType]) ? array_keys($includedFields[$resourceType]) : [];
     }
 
     /**
@@ -85,65 +52,54 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     }
 
     /**
-     *
-     */
-    private function setIncludedFields()
-    {
-        foreach ($this->getQueryParam('fields', []) as $resourceType => $fields) {
-            $this->includedFields[$resourceType] = array_flip(explode(',', $fields));
-        }
-    }
-
-    /**
-     *
-     */
-    private function setSorting()
-    {
-        $this->sorting = explode(',', $this->getQueryParam('sort', ''));
-    }
-
-    /**
-     * @param string $resourceType
-     *
-     * @return array
-     */
-    public function getIncludedFields($resourceType)
-    {
-        return isset($this->includedFields[$resourceType]) ? array_keys($this->includedFields[$resourceType]) : [];
-    }
-
-    /**
      * @param string $baseRelationshipPath
      *
      * @return array
      */
     public function getIncludedRelationships($baseRelationshipPath)
     {
-        return (isset($this->relationships[$baseRelationshipPath])) ? $this->relationships[$baseRelationshipPath] : [];
-    }
+        $relationshipNames = explode(',', $this->getQueryParam('include', ''));
+        $relationships = [];
 
-    /**
-     * @return array
-     */
-    public function getSorting()
-    {
-        return $this->sorting;
+        foreach ($relationshipNames as $relationship) {
+            $relationship = ".$relationship.";
+            $length = strlen($relationship);
+            $dot1 = 0;
+            while ($dot1 < $length - 1) {
+                $dot2 = strpos($relationship, '.', $dot1 + 1);
+                $path = substr($relationship, 1, $dot1 > 0 ? $dot1 - 1 : 0);
+                $name = substr($relationship, $dot1 + 1, $dot2 - $dot1 - 1);
+                if (isset($relationships[$path]) === false) {
+                    $relationships[$path] = [];
+                }
+                $relationships[$path][$name] = $name;
+                $dot1 = $dot2;
+            };
+        }
+
+        return (isset($relationships[$baseRelationshipPath])) ? $relationships[$baseRelationshipPath] : [];
     }
 
     /**
      * @return array|null
      */
-    public function getPagination()
+    public function getSortFields()
     {
-        return $this->pagination;
-    }
+        $sort = $this->getAttribute('sort');
+        $fields = null;
 
-    /**
-     * @return array
-     */
-    public function getFilters()
-    {
-        return $this->filters;
+        if (!empty($sort)) {
+            $fields = explode(',', $sort);
+            if (!empty($fields)) {
+                foreach ($fields as &$field) {
+                    if ('-' === $field[0]) {
+                        $field = ltrim($field, '-');
+                    }
+                }
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -155,5 +111,105 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     public function getAttribute($name, $default = null)
     {
         return $this->request->getAttribute($name, $default);
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSortDirection()
+    {
+        $sort = $this->getAttribute('sort');
+        $direction = null;
+
+        if (!empty($sort)) {
+            $direction = [];
+
+            $fields = explode(',', $sort);
+            if (!empty($fields)) {
+                foreach ($fields as $field) {
+                    $direction[$field] = ('-' === $field[0]) ? 'descending' : 'ascending';
+                }
+            }
+        }
+
+        return $direction;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPageNumber()
+    {
+        $page = $this->getAttribute('page');
+
+        if (!empty($page['number'])) {
+            return (int) $page['number'];
+        }
+
+        return 1;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPageLimit()
+    {
+        $page = $this->getAttribute('page');
+
+        if (!empty($page['limit'])) {
+            return (int) $page['limit'];
+        }
+
+        return;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPageOffset()
+    {
+        $page = $this->getAttribute('page');
+
+        if (!empty($page['offset'])) {
+            return (string) $page['offset'];
+        }
+
+        return;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getPageSize()
+    {
+        $page = $this->getAttribute('page');
+
+        if (!empty($page['size'])) {
+            return (int) $page['size'];
+        }
+
+        return;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getPageCursor()
+    {
+        $page = $this->getAttribute('page');
+
+        if (!empty($page['cursor'])) {
+            return (string) $page['cursor'];
+        }
+
+        return;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getFilters()
+    {
+        return $this->request->getAttribute('filter', null);
     }
 }
