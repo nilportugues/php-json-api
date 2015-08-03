@@ -13,7 +13,6 @@ Serializer transformers outputting valid API (PSR-7) Responses in **JSON**, **JS
   * [4.1. JSON](#41-json)
   * [4.2. JSend](#42-jsend)
   * [4.3. JSON API](#43-json-api)
-  * [4.3. JSON API](#43-json-api)
   * [4.4. HAL+JSON](#44-hal-json)
 * [5. Quality Code](#5-quality-code)
 * [6. Questions?](#6-questions)
@@ -169,7 +168,7 @@ We'll see how the mapping works and outputs.
 
 
 
-### JSON 
+### 4.1. JSON
 Given a PHP object, the JSON transformer will transform it to a valid JSON representation. It will preserve the data structure given by the properties of the classes and arrays used by the PHP Object.
 
 Notice **all keys are normalized to under_score**. This differs from the `JsonTransformer` class provided by the `nilportugues/serializer` library.
@@ -253,7 +252,7 @@ The following PSR-7 Response objects providing the right headers and HTTP status
 - `NilPortugues\Api\Http\Message\Json\UnsupportedActionResponse($json)`
 
 
-### JSend
+### 4.2. JSend
 
 JSend is a tiny and simple extension of JSON. Its implementation is really simple and follows the specification proposed by `http://labs.omniti.com/labs/jsend`.
 
@@ -332,7 +331,7 @@ All you need is use the only 3 Response PSR-7 objects backing the proposed speci
 - `NilPortugues\Api\Http\Message\JSend\ErrorResponse($message, $code = 500, $data = null)`
 
 
-### JSON API
+### 4.3. JSON API
 Given a PHP Object, and a series of mappings, the JSON API transformer will represent the given data following the `http://jsonapi.org` specification.
 
 **Code:**
@@ -517,7 +516,7 @@ The following PSR-7 Response objects providing the right headers and HTTP status
 - `NilPortugues\Api\Http\Message\JsonApi\UnsupportedActionResponse($json)`
 
 
-### (WIP) HAL+JSON
+### 4.4. HAL+JSON
 Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification draft.
 
 
