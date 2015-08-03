@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace NilPortugues\Api\Http\Message\JsonApi;
+namespace NilPortugues\Api\Http\Message\HalJson;
 
 abstract class AbstractResponse extends \NilPortugues\Api\Http\Message\AbstractResponse
 {
@@ -16,7 +16,7 @@ abstract class AbstractResponse extends \NilPortugues\Api\Http\Message\AbstractR
      * @var array
      */
     protected $headers = [
-        'Content-type' => 'application/vnd.api+json',
+        'Content-type' => 'application/hal+json',
         'Cache-Control' => 'private, max-age=0, must-revalidate',
     ];
 }

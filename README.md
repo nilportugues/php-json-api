@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/nilportugues/json-api-transformers.svg)](https://travis-ci.org/nilportugues/json-api-transformers) [![Coverage Status](https://coveralls.io/repos/nilportugues/json-api/badge.svg?branch=master&service=github)](https://coveralls.io/github/nilportugues/json-api?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nilportugues/json-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nilportugues/json-api/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e39e4c0e-a402-495b-a763-6e0482e2083d/mini.png)](https://insight.sensiolabs.com/projects/e39e4c0e-a402-495b-a763-6e0482e2083d) [![Latest Stable Version](https://poser.pugx.org/nilportugues/json-api/v/stable)](https://packagist.org/packages/nilportugues/json-api) [![Total Downloads](https://poser.pugx.org/nilportugues/json-api/downloads)](https://packagist.org/packages/nilportugues/json-api) [![License](https://poser.pugx.org/nilportugues/json-api/license)](https://packagist.org/packages/nilportugues/json-api) 
 
-Serializer transformers outputting valid API responses in JSON, JSEND, JSON API and HAL+JSON API formats.
+Serializer transformers outputting valid API (PSR-7) Responses in **JSON**, **JSend**, **JSON API** and **HAL+JSON** API formats.
 
 ## Purpose
 
@@ -11,11 +11,11 @@ Web APIs are quick becoming the centerpiece of today entreprises and business, b
 
 API are a mandated requirement for today's modern enterprise, **enabling interactions with customers** over new mobility and social channels and evolving ways to **reach new customers through partner and third party applications**.
 
-The provided **JSON API package** will allow you to **accomplish this goal in no time**.
+The provided **JSON API Transformers package** will allow you to **accomplish this goal in no time**.
 
 ## Features
 
-- Transform to JSON, JSONAPI and HAL+JSON format using mappings. 
+- Transform to JSON, JSend, JSONAPI and HAL+JSON format using mappings.
 - Supports nested classes, no matter its complexity.
 - Allows renaming of classes and properties.
 - Allows hiding properties.
@@ -162,13 +162,26 @@ Notice **all keys are normalized to under_score**. This differs from the `JsonTr
 **Code:**
 
 ```php
-use NilPortugues\Serializer\Serializer;
-use NilPortugues\Api\Transformer\Json\JsonTransformer;
+$transformer = new \NilPortugues\Api\Transformer\Json\JsonTransformer($mapper);
+$serializer = new \NilPortugues\Serializer\Serializer($transformer);
 
-$transformer = new JsonTransformer($mapper);
-$serializer = new Serializer($transformer);
+$output = $serializer->serialize($post);
+$response = new \NilPortugues\Api\Http\Message\Json\Response($output);
 
-echo $serializer->serialize($post);
+//PSR7 Response with headers and content.
+header(
+    sprintf(
+        'HTTP/%s %s %s',
+        $response->getProtocolVersion(),
+        $response->getStatusCode(),
+        $response->getReasonPhrase()
+    )
+);
+foreach($response->getHeaders() as $header => $values) {
+    header(sprintf("%s:%s\n", $header, implode(', ', $values)));
+}
+
+echo $response->getBody();
 ```
 
 **Note:** `JsonTransformer` **optionally** requires the `Mapper`. If none is provided, class will be transformed to JSON but no other transformations will be applied.
@@ -176,6 +189,11 @@ echo $serializer->serialize($post);
 
 **Output:**
 
+```
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-type: application/json; charset=utf-8
+```
 
 ```json
 {
@@ -203,6 +221,80 @@ echo $serializer->serialize($post);
 }
 ```
 
+### JSend
+
+JSend is a tiny and simple extension of JSON. Its implementation is really simple and follows the specification proposed by `http://labs.omniti.com/labs/jsend`.
+
+All you need is use the 3 Response PSR-7 objects backing the proposed specification:
+
+
+- \NilPortugues\Api\Http\Message\JSend\Response($json)
+- \NilPortugues\Api\Http\Message\JSend\FailResponse($content)
+- \NilPortugues\Api\Http\Message\JSend\ErrorResponse($message, $code = 500, $data = null)
+
+
+```php
+$transformer = new \NilPortugues\Api\Transformer\Json\JsonTransformer($mapper);
+$serializer = new \NilPortugues\Serializer\Serializer($transformer);
+
+$output = $serializer->serialize($post);
+
+//Notice how here JSend response is used instead!!
+$response = new \NilPortugues\Api\Http\Message\JSend\Response($output);
+
+
+//PSR7 Response with headers and content.
+header(
+    sprintf(
+        'HTTP/%s %s %s',
+        $response->getProtocolVersion(),
+        $response->getStatusCode(),
+        $response->getReasonPhrase()
+    )
+);
+foreach($response->getHeaders() as $header => $values) {
+    header(sprintf("%s:%s\n", $header, implode(', ', $values)));
+}
+
+echo $response->getBody();
+```
+
+**Output:**
+
+```
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-type: application/json; charset=utf-8
+```
+
+```json
+{
+    "status": "success",
+    "data": {
+        "post_id": 9,
+        "title": "Hello World",
+        "content": "Your first post",
+        "author": {
+            "user_id": 1,
+            "name": "Post Author"
+        },
+        "comments": [
+            {
+                "comment_id": 1000,
+                "dates": {
+                    "created_at": "2015-08-03T21:11:57+02:00",
+                    "accepted_at": "2015-08-03T21:46:57+02:00"
+                },
+                "comment": "Have no fear, sers, your king is safe.",
+                "user": {
+                    "user_id": 2,
+                    "name": "Barristan Selmy"
+                }
+            }
+        ]
+    }
+}
+```
 
 ### JSON API
 Given a PHP Object, and a series of mappings, the JSON API transformer will represent the given data following the `http://jsonapi.org` specification.
@@ -211,24 +303,45 @@ Given a PHP Object, and a series of mappings, the JSON API transformer will repr
 
 ```php
 //Build the JsonApi Transformer and set additional fields.
-$transformer = new JsonApiTransformer($mapper);
-$transformer->setApiVersion('1.0');
-$transformer->setSelfUrl('http://example.com/posts/9');
-$transformer->setNextUrl('http://example.com/posts/10');
-$transformer->addMeta(
-   'author', 
-   [
-      ['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']
-   ]
-);
+$transformer = new \NilPortugues\Api\Transformer\Json\JsonApiTransformer($mapper);
+
 
 //Output transformation
 $serializer = new Serializer($transformer);
+$serializer->setApiVersion('1.0');
+$serializer->setSelfUrl('http://example.com/posts/9');
+$serializer->setNextUrl('http://example.com/posts/10');
+$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
-echo $serializer->serialize($post);
+$output = $serializer->serialize($post);
+
+//Notice the JsonApi Response object!!!
+$response = new \NilPortugues\Api\Http\Message\JsonApi\Response($output);
+
+
+//PSR7 Response with headers and content.
+header(
+    sprintf(
+        'HTTP/%s %s %s',
+        $response->getProtocolVersion(),
+        $response->getStatusCode(),
+        $response->getReasonPhrase()
+    )
+);
+foreach($response->getHeaders() as $header => $values) {
+    header(sprintf("%s:%s\n", $header, implode(', ', $values)));
+}
+
+echo $response->getBody();
 ```
 
 **Output:**
+
+```
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-type: application/vnd.api+json
+```
 
 ```json
 {
@@ -310,7 +423,53 @@ echo $serializer->serialize($post);
 ```
 
 ### (WIP) HAL+JSON
-Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification.
+Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification draft.
+
+
+```php
+//Build the JsonApi Transformer and set additional fields.
+$transformer = new \NilPortugues\Api\Transformer\Json\JsonApiTransformer($mapper);
+
+
+//Output transformation
+$serializer = new Serializer($transformer);
+$serializer->setApiVersion('1.0');
+$serializer->setSelfUrl('http://example.com/posts/9');
+$serializer->setNextUrl('http://example.com/posts/10');
+$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+
+$output = $serializer->serialize($post);
+
+//Notice the HalJson Response object!!!
+$response = new \NilPortugues\Api\Http\Message\HalJson\Response($output);
+
+
+//PSR7 Response with headers and content.
+header(
+    sprintf(
+        'HTTP/%s %s %s',
+        $response->getProtocolVersion(),
+        $response->getStatusCode(),
+        $response->getReasonPhrase()
+    )
+);
+foreach($response->getHeaders() as $header => $values) {
+    header(sprintf("%s:%s\n", $header, implode(', ', $values)));
+}
+
+echo $response->getBody();
+```
+
+**Output:**
+
+```
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-type: application/hal+json
+```
+
+```json
+```
 
 
 ## Quality Code

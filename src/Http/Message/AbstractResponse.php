@@ -31,7 +31,10 @@ abstract class AbstractResponse implements ResponseInterface
     /**
      * @var array
      */
-    protected $headers = ['Content-type' => 'application/json; charset=utf-8'];
+    protected $headers = [
+        'Content-type' => 'application/json; charset=utf-8',
+        'Cache-Control' => 'private, max-age=0, must-revalidate',
+    ];
 
     /**
      * @param string $body

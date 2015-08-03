@@ -15,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Class AbstractRequest.
  */
-final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
+final class Request
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -136,17 +136,18 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getPageNumber()
     {
         $page = $this->getAttribute('page');
+        $number = 1;
 
         if (!empty($page['number'])) {
-            return (int) $page['number'];
+            $number = (int) $page['number'];
         }
 
-        return 1;
+        return $number;
     }
 
     /**
@@ -155,12 +156,13 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     public function getPageLimit()
     {
         $page = $this->getAttribute('page');
+        $limit = null;
 
         if (!empty($page['limit'])) {
-            return (int) $page['limit'];
+            $limit = (int) $page['limit'];
         }
 
-        return;
+        return $limit;
     }
 
     /**
@@ -170,11 +172,12 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     {
         $page = $this->getAttribute('page');
 
+        $offset = null;
         if (!empty($page['offset'])) {
-            return (string) $page['offset'];
+            $offset = (string) $page['offset'];
         }
 
-        return;
+        return $offset;
     }
 
     /**
@@ -183,12 +186,13 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     public function getPageSize()
     {
         $page = $this->getAttribute('page');
+        $size = null;
 
         if (!empty($page['size'])) {
-            return (int) $page['size'];
+            $size = (int) $page['size'];
         }
 
-        return;
+        return $size;
     }
 
     /**
@@ -197,12 +201,13 @@ final class Request extends \NilPortugues\Api\Http\Message\AbstractRequest
     public function getPageCursor()
     {
         $page = $this->getAttribute('page');
+        $cursor = null;
 
         if (!empty($page['cursor'])) {
-            return (string) $page['cursor'];
+            $cursor = (string) $page['cursor'];
         }
 
-        return;
+        return $cursor;
     }
 
     /**
