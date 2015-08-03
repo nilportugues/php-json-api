@@ -5,7 +5,22 @@
 
 Serializer transformers outputting valid API (PSR-7) Responses in **JSON**, **JSend**, **JSON API** and **HAL+JSON** API formats.
 
-## Purpose
+
+* [1. Purpose](#1-purpose)
+* [2. Features](#2-features)
+* [3. Installation](#3-installation)
+* [4. Usage](#4-usage)
+  * [4.1. JSON](#41-json)
+  * [4.2. JSend](#42-jsend)
+  * [4.3. JSON API](#43-json-api)
+  * [4.3. JSON API](#43-json-api)
+  * [4.4. HAL+JSON](#44-hal-json)
+* [5. Quality Code](#5-quality-code)
+* [6. Questions?](#6-questions)
+* [7. Author](#7-author)
+
+
+## 1. Purpose
 
 Web APIs are quick becoming the centerpiece of today entreprises and business, big or small, and allow us **to connect anything and everything**. By exposing data and application functionality to external applications **any organization can remake its business into an extensible platform**. 
 
@@ -13,7 +28,7 @@ API are a mandated requirement for today's modern enterprise, **enabling interac
 
 The provided **JSON API Transformers package** will allow you to **accomplish this goal in no time**.
 
-## Features
+## 2. Features
 
 - Transform to JSON, JSend, JSONAPI and HAL+JSON format using mappings.
 - Supports nested classes, no matter its complexity.
@@ -23,14 +38,14 @@ The provided **JSON API Transformers package** will allow you to **accomplish th
 - Fully tested and high quality code.
 - Actively supported and maintained.
 
-## Installation
+## 3. Installation
 The recommended way to install the  JSON API Transformers is through [Composer](http://getcomposer.org). Run the following command to install it:
 
 ```sh
 php composer.phar require nilportugues/json-api
 ```
 
-## Usage
+## 4. Usage
 Given the following piece of code, defining a Blog Post and some Comments:
 
 ```php
@@ -221,16 +236,28 @@ Content-type: application/json; charset=utf-8
 }
 ```
 
+
+#### Response objects
+
+The following PSR-7 Response objects providing the right headers and HTTP status codes are available:
+
+- `NilPortugues\Api\Http\Message\Json\ErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourceCreatedResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourceDeletedResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourceNotFoundResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourcePatchErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourcePostErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourceProcessingResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\ResourceUpdatedResponse($json)`
+- `NilPortugues\Api\Http\Message\Json\Response($json)`
+- `NilPortugues\Api\Http\Message\Json\UnsupportedActionResponse($json)`
+
+
 ### JSend
 
 JSend is a tiny and simple extension of JSON. Its implementation is really simple and follows the specification proposed by `http://labs.omniti.com/labs/jsend`.
 
-All you need is use the 3 Response PSR-7 objects backing the proposed specification:
 
-
-- \NilPortugues\Api\Http\Message\JSend\Response($json)
-- \NilPortugues\Api\Http\Message\JSend\FailResponse($content)
-- \NilPortugues\Api\Http\Message\JSend\ErrorResponse($message, $code = 500, $data = null)
 
 
 ```php
@@ -295,6 +322,15 @@ Content-type: application/json; charset=utf-8
     }
 }
 ```
+
+#### Response objects
+
+All you need is use the only 3 Response PSR-7 objects backing the proposed specification:
+
+- `NilPortugues\Api\Http\Message\JSend\Response($json)`
+- `NilPortugues\Api\Http\Message\JSend\FailResponse($content)`
+- `NilPortugues\Api\Http\Message\JSend\ErrorResponse($message, $code = 500, $data = null)`
+
 
 ### JSON API
 Given a PHP Object, and a series of mappings, the JSON API transformer will represent the given data following the `http://jsonapi.org` specification.
@@ -422,6 +458,65 @@ Content-type: application/vnd.api+json
 }
 ```
 
+#### Request objects
+
+JsonApi comes with a helper Request class, `NilPortugues\Api\Http\Message\JsonApi\Request(ServerRequestInterface $request)`, implementing the PSR-7 Request Interface. Using this request object will provide you access to all the interactions expected in a JsonApi API:
+
+##### JsonApi Query Parameters:
+
+- &filter[resource]=field1,field2
+- &include[resource]
+- &include[resource.field1]
+- &sort=field1,-field2
+- &sort=-field1,field2
+- &page[number]
+- &page[limit]
+- &page[cursor]
+- &page[offset]
+- &page[size]
+
+
+##### NilPortugues\Api\Http\Message\JsonApi\Request Interface
+
+Given the query parameters listed above, Request implements helper methods that parse and return data already prepared.
+
+```php
+namespace NilPortugues\Api\Http\Message\JsonApi;
+
+final class Request
+{
+    public function __construct(ServerRequestInterface $request) { ... }
+    public function getIncludedFields($resourceType) { ... }
+    public function getQueryParam($name, $default = null) { ... }
+    public function getIncludedRelationships($baseRelationshipPath) { ... }
+    public function getSortFields() { ... }
+    public function getAttribute($name, $default = null) { ... }
+    public function getSortDirection() { ... }
+    public function getPageNumber() { ... }
+    public function getPageLimit() { ... }
+    public function getPageOffset() { ... }
+    public function getPageSize() { ... }
+    public function getPageCursor() { ... }
+    public function getFilters() { ... }
+}
+```
+
+#### Response objects
+
+The following PSR-7 Response objects providing the right headers and HTTP status codes are available:
+
+- `NilPortugues\Api\Http\Message\JsonApi\ErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourceCreatedResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourceDeletedResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourceNotFoundResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourcePatchErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourcePostErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourceProcessingResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\ResourceUpdatedResponse($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\Response($json)`
+- `NilPortugues\Api\Http\Message\JsonApi\UnsupportedActionResponse($json)`
+
+
 ### (WIP) HAL+JSON
 Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification draft.
 
@@ -472,7 +567,23 @@ Content-type: application/hal+json
 ```
 
 
-## Quality Code
+#### Response objects
+
+The following PSR-7 Response objects providing the right headers and HTTP status codes are available:
+
+- `NilPortugues\Api\Http\Message\HalJson\ErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourceCreatedResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourceDeletedResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourceNotFoundResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourcePatchErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourcePostErrorResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourceProcessingResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\ResourceUpdatedResponse($json)`
+- `NilPortugues\Api\Http\Message\HalJson\Response($json)`
+- `NilPortugues\Api\Http\Message\HalJson\UnsupportedActionResponse($json)`
+
+
+## 5. Quality Code
 Testing has been done using PHPUnit and [Travis-CI](https://travis-ci.org). All code has been tested to be compatible from PHP 5.5 and above, plus [HHVM](http://hhvm.com/).
 
 To run the test suite, you need [Composer](http://getcomposer.org):
@@ -483,10 +594,10 @@ To run the test suite, you need [Composer](http://getcomposer.org):
 ```
 
 
-## Questions?
+## 6. Questions?
 Drop me an e-mail or get in touch with me using [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nilportugues/json-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-## Author
+## 7. Author
 Nil Portugués Calderó
 
  - <contact@nilportugues.com>

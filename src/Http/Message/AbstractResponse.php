@@ -37,11 +37,11 @@ abstract class AbstractResponse implements ResponseInterface
     ];
 
     /**
-     * @param string $body
+     * @param string $json
      */
-    public function __construct($body)
+    public function __construct($json)
     {
-        $this->response = self::instance($body, $this->httpCode, $this->headers);
+        $this->response = self::instance($json, $this->httpCode, $this->headers);
     }
 
     /**
