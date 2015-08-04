@@ -475,7 +475,7 @@ JsonApi comes with a helper Request class, `NilPortugues\Api\Http\Message\JsonAp
 - &page[size]
 
 
-##### NilPortugues\Api\Http\Message\JsonApi\Request Interface
+##### NilPortugues\Api\Http\Message\JsonApi\Request
 
 Given the query parameters listed above, Request implements helper methods that parse and return data already prepared.
 
@@ -521,8 +521,8 @@ Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will 
 
 
 ```php
-//Build the JsonApi Transformer and set additional fields.
-$transformer = new \NilPortugues\Api\Transformer\Json\JsonApiTransformer($mapper);
+//Build the HalJson Transformer and set additional fields.
+$transformer = new \NilPortugues\Api\Transformer\Json\HalJsonTransformer($mapper);
 
 
 //Output transformation
