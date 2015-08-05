@@ -51,10 +51,9 @@ $mappings = [
             'self' => 'http://example.com/posts/{postId}',
         ],
         'relationships' => [
-            //@todo relationship and related tags should be groupped by attribute...
             'author' => [
                 'related' => 'http://example.com/posts/{postId}/author',
-                'relationships' => 'http://example.com/posts/{postId}/relationships/author',
+                'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
         ],
     ],

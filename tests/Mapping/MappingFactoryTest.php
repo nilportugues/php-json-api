@@ -33,10 +33,11 @@ class MappingFactoryTest extends \PHPUnit_Framework_TestCase
             ],
             'urls' => [
                 'self' => 'http://example.com/posts/{postId}',
-                'related' => 'http://example.com/posts/{postId}/author',
-                'relationships' => [
+            ],
+            'relationships' => [
+                'author' => [
+                    'related' => 'http://example.com/posts/{postId}/author',
                     'self' => 'http://example.com/posts/{postId}/relationships/author',
-                    'tags' => 'http://example.com/posts/{postId}/relationships/tags',
                 ],
             ],
         ];
@@ -49,8 +50,8 @@ class MappingFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['comments'], $mapping->getHiddenProperties());
         $this->assertEquals(['postId'], $mapping->getIdProperties());
         $this->assertEquals('http://example.com/posts/{postId}', $mapping->getResourceUrl());
-        $this->assertEquals('http://example.com/posts/{postId}/author', $mapping->getRelatedUrl());
-        $this->assertEquals('http://example.com/posts/{postId}/relationships/author', $mapping->getRelationshipSelfUrl());
+        $this->assertEquals('http://example.com/posts/{postId}/author', $mapping->getRelatedUrl('author'));
+        $this->assertEquals('http://example.com/posts/{postId}/relationships/author', $mapping->getRelationshipSelfUrl('author'));
     }
 
     public function testItWillThrowExceptionIfArrayHasNoClassKey()
