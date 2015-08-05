@@ -121,13 +121,4 @@ class MappingTest extends \PHPUnit_Framework_TestCase
         $this->mapping->setSelfUrl('/api/post/{postId}');
         $this->assertEquals('/api/post/{postId}', $this->mapping->getSelfUrl());
     }
-
-    /**
-     *
-     */
-    public function testRelatedUrl()
-    {
-        $this->mapping->setRelatedUrl('/api/post/{postId}/related');
-        $this->assertEquals('/api/post/{postId}/related', $this->mapping->getRelatedUrl());
-    }
 }

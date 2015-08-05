@@ -43,46 +43,76 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testItWillSerializeToJsonApiAComplexObject()
     {
-        $post = new Post(
-            new PostId(9),
-            'Hello World',
-            'Your first post',
-            new User(
-                new UserId(1),
-                'Post Author'
-            ),
-            [
-                new Comment(
-                    new CommentId(1000),
-                    'Have no fear, sers, your king is safe.',
-                    new User(new UserId(2), 'Barristan Selmy'),
-                    [
-                        'created_at' => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
-                        'accepted_at' => (new DateTime('2015-07-19T00:00:00+00:00'))->format('c'),
-                    ]
-                ),
-            ]
-        );
-
-        $postMapping = new Mapping(Post::class, 'http://example.com/posts/{postId}', ['postId']);
-        $postMapping->setSelfUrl('http://example.com/posts/1');
-        $postMapping->setRelatedUrl('http://api.example.com/posts/{postId}/author');
-        $postMapping->setRelationshipUrl('http://api.example.com/posts/{postId}/relationships/author');
-
-        $postIdMapping = new Mapping(PostId::class, 'http://example.com/posts/{postId}', ['postId']);
-        $userMapping = new Mapping(User::class, 'http://example.com/users/{userId}', ['userId']);
-        $userIdMapping = new Mapping(UserId::class,  'http://example.com/users/{userId}', ['userId']);
-        $commentMapping = new Mapping(Comment::class, 'http://example.com/comments/{commentId}', ['commentId']);
-        $commentIdMapping = new Mapping(CommentId::class, 'http://example.com/comments/{commentId}', ['commentId']);
-
         $mappings = [
-            $postMapping->getClassName() => $postMapping,
-            $postIdMapping->getClassName() => $postIdMapping,
-            $userMapping->getClassName() => $userMapping,
-            $userIdMapping->getClassName() => $userIdMapping,
-            $commentMapping->getClassName() => $commentMapping,
-            $commentIdMapping->getClassName() => $commentIdMapping,
+            [
+                'class' => Post::class,
+                'id_properties' => [
+                    'postId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/posts/{postId}',
+                ],
+                'relationships' => [
+                    'author' => [
+                        'related' => 'http://example.com/posts/{postId}/author',
+                        'self' => 'http://example.com/posts/{postId}/relationships/author',
+                    ],
+                ],
+            ],
+            [
+                'class' => PostId::class,
+                'id_properties' => [
+                    'postId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/posts/{postId}',
+                    'relationships' => [
+                        Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
+                    ],
+                ],
+            ],
+            [
+                'class' => User::class,
+                'id_properties' => [
+                    'userId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/users/{userId}',
+                ],
+            ],
+            [
+                'class' => UserId::class,
+                'id_properties' => [
+                    'userId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/users/{userId}',
+                ],
+            ],
+            [
+                'class' => Comment::class,
+                'id_properties' => [
+                    'commentId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/comments/{commentId}',
+                    'relationships' => [
+                        Post::class => 'http://example.com/posts/{postId}/relationships/comments',
+                    ],
+                ],
+            ],
+            [
+                'class' => CommentId::class,
+                'id_properties' => [
+                    'commentId',
+                ],
+                'urls' => [
+                    'self' => 'http://example.com/comments/{commentId}',
+                ],
+            ],
         ];
+
+        $mapper = new Mapper($mappings);
 
         $expected = <<<JSON
 {
@@ -99,8 +129,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         "relationships": {
             "author": {
                 "links": {
-                    "self": "http://api.example.com/posts/9/relationships/author",
-                    "related": "http://api.example.com/posts/9/author"
+                    "self": "http://example.com/posts/9/relationships/author",
+                    "related": "http://example.com/posts/9/author"
                 },
                 "data": {
                     "type": "user",
@@ -162,9 +192,26 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
     }
 }
 JSON;
-
-        $mapper = new Mapper();
-        $mapper->setClassMap($mappings);
+        $post = new Post(
+            new PostId(9),
+            'Hello World',
+            'Your first post',
+            new User(
+                new UserId(1),
+                'Post Author'
+            ),
+            [
+                new Comment(
+                    new CommentId(1000),
+                    'Have no fear, sers, your king is safe.',
+                    new User(new UserId(2), 'Barristan Selmy'),
+                    [
+                        'created_at' => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
+                        'accepted_at' => (new DateTime('2015-07-19T00:00:00+00:00'))->format('c'),
+                    ]
+                ),
+            ]
+        );
 
         $transformer = new JsonApiTransformer($mapper);
         $transformer->setApiVersion('1.0');

@@ -38,18 +38,10 @@ class MappingFactory
             $mapping->setHiddenProperties($mappedClass['hide_properties']);
         }
 
-        if (false === empty($mappedClass['urls']['related'])) {
-            $mapping->setRelatedUrl($mappedClass['urls']['related']);
-            unset($mappedClass['urls']['related']);
-        }
-
-        if (false === empty($mappedClass['urls']['relationships']['self'])) {
-            $mapping->setRelationshipUrl($mappedClass['urls']['relationships']['self']);
-            unset($mappedClass['urls']['relationships']['self']);
-        }
-
-        if (false === empty($mappedClass['urls']['relationships'])) {
-            $mapping->addAdditionalRelationships($mappedClass['urls']['relationships']);
+        if (!empty($mappedClass['relationships'])) {
+            foreach ($mappedClass['relationships'] as $propertyName => $urls) {
+                $mapping->setRelationshipUrls($propertyName, $urls);
+            }
         }
 
         return $mapping;
