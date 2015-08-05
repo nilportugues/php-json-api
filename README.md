@@ -13,7 +13,7 @@ Serializer transformers outputting valid API (PSR-7) Responses in **JSON**, **JS
   * [4.1. JSON](#41-json)
   * [4.2. JSend](#42-jsend)
   * [4.3. JSON API](#43-json-api)
-  * [4.4. HAL+JSON](#44-hal-json)
+  * [4.4. HAL+JSON](#44-haljson)
 * [5. Quality Code](#5-quality-code)
 * [6. Questions?](#6-questions)
 * [7. Author](#7-author)
