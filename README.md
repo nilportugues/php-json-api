@@ -87,10 +87,12 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/posts/{postId}',
-            'related' => 'http://example.com/posts/{postId}/author',
-            'relationships' => [
+        ],
+        'relationships' => [
+            'author' => [
+                'related' => 'http://example.com/posts/{postId}/author',
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
-            ],
+            ]
         ],
     ],
     [
@@ -103,9 +105,11 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/posts/{postId}',
-            'relationships' => [
-                Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
-            ],
+        ]
+        'relationships' => [
+            'comment' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+            ]
         ],
     ],
     [
@@ -142,8 +146,10 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/comments/{commentId}',
-            'relationships' => [
-                Post::class => 'http://example.com/posts/{postId}/relationships/comments',
+        ],
+        'relationships' => [
+            'post' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ],
         ],
     ],
