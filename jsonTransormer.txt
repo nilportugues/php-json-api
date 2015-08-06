@@ -1,8 +1,8 @@
 <?php
 
-use NilPortugues\Api\Http\Message\JSend\Response;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Transformer\Json\JsonApiTransformer;
+use NilPortugues\Api\Transformer\Json\HalJsonTransformer;
 use NilPortugues\Api\Transformer\Json\JsonTransformer;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\Comment;
@@ -128,16 +128,16 @@ $mappings = [
 $mapper = new Mapper($mappings);
 
 
-$serializer = new JsonApiTransformer($mapper);
-$serializer->setApiVersion('1.0');
-$serializer->setSelfUrl('http://example.com/posts/9');
-$serializer->setNextUrl('http://example.com/posts/10');
-$serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+$serializer = new HalJsonTransformer($mapper);
+//$serializer->setApiVersion('1.0');
+//$serializer->setSelfUrl('http://example.com/posts/9');
+//$serializer->setNextUrl('http://example.com/posts/10');
+//$serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 
 $jsonResponse = (new Serializer($serializer))->serialize($post);
 
-$response = new NilPortugues\Api\Http\Message\JsonApi\Response($jsonResponse);
+$response = new NilPortugues\Api\Http\Message\HalJson\Response($jsonResponse);
 
 header(
     sprintf(

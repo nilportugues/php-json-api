@@ -2,7 +2,12 @@
 
 namespace NilPortugues\Api\Transformer\Json;
 
+use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
+use NilPortugues\Api\Transformer\TransformerException;
+use NilPortugues\Serializer\Serializer;
 
 /**
  * This Transformer follows the JSON+HAL specification.
@@ -32,11 +37,79 @@ class HalJsonTransformer extends Transformer
 
 
     /**
-     * @param mixed $value
+     * @param array $value
      *
+     * @throws \NilPortugues\Api\Transformer\TransformerException
      * @return string
      */
     public function serialize($value)
     {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
+
+        if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
+            $data = [];
+            unset($value[Serializer::MAP_TYPE]);
+            foreach ($value[Serializer::SCALAR_VALUE] as $v) {
+                $data[] = $this->serializeObject($v);
+            }
+        } else {
+            $data = $this->serializeObject($value);
+        }
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function serializeObject(array $value)
+    {
+        $value = $this->preSerialization($value);
+        $data = $this->serialization($value);
+
+        return $this->postSerialization($data);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function preSerialization(array $value)
+    {
+        /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
+        foreach ($this->mappings as $class => $mapping) {
+            RecursiveFilterHelper::deletePropertiesNotInFilter($this->mappings, $value, $class);
+            RecursiveDeleteHelper::deleteProperties($this->mappings, $value, $class);
+            RecursiveRenamerHelper::renameKeyValue($this->mappings, $value, $class);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    private function serialization(array &$data)
+    {
+        return $data;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    private function postSerialization(array &$data)
+    {
+        return $data;
     }
 }
