@@ -8,9 +8,9 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
+namespace NilPortugues\Tests\Api\Http\Message\HalJson;
 
-use NilPortugues\Api\Http\Message\JsonApi\ResourceDeletedResponse;
+use NilPortugues\Api\Http\Message\HalJson\ResourceDeletedResponse;
 
 class ResourceDeletedResponseTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,6 +20,6 @@ class ResourceDeletedResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(null, $response->getBody());
         $this->assertEquals(204, $response->getStatusCode());
-        $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+        $this->assertEquals(['application/hal+json'], $response->getHeader('Content-type'));
     }
 }

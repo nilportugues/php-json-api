@@ -491,7 +491,6 @@ namespace NilPortugues\Api\Http\Message\JsonApi;
 final class Request
 {
     public function __construct(ServerRequestInterface $request) { ... }
-    public function getIncludedFields($resourceType) { ... }
     public function getQueryParam($name, $default = null) { ... }
     public function getIncludedRelationships($baseRelationshipPath) { ... }
     public function getSortFields() { ... }
