@@ -15,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Class AbstractRequest.
  */
-final class Request
+final class Request extends \Zend\Diactoros\Request
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -23,21 +23,6 @@ final class Request
     public function __construct(ServerRequestInterface $request)
     {
         $this->request = $request;
-    }
-
-    /**
-     * @param string $resourceType
-     *
-     * @return array
-     */
-    public function getIncludedFields($resourceType)
-    {
-        $includedFields = [];
-        foreach ($this->getQueryParam('fields', []) as $resourceType => $fields) {
-            $includedFields[$resourceType] = array_flip(explode(',', $fields));
-        }
-
-        return isset($includedFields[$resourceType]) ? array_keys($includedFields[$resourceType]) : [];
     }
 
     /**
@@ -52,32 +37,26 @@ final class Request
     }
 
     /**
-     * @param string $baseRelationshipPath
-     *
      * @return array
      */
-    public function getIncludedRelationships($baseRelationshipPath)
+    public function getIncludedRelationships()
     {
         $relationshipNames = explode(',', $this->getQueryParam('include', ''));
         $relationships = [];
 
         foreach ($relationshipNames as $relationship) {
-            $relationship = ".$relationship.";
-            $length = strlen($relationship);
-            $dot1 = 0;
-            while ($dot1 < $length - 1) {
-                $dot2 = strpos($relationship, '.', $dot1 + 1);
-                $path = substr($relationship, 1, $dot1 > 0 ? $dot1 - 1 : 0);
-                $name = substr($relationship, $dot1 + 1, $dot2 - $dot1 - 1);
-                if (isset($relationships[$path]) === false) {
-                    $relationships[$path] = [];
-                }
-                $relationships[$path][$name] = $name;
-                $dot1 = $dot2;
-            };
+            $data = explode('.', $relationship);
+            $type = $data[0];
+            $attribute = (!empty($data[1])) ? $data[1] : null;
+
+            if (null === $attribute) {
+                $relationships[$type] = $type;
+            } else {
+                $relationships[$type][] = $attribute;
+            }
         }
 
-        return (isset($relationships[$baseRelationshipPath])) ? $relationships[$baseRelationshipPath] : [];
+        return $relationships;
     }
 
     /**
@@ -85,7 +64,7 @@ final class Request
      */
     public function getSortFields()
     {
-        $sort = $this->getAttribute('sort');
+        $sort = $this->getQueryParam('sort');
         $fields = null;
 
         if (!empty($sort)) {
@@ -103,22 +82,12 @@ final class Request
     }
 
     /**
-     * @param string $name
-     * @param mixed  $default
-     *
-     * @return mixed
-     */
-    public function getAttribute($name, $default = null)
-    {
-        return $this->request->getAttribute($name, $default);
-    }
-
-    /**
      * @return array|null
      */
     public function getSortDirection()
     {
-        $sort = $this->getAttribute('sort');
+        $sort = $this->getQueryParam('sort');
+
         $direction = null;
 
         if (!empty($sort)) {
@@ -127,7 +96,7 @@ final class Request
             $fields = explode(',', $sort);
             if (!empty($fields)) {
                 foreach ($fields as $field) {
-                    $direction[$field] = ('-' === $field[0]) ? 'descending' : 'ascending';
+                    $direction[ltrim($field, '-')] = ('-' === $field[0]) ? 'descending' : 'ascending';
                 }
             }
         }
@@ -140,7 +109,7 @@ final class Request
      */
     public function getPageNumber()
     {
-        $page = $this->getAttribute('page');
+        $page = $this->getQueryParam('page');
         $number = 1;
 
         if (!empty($page['number'])) {
@@ -155,7 +124,7 @@ final class Request
      */
     public function getPageLimit()
     {
-        $page = $this->getAttribute('page');
+        $page = $this->getQueryParam('page');
         $limit = null;
 
         if (!empty($page['limit'])) {
@@ -170,7 +139,7 @@ final class Request
      */
     public function getPageOffset()
     {
-        $page = $this->getAttribute('page');
+        $page = $this->getQueryParam('page');
 
         $offset = null;
         if (!empty($page['offset'])) {
@@ -185,7 +154,7 @@ final class Request
      */
     public function getPageSize()
     {
-        $page = $this->getAttribute('page');
+        $page = $this->getQueryParam('page');
         $size = null;
 
         if (!empty($page['size'])) {
@@ -200,7 +169,7 @@ final class Request
      */
     public function getPageCursor()
     {
-        $page = $this->getAttribute('page');
+        $page = $this->getQueryParam('page');
         $cursor = null;
 
         if (!empty($page['cursor'])) {
@@ -215,6 +184,13 @@ final class Request
      */
     public function getFilters()
     {
-        return $this->request->getAttribute('filter', null);
+        $filters = $this->getQueryParam('filter', null);
+
+        foreach ($filters as &$filter) {
+            $filter = explode(',', $filter);
+            $filter = array_map('trim', $filter);
+        }
+
+        return $filters;
     }
 }

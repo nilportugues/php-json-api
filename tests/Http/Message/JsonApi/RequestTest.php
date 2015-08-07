@@ -10,9 +10,90 @@
  */
 namespace NilPortugues\Tests\Api\Http\Message\JsonApi;
 
+use NilPortugues\Api\Http\Message\JsonApi\Request;
+use Zend\Diactoros\ServerRequestFactory;
+
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-    public function testResponse()
+    /**
+     * @var Request
+     */
+    private $request;
+
+    /**
+     *
+     */
+    protected function setUp()
     {
+        $_GET = [
+            'filter' => ['user' => 'user_name,email'],
+            'include' => 'friends.username,comments',
+            'sort' => '-age,gender',
+            'page' => [
+                'number' => 1,
+                'limit' => 100,
+                'size' => 20,
+                'cursor' => 'abc',
+                'offset' => '50a',
+            ],
+        ];
+
+        $frameworkRequestObject = ServerRequestFactory::fromGlobals(null, $_GET);
+        $this->request = new Request($frameworkRequestObject);
+    }
+
+    public function testGetPageNumber()
+    {
+        $this->assertEquals(1, $this->request->getPageNumber());
+    }
+
+    public function testGetQueryParam()
+    {
+        $this->assertEquals('-age,gender', $this->request->getQueryParam('sort'));
+    }
+
+    public function testGetIncludedRelationships()
+    {
+        $expected = [
+            'friends' => ['username'],
+            'comments' => 'comments',
+        ];
+
+        $this->assertEquals($expected, $this->request->getIncludedRelationships());
+    }
+
+    public function testGetSortFields()
+    {
+        $this->assertEquals(['age', 'gender'], $this->request->getSortFields());
+    }
+
+    public function testGetSortDirection()
+    {
+        $this->assertEquals(['age' => 'descending', 'gender' => 'ascending'], $this->request->getSortDirection());
+    }
+
+    public function testGetPageLimit()
+    {
+        $this->assertEquals(100, $this->request->getPageLimit());
+    }
+
+    public function testGetPageOffset()
+    {
+        $this->assertEquals('50a', $this->request->getPageOffset());
+    }
+
+    public function testGetPageSize()
+    {
+        $this->assertEquals(20, $this->request->getPageSize());
+    }
+
+    public function testGetPageCursor()
+    {
+        $this->assertEquals('abc', $this->request->getPageCursor());
+    }
+
+    public function testGetFilters()
+    {
+        $this->assertSame(['user' => ['user_name', 'email']], $this->request->getFilters());
     }
 }

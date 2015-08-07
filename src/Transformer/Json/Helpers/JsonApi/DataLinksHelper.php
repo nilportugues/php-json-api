@@ -83,7 +83,7 @@ final class DataLinksHelper
                 $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
                 self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);
-                self::relationshipLinksRelated($mappings, $parent, $data, $propertyName);
+                self::relationshipLinksRelated($propertyName, $mappings, $parent, $data);
             }
         }
 
@@ -111,6 +111,7 @@ final class DataLinksHelper
                 array_filter(
                     [
                         JsonApiTransformer::LINKS_KEY => self::setResponseDataRelationshipSelfLinks(
+                            $propertyName,
                             $mappings,
                             $parent
                         ),
@@ -122,19 +123,21 @@ final class DataLinksHelper
     }
 
     /**
-     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
-     * @param array                               $parent
+     * @param string $propertyName
+     * @param array  $mappings
+     * @param array  $parent
      *
      * @return array
      */
-    public static function setResponseDataRelationshipSelfLinks(array &$mappings, array &$parent)
+    public static function setResponseDataRelationshipSelfLinks($propertyName, array &$mappings, array &$parent)
     {
         $data = [];
         $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
         if (!empty($mappings[$parentType])) {
             list($idValues, $idProperties) = self::getPropertyAndValues($mappings, $parent, $parentType);
-            $selfLink = $mappings[$parentType]->getRelationshipSelfUrl();
+
+            $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
             if (!empty($selfLink)) {
                 $data[JsonApiTransformer::SELF_LINK] = str_replace($idProperties, $idValues, $selfLink);
@@ -145,16 +148,16 @@ final class DataLinksHelper
     }
 
     /**
+     * @param string                              $propertyName
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $parent
      * @param array                               $data
-     * @param string                              $propertyName
      */
-    private static function relationshipLinksRelated(array &$mappings, array &$parent, array &$data, $propertyName)
+    private static function relationshipLinksRelated($propertyName, array &$mappings, array &$parent, array &$data)
     {
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
-            $relatedUrl = $mappings[$parentType]->getRelatedUrl();
+            $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
             if (!empty($relatedUrl)) {
                 list($idValues, $idProperties) = self::getPropertyAndValues($mappings, $parent, $parentType);

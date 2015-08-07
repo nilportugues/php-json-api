@@ -37,14 +37,9 @@ class Mapping
     private $selfUrl = '';
 
     /**
-     * @var string
+     * @var array
      */
-    private $relatedUrl = '';
-
-    /**
-     * @var string
-     */
-    private $relationshipSelfUrl = '';
+    private $relationshipSelfUrl = [];
 
     /**
      * @var array
@@ -135,8 +130,9 @@ class Mapping
         $replace = sprintf('{%s}', $propertyAlias);
 
         $this->selfUrl = str_replace($search, $replace, $this->selfUrl);
-        $this->relatedUrl = str_replace($search, $replace, $this->relatedUrl);
         $this->resourceUrlPattern = str_replace($search, $replace, $this->resourceUrlPattern);
+
+        //@todo: replace the relationship array links for each property.
     }
 
     /**
@@ -250,20 +246,15 @@ class Mapping
     }
 
     /**
-     * @param $type
-     * @param $relatedUrl
-     */
-    public function setRelatedUrl($relatedUrl)
-    {
-        $this->relatedUrl = (string) $relatedUrl;
-    }
-
-    /**
+     * @param $propertyName
+     *
      * @return string
      */
-    public function getRelatedUrl()
+    public function getRelatedUrl($propertyName)
     {
-        return $this->relatedUrl;
+        return (!empty($this->relationshipSelfUrl[$propertyName]['related']))
+            ? $this->relationshipSelfUrl[$propertyName]['related']
+            : '';
     }
 
     /**
@@ -283,22 +274,43 @@ class Mapping
     }
 
     /**
-     * @param string $relationshipSelfUrl
+     * @param string $propertyName
+     * @param string $urls
      *
      * @return $this
      */
-    public function setRelationshipUrl($relationshipSelfUrl)
+    public function setRelationshipUrls($propertyName, $urls)
     {
-        $this->relationshipSelfUrl = $relationshipSelfUrl;
+        $this->relationshipSelfUrl[$propertyName] = $urls;
 
         return $this;
     }
 
     /**
+     * @param $propertyName
+     *
      * @return string
      */
-    public function getRelationshipSelfUrl()
+    public function getRelationshipSelfUrl($propertyName)
     {
-        return $this->relationshipSelfUrl;
+        return (!empty($this->relationshipSelfUrl[$propertyName]['self']))
+            ? $this->relationshipSelfUrl[$propertyName]['self']
+            : '';
+    }
+
+    /**
+     * @param string $propertyName
+     *
+     * @return array
+     */
+    public function getRelationshipUrls($propertyName)
+    {
+        $copy = $this->relationshipSelfUrl[$propertyName];
+
+        if (!empty($copy[$propertyName]['self'])) {
+            unset($copy[$propertyName]['self']);
+        }
+
+        return $copy;
     }
 }

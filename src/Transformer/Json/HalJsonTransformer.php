@@ -2,7 +2,12 @@
 
 namespace NilPortugues\Api\Transformer\Json;
 
+use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
+use NilPortugues\Api\Transformer\TransformerException;
+use NilPortugues\Serializer\Serializer;
 
 /**
  * This Transformer follows the JSON+HAL specification.
@@ -11,42 +16,100 @@ use NilPortugues\Api\Transformer\Transformer;
  */
 class HalJsonTransformer extends Transformer
 {
-    /**
-     * @var
-     */
-    private $curies = [];
+    const EMBEDDED_KEY = '_embedded';
+
+    const LINKS_KEY = '_links';
+    const LINKS_TEMPLATED_KEY = 'templated';
+    const LINKS_DEPRECATION_KEY = 'deprecation';
+    const LINKS_TYPE_KEY = 'type';
+    const LINKS_NAME_KEY = 'name';
+    const LINKS_PROFILE_KEY = 'profile';
+    const LINKS_TITLE_KEY = 'title';
+    const LINKS_HREF_LANG_KEY = 'hreflang';
+
+    const MEDIA_PROFILE_KEY = 'profile';
+
+    const SELF_LINK = 'self';
+    const FIRST_LINK = 'first';
+    const LAST_LINK = 'last';
+    const PREV_LINK = 'prev';
+    const NEXT_LINK = 'next';
+
 
     /**
-     * @param array $curies
-     */
-    public function setCuries(array $curies)
-    {
-        $this->curies = array_merge($this->curies, $curies);
-    }
-
-    /**
-     * @param       $name
-     * @param array $curie
-     */
-    public function addCurie($name, array $curie)
-    {
-        $this->curies[$name] = $curie;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCuries()
-    {
-        return $this->curies;
-    }
-
-    /**
-     * @param mixed $value
+     * @param array $value
      *
+     * @throws \NilPortugues\Api\Transformer\TransformerException
      * @return string
      */
     public function serialize($value)
     {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
+
+        if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
+            $data = [];
+            unset($value[Serializer::MAP_TYPE]);
+            foreach ($value[Serializer::SCALAR_VALUE] as $v) {
+                $data[] = $this->serializeObject($v);
+            }
+        } else {
+            $data = $this->serializeObject($value);
+        }
+
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function serializeObject(array $value)
+    {
+        $value = $this->preSerialization($value);
+        $data = $this->serialization($value);
+
+        return $this->postSerialization($data);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    private function preSerialization(array $value)
+    {
+        /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
+        foreach ($this->mappings as $class => $mapping) {
+            RecursiveFilterHelper::deletePropertiesNotInFilter($this->mappings, $value, $class);
+            RecursiveDeleteHelper::deleteProperties($this->mappings, $value, $class);
+            RecursiveRenamerHelper::renameKeyValue($this->mappings, $value, $class);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    private function serialization(array &$data)
+    {
+        return $data;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return array
+     */
+    private function postSerialization(array &$data)
+    {
+        return $data;
     }
 }
