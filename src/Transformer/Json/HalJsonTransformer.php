@@ -6,7 +6,6 @@ use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
-use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 
 /**
@@ -26,6 +25,7 @@ class HalJsonTransformer extends Transformer
     const LINKS_PROFILE_KEY = 'profile';
     const LINKS_TITLE_KEY = 'title';
     const LINKS_HREF_LANG_KEY = 'hreflang';
+    const LINKS_HREF = 'href';
 
     const MEDIA_PROFILE_KEY = 'profile';
 
@@ -35,20 +35,16 @@ class HalJsonTransformer extends Transformer
     const PREV_LINK = 'prev';
     const NEXT_LINK = 'next';
 
-
     /**
      * @param array $value
      *
      * @throws \NilPortugues\Api\Transformer\TransformerException
+     *
      * @return string
      */
     public function serialize($value)
     {
-        if (empty($this->mappings) || !is_array($this->mappings)) {
-            throw new TransformerException(
-                'No mappings were found. Mappings are required by the transformer to work.'
-            );
-        }
+        $this->noMappingGuard();
 
         if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
             $data = [];
@@ -108,8 +104,10 @@ class HalJsonTransformer extends Transformer
      *
      * @return array
      */
-    private function postSerialization(array &$data)
+    private function postSerialization(array $data)
     {
+        $this->recursiveSetKeysToUnderScore($data);
+
         return $data;
     }
 }

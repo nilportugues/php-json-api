@@ -212,4 +212,16 @@ abstract class Transformer implements StrategyInterface
     {
         return $this->selfUrl;
     }
+
+    /**
+     * @throws TransformerException
+     */
+    protected function noMappingGuard()
+    {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
+    }
 }
