@@ -36,6 +36,12 @@ class HalJsonTransformer extends Transformer
     const LAST_LINK = 'last';
     const PREV_LINK = 'prev';
     const NEXT_LINK = 'next';
+    const LINKS_CURIES = 'curies';
+
+    /**
+     * @var array
+     */
+    private $curies = [];
 
     /**
      * @param array $value
@@ -110,6 +116,10 @@ class HalJsonTransformer extends Transformer
             if (is_array($value)) {
                 if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
                     $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+
+                    $curie = $this->mappings[$type]->getCuries();
+                    $this->curies[$curie['name']] = $curie;
+
                     $idProperties = $this->mappings[$type]->getIdProperties();
 
                     if (false === in_array($propertyName, $idProperties)) {
@@ -132,7 +142,7 @@ class HalJsonTransformer extends Transformer
                             $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type))
                         );
 
-                        $data[self::LINKS_KEY][$propertyName][self::LINKS_HREF] = str_replace(
+                        $data[self::LINKS_KEY][$this->getPropertyNameWithCurie($type, $propertyName)][self::LINKS_HREF] = str_replace(
                             $idProperties,
                             $idValues,
                             $this->mappings[$type]->getResourceUrl()
@@ -154,6 +164,9 @@ class HalJsonTransformer extends Transformer
 
                                     $data[self::EMBEDDED_KEY][$propertyName][$inArrayProperty] = $inArrayValue;
                                     $type = $inArrayValue[Serializer::CLASS_IDENTIFIER_KEY];
+
+                                    $curie = $this->mappings[$type]->getCuries();
+                                    $this->curies[$curie['name']] = $curie;
 
                                     list($idValues, $idProperties) = DataLinksHelper::getPropertyAndValues(
                                         $this->mappings,
@@ -181,7 +194,7 @@ class HalJsonTransformer extends Transformer
      * @param array  $copy
      * @param string $type
      *
-     * @return mixed
+     * @return array
      */
     protected function getResponseAdditionalLinks(array $copy, $type)
     {
@@ -192,7 +205,18 @@ class HalJsonTransformer extends Transformer
             $type
         );
 
-        return str_replace($idProperties, $idValues, $otherUrls);
+        $otherUrls = str_replace($idProperties, $idValues, $otherUrls);
+
+        foreach ($otherUrls as $propertyName => $value) {
+            $curieName = $this->getPropertyNameWithCurie($type, $propertyName);
+            $otherUrls[$curieName] = $value;
+
+            if ($propertyName !== $curieName) {
+                unset($otherUrls[$propertyName]);
+            }
+        }
+
+        return $otherUrls;
     }
 
     /**
@@ -202,10 +226,13 @@ class HalJsonTransformer extends Transformer
     {
         if (!empty($data[Serializer::CLASS_IDENTIFIER_KEY])) {
             $data[self::LINKS_KEY] = array_merge(
+                $this->buildCuries(),
                 $this->addHrefToLinks($this->buildLinks()),
                 (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
                 $this->addHrefToLinks($this->getResponseAdditionalLinks($data, $data[Serializer::CLASS_IDENTIFIER_KEY]))
             );
+
+            $data[self::LINKS_KEY] = array_filter($data[self::LINKS_KEY]);
 
             if (empty($data[self::LINKS_KEY])) {
                 unset($data[self::LINKS_KEY]);
@@ -270,5 +297,44 @@ class HalJsonTransformer extends Transformer
         if (!empty($this->meta)) {
             $response[self::META_KEY] = $this->meta;
         }
+    }
+
+    /**
+     * @param string $type
+     * @param string $propertyName
+     *
+     * @return string
+     */
+    private function getPropertyNameWithCurie($type, $propertyName)
+    {
+        $curie = $this->mappings[$type]->getCuries();
+        if (!empty($curie)) {
+            $propertyName = sprintf(
+                '%s:%s',
+                $curie['name'],
+                RecursiveFormatterHelper::camelCaseToUnderscore($propertyName)
+            );
+        }
+
+        return $propertyName;
+    }
+
+    /**
+     * @return array
+     */
+    private function buildCuries()
+    {
+        $curies = [];
+        $this->curies = (array) array_filter($this->curies);
+
+        if (!empty($this->curies)) {
+            $curies = [self::LINKS_CURIES => array_values($this->curies)];
+
+            foreach ($curies[self::LINKS_CURIES] as &$value) {
+                $value[self::LINKS_TEMPLATED_KEY] = true;
+            }
+        }
+
+        return (!empty($curies)) ? $curies : [];
     }
 }

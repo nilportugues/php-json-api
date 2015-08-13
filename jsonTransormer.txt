@@ -64,7 +64,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -84,7 +84,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -103,7 +103,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -122,7 +122,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -144,7 +144,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -166,7 +166,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
 ];
@@ -197,7 +197,4 @@ foreach($response->getHeaders() as $header => $values) {
 }
 
 echo $response->getBody();
-
-//@todo: I need to add a Tags array object, that has relationships...
-//@todo: Currently relationships-<property>-links-self works in a WRONG way.
 

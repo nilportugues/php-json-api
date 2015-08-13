@@ -44,6 +44,10 @@ class MappingFactory
             }
         }
 
+        if (false === empty($mappedClass['curies'])) {
+            $mapping->setCuries($mappedClass['curies']);
+        }
+
         $otherUrls = self::getOtherUrls($mappedClass);
         if (!empty($otherUrls)) {
             $mapping->setUrls($otherUrls);

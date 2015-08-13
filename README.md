@@ -105,7 +105,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -125,7 +125,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -144,7 +144,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -163,7 +163,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -185,7 +185,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
     [
@@ -207,7 +207,7 @@ $mappings = [
         // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
-            'href' => "http://docs.example.com/relations/{rel}",
+            'href' => "http://example.com/docs/rels/{rel}",
         ]
     ],
 ];
@@ -637,7 +637,7 @@ The following PSR-7 Response objects providing the right headers and HTTP status
 
 
 ### 4.4. HAL+JSON
-Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `http://stateless.co/hal_specification.html` specification draft.
+Given a PHP Object, and a series of mappings, the HAL+JSON API transformer will represent the given data following the `https://tools.ietf.org/html/draft-kelly-json-hal-07` specification draft.
 
 
 ```php
@@ -694,10 +694,10 @@ Content-type: application/hal+json
                 "self": {
                     "href": "http://example.com/users/1"
                 },
-                "friends": {
+                "example:friends": {
                     "href": "http://example.com/users/1/friends"
                 },
-                "comments": {
+                "example:comments": {
                     "href": "http://example.com/users/1/comments"
                 }
             }
@@ -706,8 +706,8 @@ Content-type: application/hal+json
             {
                 "comment_id": 1000,
                 "dates": {
-                    "created_at": "2015-08-13T21:11:54+02:00",
-                    "accepted_at": "2015-08-13T21:46:54+02:00"
+                    "created_at": "2015-08-13T22:47:45+02:00",
+                    "accepted_at": "2015-08-13T23:22:45+02:00"
                 },
                 "comment": "Have no fear, sers, your king is safe.",
                 "_embedded": {
@@ -718,17 +718,17 @@ Content-type: application/hal+json
                             "self": {
                                 "href": "http://example.com/users/2"
                             },
-                            "friends": {
+                            "example:friends": {
                                 "href": "http://example.com/users/2/friends"
                             },
-                            "comments": {
+                            "example:comments": {
                                 "href": "http://example.com/users/2/comments"
                             }
                         }
                     }
                 },
                 "_links": {
-                    "user": {
+                    "example:user": {
                         "href": "http://example.com/users/2"
                     },
                     "self": {
@@ -739,16 +739,23 @@ Content-type: application/hal+json
         ]
     },
     "_links": {
+        "curies": [
+            {
+                "name": "example",
+                "href": "http://example.com/docs/rels/{rel}",
+                "templated": true
+            }
+        ],
         "self": {
             "href": "http://example.com/posts/9"
         },
         "next": {
             "href": "http://example.com/posts/10"
         },
-        "author": {
+        "example:author": {
             "href": "http://example.com/users/1"
         },
-        "comments": {
+        "example:comments": {
             "href": "http://example.com/posts/9/comments"
         }
     },
