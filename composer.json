@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=5.5.0",
-        "nilportugues/serializer": "0.0.*",
+        "nilportugues/serializer": "dev-master",
         "psr/http-message": "~1.0",
         "zendframework/zend-diactoros": "^1.1.0"
     },
@@ -30,8 +30,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "NilPortugues\\Tests\\Api\\": "tests/",
-            "NilPortugues\\Example\\Api\\": "example/"
+            "NilPortugues\\Tests\\Api\\": "tests/"
         }
     },
     "config": {

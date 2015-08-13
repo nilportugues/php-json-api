@@ -23,6 +23,7 @@ use NilPortugues\Serializer\Serializer;
 class JsonTransformer extends Transformer
 {
     const META_KEY = 'meta';
+    const LINKS = 'links';
 
     /**
      * @param Mapper $mapper
@@ -64,6 +65,7 @@ class JsonTransformer extends Transformer
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);
         $this->recursiveSetKeysToUnderScore($value);
         $this->setResponseMeta($value);
+        $this->setResponseLinks($value);
 
         return $value;
     }
@@ -75,6 +77,17 @@ class JsonTransformer extends Transformer
     {
         if (!empty($this->meta)) {
             $response[self::META_KEY] = $this->meta;
+        }
+    }
+
+    /**
+     * @param array $response
+     */
+    private function setResponseLinks(array &$response)
+    {
+        $links = $this->buildLinks();
+        if (!empty($links)) {
+            $response[self::LINKS] = $this->addHrefToLinks($links);
         }
     }
 }

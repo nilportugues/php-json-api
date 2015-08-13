@@ -64,9 +64,13 @@ final class RecursiveFormatterHelper
      */
     private static function loopScalarValues(array &$array, $method)
     {
-        foreach ($array as &$value) {
+        foreach ($array as $key => &$value) {
             if (is_array($value)) {
-                self::$method($value);
+                if (!empty($value)) {
+                    self::$method($value);
+                } else {
+                    unset($array[$key]);
+                }
             }
         }
     }

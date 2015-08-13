@@ -4,7 +4,6 @@ namespace NilPortugues\Api\Transformer\Json;
 
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
-use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\DataAttributesHelper;
 use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\DataIncludedHelper;
@@ -20,7 +19,6 @@ use NilPortugues\Serializer\Serializer;
  */
 class JsonApiTransformer extends Transformer
 {
-    const SELF_LINK = 'self';
     const TITLE = 'title';
     const RELATIONSHIPS_KEY = 'relationships';
     const LINKS_KEY = 'links';
@@ -34,10 +32,6 @@ class JsonApiTransformer extends Transformer
     const ID_KEY = 'id';
     const ID_SEPARATOR = '.';
     const RELATED_LINK = 'related';
-    const FIRST_LINK = 'first';
-    const LAST_LINK = 'last';
-    const PREV_LINK = 'prev';
-    const NEXT_LINK = 'next';
 
     /**
      * @param array $value
@@ -138,21 +132,16 @@ class JsonApiTransformer extends Transformer
      * @param array $value
      * @param array $data
      */
-    private function setResponseLinks(array $value, array &$data)
+    protected function setResponseLinks(array $value, array &$data)
     {
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
-            $links = array_filter(
-                [
-                    self::SELF_LINK => $this->getSelfUrl(),
-                    self::FIRST_LINK => $this->getFirstUrl(),
-                    self::LAST_LINK => $this->getLastUrl(),
-                    self::PREV_LINK => $this->getPrevUrl(),
-                    self::NEXT_LINK => $this->getNextUrl(),
-                ]
+            $data[self::LINKS_KEY] = array_merge(
+                $this->addHrefToLinks($this->buildLinks()),
+                (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : []
             );
 
-            if (!empty($links)) {
-                $data[self::LINKS_KEY] = $links;
+            if (empty($data[self::LINKS_KEY])) {
+                unset($data[self::LINKS_KEY]);
             }
         }
     }
@@ -182,9 +171,50 @@ class JsonApiTransformer extends Transformer
      */
     private function postSerialization(array $data)
     {
-        RecursiveFormatterHelper::formatScalarValues($data);
+        $this->formatScalarValues($data);
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $data;
+    }
+
+    /**
+     * Replaces the Serializer array structure representing scalar values to the actual scalar value using recursion.
+     *
+     * @param array $array
+     */
+    private static function formatScalarValues(array &$array)
+    {
+        $array = self::arrayToScalarValue($array);
+
+        if (is_array($array) && !array_key_exists(Serializer::SCALAR_VALUE, $array)) {
+            self::loopScalarValues($array, 'formatScalarValues');
+        }
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    private static function arrayToScalarValue(array &$array)
+    {
+        if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
+            $array = $array[Serializer::SCALAR_VALUE];
+        }
+
+        return $array;
+    }
+
+    /**
+     * @param array  $array
+     * @param string $method
+     */
+    private static function loopScalarValues(array &$array, $method)
+    {
+        foreach ($array as $propertyName => &$value) {
+            if (is_array($value) && self::LINKS_KEY !== $propertyName) {
+                self::$method($value);
+            }
+        }
     }
 }

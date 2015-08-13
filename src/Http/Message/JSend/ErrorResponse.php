@@ -24,12 +24,16 @@ class ErrorResponse extends AbstractResponse
      */
     public function __construct($message, $code = 500, $data = null)
     {
-        $body = json_encode(array_filter([
-            'status' => 'error',
-            'code' => $code,
-            'message' => (string) $message,
-            'data' => '',
-        ]));
+        $body = json_encode(
+            array_filter(
+                [
+                    'status' => 'error',
+                    'code' => $code,
+                    'message' => (string) $message,
+                    'data' => '',
+                ]
+            )
+        );
 
         if ($data) {
             $body = str_replace('"data": ""', substr(substr($data, 1), 0, -1), $body);

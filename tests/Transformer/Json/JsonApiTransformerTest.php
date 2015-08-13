@@ -46,12 +46,21 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         $mappings = [
             [
                 'class' => Post::class,
+                'aliased_properties' => [
+                ],
+                'hide_properties' => [
+
+                ],
                 'id_properties' => [
                     'postId',
                 ],
                 'urls' => [
+                    // Mandatory
                     'self' => 'http://example.com/posts/{postId}',
+                    // Optional
+                    'comments' => 'http://example.com/posts/{postId}/comments',
                 ],
+                // (Optional) Used by JSONAPI
                 'relationships' => [
                     'author' => [
                         'related' => 'http://example.com/posts/{postId}/author',
@@ -61,6 +70,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'class' => PostId::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
                 'id_properties' => [
                     'postId',
                 ],
@@ -73,41 +85,64 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 'class' => User::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
                 'id_properties' => [
                     'userId',
                 ],
                 'urls' => [
                     'self' => 'http://example.com/users/{userId}',
+                    'friends' => 'http://example.com/users/{userId}/friends',
+                    'comments' => 'http://example.com/users/{userId}/comments',
                 ],
             ],
             [
                 'class' => UserId::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
                 'id_properties' => [
                     'userId',
                 ],
                 'urls' => [
                     'self' => 'http://example.com/users/{userId}',
+                    'friends' => 'http://example.com/users/{userId}/friends',
+                    'comments' => 'http://example.com/users/{userId}/comments',
                 ],
             ],
             [
                 'class' => Comment::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
                 'id_properties' => [
                     'commentId',
                 ],
                 'urls' => [
                     'self' => 'http://example.com/comments/{commentId}',
-                    'relationships' => [
-                        Post::class => 'http://example.com/posts/{postId}/relationships/comments',
+                ],
+                'relationships' => [
+                    'post' => [
+                        'self' => 'http://example.com/posts/{postId}/relationships/comments',
                     ],
                 ],
             ],
             [
                 'class' => CommentId::class,
+                'alias' => '',
+                'aliased_properties' => [],
+                'hide_properties' => [],
                 'id_properties' => [
                     'commentId',
                 ],
                 'urls' => [
                     'self' => 'http://example.com/comments/{commentId}',
+                ],
+                'relationships' => [
+                    'post' => [
+                        'self' => 'http://example.com/posts/{postId}/relationships/comments',
+                    ],
                 ],
             ],
         ];
@@ -124,13 +159,14 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
             "content": "Your first post"
         },
         "links": {
-            "self": "http://example.com/posts/9"
+            "self": { "href": "http://example.com/posts/9" },
+            "comments": { "href": "http://example.com/posts/9/comments" }
         },
         "relationships": {
             "author": {
                 "links": {
-                    "self": "http://example.com/posts/9/relationships/author",
-                    "related": "http://example.com/posts/9/author"
+                    "self": { "href": "http://example.com/posts/9/relationships/author" },
+                    "related": { "href": "http://example.com/posts/9/author"}
                 },
                 "data": {
                     "type": "user",
@@ -147,7 +183,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                 "name": "Post Author"
             },
             "links": {
-                "self": "http://example.com/users/1"
+                "self": { "href": "http://example.com/users/1" },
+                "friends": { "href": "http://example.com/users/1/friends" },
+                "comments": { "href": "http://example.com/users/1/comments" }
             }
         },
         {
@@ -157,7 +195,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                 "name": "Barristan Selmy"
             },
             "links": {
-                "self": "http://example.com/users/2"
+                "self": { "href": "http://example.com/users/2" },
+                "friends": { "href": "http://example.com/users/2/friends" },
+                "comments": { "href": "http://example.com/users/2/comments" }
             }
         },
         {
@@ -171,14 +211,14 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                 "comment": "Have no fear, sers, your king is safe."
             },
             "links": {
-                "self": "http://example.com/comments/1000"
+                "self": { "href": "http://example.com/comments/1000" }
             }
         }
     ],
     "links": {
-        "self": "http://example.com/posts/9",
-        "first": "http://example.com/posts/1",
-        "next": "http://example.com/posts/10"
+        "self": { "href": "http://example.com/posts/9"},
+        "first": { "href": "http://example.com/posts/1"},
+        "next": { "href": "http://example.com/posts/10"}
     },
     "meta": {
         "author": {
@@ -290,7 +330,7 @@ JSON;
             ]
         },
         "links": {
-            "self": "/post/1"
+            "self": { "href": "/post/1" }
         }
     },
     "jsonapi": {
@@ -363,7 +403,7 @@ JSON;
             ]
         },
         "links": {
-            "self": "/post/1"
+            "self": { "href": "/post/1" }
         }
     },
     "jsonapi": {
@@ -434,7 +474,7 @@ JSON;
             ]
         },
         "links": {
-            "self": "/post/1"
+            "self": { "href": "/post/1" }
         }
     },
     "jsonapi": {
@@ -504,7 +544,7 @@ JSON;
             ]
         },
         "links": {
-            "self": "/post/1"
+            "self": { "href": "/post/1"}
         }
     },
     "jsonapi": {
@@ -540,7 +580,7 @@ JSON;
             "body": "post body"
         },
         "links": {
-            "self": "/post/1"
+            "self": { "href": "/post/1"}
         }
     },
     "jsonapi": {
@@ -600,7 +640,7 @@ JSON;
                 "body": "post body 1"
             },
             "links": {
-                "self": "/post/1"
+                "self": { "href": "/post/1" }
             }
         },
         "jsonapi": {
@@ -616,7 +656,7 @@ JSON;
                 "body": "post body 2"
             },
             "links": {
-                "self": "/post/2"
+                "self": { "href": "/post/2" }
             }
         },
         "jsonapi": {

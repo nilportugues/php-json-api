@@ -3,6 +3,7 @@
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Transformer\Json\JsonApiTransformer;
 use NilPortugues\Api\Transformer\Json\HalJsonTransformer;
+use NilPortugues\Api\Transformer\Json\JSendTransformer;
 use NilPortugues\Api\Transformer\Json\JsonTransformer;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Tests\Api\Dummy\ComplexObject\Comment;
@@ -48,17 +49,19 @@ $mappings = [
             'postId',
         ],
         'urls' => [
+            // Mandatory
             'self' => 'http://example.com/posts/{postId}',
-            'comments' => 'http://example.com/posts/{postId}/comments',
+             // Optional
+            'comments' => 'http://example.com/posts/{postId}/comments'
         ],
-        //(Optional) Used by JSONAPI
+        // (Optional) Used by JSONAPI
         'relationships' => [
             'author' => [
                 'related' => 'http://example.com/posts/{postId}/author',
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
         ],
-        //(Optional) Used by HAL+JSON
+        // (Optional) Used by HAL+JSON
         'curies' => [
             'name' => 'example',
             'href' => "http://docs.example.com/relations/{rel}",
@@ -78,6 +81,11 @@ $mappings = [
                 Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
             ],
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => User::class,
@@ -89,7 +97,14 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/users/{userId}',
+            'friends' => 'http://example.com/users/{userId}/friends',
+            'comments' => 'http://example.com/users/{userId}/comments',
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => UserId::class,
@@ -101,7 +116,14 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/users/{userId}',
+            'friends' => 'http://example.com/users/{userId}/friends',
+            'comments' => 'http://example.com/users/{userId}/comments',
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => Comment::class,
@@ -113,10 +135,17 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/comments/{commentId}',
-            'relationships' => [
-                Post::class => 'http://example.com/posts/{postId}/relationships/comments',
-            ],
         ],
+        'relationships' => [
+            'post' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+            ]
+        ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => CommentId::class,
@@ -129,6 +158,16 @@ $mappings = [
         'urls' => [
             'self' => 'http://example.com/comments/{commentId}',
         ],
+        'relationships' => [
+            'post' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+            ]
+        ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
 ];
 

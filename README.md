@@ -73,27 +73,40 @@ $post = new Post(
 An a Mapping array for all the involved classes:
 
 ```php
+
 $mappings = [
     [
         'class' => Post::class,
         'alias' => 'Message',
         'aliased_properties' => [
+            'author' => 'author',
             'title' => 'headline',
             'content' => 'body',
         ],
-        'hide_properties' => [],
+        'hide_properties' => [
+
+        ],
         'id_properties' => [
             'postId',
         ],
         'urls' => [
+            // Mandatory
             'self' => 'http://example.com/posts/{postId}',
+             // Optional
+            'comments' => 'http://example.com/posts/{postId}/comments'
         ],
+        // (Optional) Used by JSONAPI
         'relationships' => [
             'author' => [
                 'related' => 'http://example.com/posts/{postId}/author',
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => PostId::class,
@@ -105,12 +118,15 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/posts/{postId}',
-        ]
-        'relationships' => [
-            'comment' => [
-                'self' => 'http://example.com/posts/{postId}/relationships/comments',
-            ]
+            'relationships' => [
+                Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
+            ],
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => User::class,
@@ -122,7 +138,14 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/users/{userId}',
+            'friends' => 'http://example.com/users/{userId}/friends',
+            'comments' => 'http://example.com/users/{userId}/comments',
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => UserId::class,
@@ -134,7 +157,14 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/users/{userId}',
+            'friends' => 'http://example.com/users/{userId}/friends',
+            'comments' => 'http://example.com/users/{userId}/comments',
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => Comment::class,
@@ -150,8 +180,13 @@ $mappings = [
         'relationships' => [
             'post' => [
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
-            ],
+            ]
         ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => CommentId::class,
@@ -164,6 +199,16 @@ $mappings = [
         'urls' => [
             'self' => 'http://example.com/comments/{commentId}',
         ],
+        'relationships' => [
+            'post' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+            ]
+        ],
+        // (Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
 ];
 
@@ -183,7 +228,11 @@ Notice **all keys are normalized to under_score**. This differs from the `JsonTr
 
 ```php
 $transformer = new \NilPortugues\Api\Transformer\Json\JsonTransformer($mapper);
+
 $serializer = new \NilPortugues\Serializer\Serializer($transformer);
+$serializer->setSelfUrl('http://example.com/posts/9');
+$serializer->setNextUrl('http://example.com/posts/10');
+$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 $output = $serializer->serialize($post);
 $response = new \NilPortugues\Api\Http\Message\Json\Response($output);
@@ -228,8 +277,8 @@ Content-type: application/json; charset=utf-8
         {
             "comment_id": 1000,
             "dates": {
-                "created_at": "2015-07-27T20:59:45+02:00",
-                "accepted_at": "2015-07-27T21:34:45+02:00"
+                "created_at": "2015-08-13T21:10:38+02:00",
+                "accepted_at": "2015-08-13T21:45:38+02:00"
             },
             "comment": "Have no fear, sers, your king is safe.",
             "user": {
@@ -237,7 +286,23 @@ Content-type: application/json; charset=utf-8
                 "name": "Barristan Selmy"
             }
         }
-    ]
+    ],
+    "meta": {
+        "author": [
+            {
+                "name": "Nil Portugués Calderó",
+                "email": "contact@nilportugues.com"
+            }
+        ]
+    },
+    "links": {
+        "self": {
+            "href": "http://example.com/posts/9"
+        },
+        "next": {
+            "href": "http://example.com/posts/10"
+        }
+    }
 }
 ```
 
@@ -260,14 +325,18 @@ The following PSR-7 Response objects providing the right headers and HTTP status
 
 ### 4.2. JSend
 
-JSend is a tiny and simple extension of JSON. Its implementation is really simple and follows the specification proposed by `http://labs.omniti.com/labs/jsend`.
+JSend is a tiny and simple extension of JSON.
 
-
+Its implementation is really simple and follows the specification proposed by `http://labs.omniti.com/labs/jsend`.
 
 
 ```php
-$transformer = new \NilPortugues\Api\Transformer\Json\JsonTransformer($mapper);
+$transformer = new \NilPortugues\Api\Transformer\Json\JSendTransformer($mapper);
+
 $serializer = new \NilPortugues\Serializer\Serializer($transformer);
+$serializer->setSelfUrl('http://example.com/posts/9');
+$serializer->setNextUrl('http://example.com/posts/10');
+$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 $output = $serializer->serialize($post);
 
@@ -304,8 +373,8 @@ Content-type: application/json; charset=utf-8
     "status": "success",
     "data": {
         "post_id": 9,
-        "title": "Hello World",
-        "content": "Your first post",
+        "headline": "Hello World",
+        "body": "Your first post",
         "author": {
             "user_id": 1,
             "name": "Post Author"
@@ -314,8 +383,8 @@ Content-type: application/json; charset=utf-8
             {
                 "comment_id": 1000,
                 "dates": {
-                    "created_at": "2015-08-03T21:11:57+02:00",
-                    "accepted_at": "2015-08-03T21:46:57+02:00"
+                    "created_at": "2015-08-13T21:08:22+02:00",
+                    "accepted_at": "2015-08-13T21:43:22+02:00"
                 },
                 "comment": "Have no fear, sers, your king is safe.",
                 "user": {
@@ -324,6 +393,22 @@ Content-type: application/json; charset=utf-8
                 }
             }
         ]
+    },
+    "meta": {
+        "author": [
+            {
+                "name": "Nil Portugués Calderó",
+                "email": "contact@nilportugues.com"
+            }
+        ]
+    },
+    "links": {
+        "self": {
+            "href": "http://example.com/posts/9"
+        },
+        "next": {
+            "href": "http://example.com/posts/10"
+        }
     }
 }
 ```
@@ -393,13 +478,22 @@ Content-type: application/vnd.api+json
             "body": "Your first post"
         },
         "links": {
-            "self": "http://example.com/posts/9"
+            "self": {
+                "href": "http://example.com/posts/9"
+            },
+            "comments": {
+                "href": "http://example.com/posts/9/comments"
+            }
         },
         "relationships": {
             "author": {
                 "links": {
-                    "self": "http://example.com/posts/9/relationships/author",
-                    "related": "http://example.com/posts/9/author"
+                    "self": {
+                        "href": "http://example.com/posts/9/relationships/author"
+                    },
+                    "related": {
+                        "href": "http://example.com/posts/9/author"
+                    }
                 },
                 "data": {
                     "type": "user",
@@ -416,7 +510,15 @@ Content-type: application/vnd.api+json
                 "name": "Post Author"
             },
             "links": {
-                "self": "http://example.com/users/1"
+                "self": {
+                    "href": "http://example.com/users/1"
+                },
+                "friends": {
+                    "href": "http://example.com/users/1/friends"
+                },
+                "comments": {
+                    "href": "http://example.com/users/1/comments"
+                }
             }
         },
         {
@@ -426,7 +528,15 @@ Content-type: application/vnd.api+json
                 "name": "Barristan Selmy"
             },
             "links": {
-                "self": "http://example.com/users/2"
+                "self": {
+                    "href": "http://example.com/users/2"
+                },
+                "friends": {
+                    "href": "http://example.com/users/2/friends"
+                },
+                "comments": {
+                    "href": "http://example.com/users/2/comments"
+                }
             }
         },
         {
@@ -434,19 +544,25 @@ Content-type: application/vnd.api+json
             "id": "1000",
             "attributes": {
                 "dates": {
-                    "created_at": "2015-07-27T19:33:44+02:00",
-                    "accepted_at": "2015-07-27T20:08:44+02:00"
+                    "created_at": "2015-08-13T21:11:07+02:00",
+                    "accepted_at": "2015-08-13T21:46:07+02:00"
                 },
                 "comment": "Have no fear, sers, your king is safe."
             },
             "links": {
-                "self": "http://example.com/comments/1000"
+                "self": {
+                    "href": "http://example.com/comments/1000"
+                }
             }
         }
     ],
     "links": {
-        "self": "http://example.com/posts/9",
-        "next": "http://example.com/posts/10"
+        "self": {
+            "href": "http://example.com/posts/9"
+        },
+        "next": {
+            "href": "http://example.com/posts/10"
+        }
     },
     "meta": {
         "author": [
@@ -567,39 +683,54 @@ Content-type: application/hal+json
 
 ```json
 {
-    "postId": 9,
+    "post_id": 9,
     "headline": "Hello World",
     "body": "Your first post",
     "_embedded": {
         "author": {
-            "userId": 1,
+            "user_id": 1,
             "name": "Post Author",
             "_links": {
                 "self": {
                     "href": "http://example.com/users/1"
+                },
+                "friends": {
+                    "href": "http://example.com/users/1/friends"
+                },
+                "comments": {
+                    "href": "http://example.com/users/1/comments"
                 }
             }
         },
         "comments": [
             {
-                "commentId": 1000,
+                "comment_id": 1000,
                 "dates": {
-                    "created_at": "2015-08-13T12:57:33+02:00",
-                    "accepted_at": "2015-08-13T13:32:33+02:00"
+                    "created_at": "2015-08-13T21:11:54+02:00",
+                    "accepted_at": "2015-08-13T21:46:54+02:00"
                 },
                 "comment": "Have no fear, sers, your king is safe.",
                 "_embedded": {
                     "user": {
-                        "userId": 2,
+                        "user_id": 2,
                         "name": "Barristan Selmy",
                         "_links": {
                             "self": {
                                 "href": "http://example.com/users/2"
+                            },
+                            "friends": {
+                                "href": "http://example.com/users/2/friends"
+                            },
+                            "comments": {
+                                "href": "http://example.com/users/2/comments"
                             }
                         }
                     }
                 },
                 "_links": {
+                    "user": {
+                        "href": "http://example.com/users/2"
+                    },
                     "self": {
                         "href": "http://example.com/comments/1000"
                     }
@@ -613,6 +744,12 @@ Content-type: application/hal+json
         },
         "next": {
             "href": "http://example.com/posts/10"
+        },
+        "author": {
+            "href": "http://example.com/users/1"
+        },
+        "comments": {
+            "href": "http://example.com/posts/9/comments"
         }
     },
     "_meta": {

@@ -10,6 +10,13 @@ use NilPortugues\Serializer\Strategy\StrategyInterface;
 
 abstract class Transformer implements StrategyInterface
 {
+    const SELF_LINK = 'self';
+    const FIRST_LINK = 'first';
+    const LAST_LINK = 'last';
+    const PREV_LINK = 'prev';
+    const NEXT_LINK = 'next';
+    const LINKS_HREF = 'href';
+
     /**
      * @var Mapping[]
      */
@@ -50,18 +57,6 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * @throws TransformerException
-     */
-    protected function noMappingGuard()
-    {
-        if (empty($this->mappings) || !is_array($this->mappings)) {
-            throw new TransformerException(
-                'No mappings were found. Mappings are required by the transformer to work.'
-            );
-        }
-    }
-
-    /**
      * Represents the provided $value as a serialized value in string format.
      *
      * @param mixed $value
@@ -82,6 +77,55 @@ abstract class Transformer implements StrategyInterface
     public function unserialize($value)
     {
         throw new TransformerException(sprintf('%s does not perform unserializations.', __CLASS__));
+    }
+
+    /**
+     * @param string       $key
+     * @param array|string $value
+     */
+    public function addMeta($key, $value)
+    {
+        $this->meta[$key] = $value;
+    }
+
+    /**
+     * @param array $meta
+     *
+     * @return $this
+     */
+    public function setMeta(array $meta)
+    {
+        $this->meta = $meta;
+
+        return $this;
+    }
+
+    /**
+     * @param array $links
+     *
+     * @return array
+     */
+    protected function addHrefToLinks(array $links)
+    {
+        if (!empty($links)) {
+            foreach ($links as &$link) {
+                $link = [self::LINKS_HREF => $link];
+            }
+        }
+
+        return $links;
+    }
+
+    /**
+     * @throws TransformerException
+     */
+    protected function noMappingGuard()
+    {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
     }
 
     /**
@@ -139,6 +183,80 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * @return array
+     */
+    protected function buildLinks()
+    {
+        $links = array_filter(
+            [
+                self::SELF_LINK => $this->getSelfUrl(),
+                self::FIRST_LINK => $this->getFirstUrl(),
+                self::LAST_LINK => $this->getLastUrl(),
+                self::PREV_LINK => $this->getPrevUrl(),
+                self::NEXT_LINK => $this->getNextUrl(),
+            ]
+        );
+
+        return $links;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSelfUrl()
+    {
+        return $this->selfUrl;
+    }
+
+    /**
+     * @param string $selfUrl
+     *
+     * @return $this
+     */
+    public function setSelfUrl($selfUrl)
+    {
+        $this->selfUrl = $selfUrl;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstUrl()
+    {
+        return $this->firstUrl;
+    }
+
+    /**
+     * @param string $firstUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setFirstUrl($firstUrl)
+    {
+        $this->firstUrl = (string) $firstUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastUrl()
+    {
+        return $this->lastUrl;
+    }
+
+    /**
+     * @param string $lastUrl
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function setLastUrl($lastUrl)
+    {
+        $this->lastUrl = (string) $lastUrl;
+    }
+
+    /**
      * @return string
      */
     public function getPrevUrl()
@@ -172,82 +290,5 @@ abstract class Transformer implements StrategyInterface
     public function setNextUrl($nextUrl)
     {
         $this->nextUrl = (string) $nextUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLastUrl()
-    {
-        return $this->lastUrl;
-    }
-
-    /**
-     * @param string $lastUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setLastUrl($lastUrl)
-    {
-        $this->lastUrl = (string) $lastUrl;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFirstUrl()
-    {
-        return $this->firstUrl;
-    }
-
-    /**
-     * @param string $firstUrl
-     *
-     * @throws \InvalidArgumentException
-     */
-    public function setFirstUrl($firstUrl)
-    {
-        $this->firstUrl = (string) $firstUrl;
-    }
-
-    /**
-     * @param string $selfUrl
-     *
-     * @return $this
-     */
-    public function setSelfUrl($selfUrl)
-    {
-        $this->selfUrl = $selfUrl;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSelfUrl()
-    {
-        return $this->selfUrl;
-    }
-
-    /**
-     * @param string       $key
-     * @param array|string $value
-     */
-    public function addMeta($key, $value)
-    {
-        $this->meta[$key] = $value;
-    }
-
-    /**
-     * @param array $meta
-     *
-     * @return $this
-     */
-    public function setMeta(array $meta)
-    {
-        $this->meta = $meta;
-
-        return $this;
     }
 }

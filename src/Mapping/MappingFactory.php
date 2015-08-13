@@ -44,6 +44,11 @@ class MappingFactory
             }
         }
 
+        $otherUrls = self::getOtherUrls($mappedClass);
+        if (!empty($otherUrls)) {
+            $mapping->setUrls($otherUrls);
+        }
+
         return $mapping;
     }
 
@@ -99,5 +104,19 @@ class MappingFactory
         }
 
         return $mappedClass['id_properties'];
+    }
+
+    /**
+     * @param array $mappedClass
+     *
+     * @return mixed
+     */
+    private static function getOtherUrls(array $mappedClass)
+    {
+        if (!empty($mappedClass['urls']['self'])) {
+            unset($mappedClass['urls']['self']);
+        }
+
+        return $mappedClass['urls'];
     }
 }

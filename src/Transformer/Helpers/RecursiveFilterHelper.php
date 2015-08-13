@@ -99,6 +99,6 @@ final class RecursiveFilterHelper
     {
         return $key == Serializer::CLASS_IDENTIFIER_KEY
         || (in_array($key, $keepKeys, true)
-        || in_array($key, $idProperties, true));
+            || in_array($key, $idProperties, true));
     }
 }

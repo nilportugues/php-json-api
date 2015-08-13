@@ -23,20 +23,19 @@ class JSendTransformer extends JsonTransformer
     protected function serialization($value)
     {
         $value = parent::serialization($value);
-
         $data = [];
-        $meta = null;
 
         if (!empty($value[self::META_KEY])) {
-            $meta = $value[self::META_KEY];
+            $data[self::META_KEY] = $value[self::META_KEY];
             unset($value[self::META_KEY]);
         }
 
-        $data['data'] = $value;
-
-        if ($meta) {
-            $data['meta'] = $meta;
+        if (!empty($value[self::LINKS])) {
+            $data[self::LINKS] = $value[self::LINKS];
+            unset($value[self::LINKS]);
         }
+
+        $data = array_merge(['data' => $value], $data);
 
         return $data;
     }
