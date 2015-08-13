@@ -39,6 +39,11 @@ class Mapping
     /**
      * @var array
      */
+    private $otherUrls = [];
+
+    /**
+     * @var array
+     */
     private $relationshipSelfUrl = [];
 
     /**
@@ -131,8 +136,7 @@ class Mapping
 
         $this->selfUrl = str_replace($search, $replace, $this->selfUrl);
         $this->resourceUrlPattern = str_replace($search, $replace, $this->resourceUrlPattern);
-
-        //@todo: replace the relationship array links for each property.
+        $this->otherUrls = str_replace($search, $replace, $this->otherUrls);
     }
 
     /**
@@ -312,5 +316,21 @@ class Mapping
         }
 
         return $copy;
+    }
+
+    /**
+     * @param array $urls
+     */
+    public function setUrls(array $urls)
+    {
+        $this->otherUrls = $urls;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUrls()
+    {
+        return $this->otherUrls;
     }
 }

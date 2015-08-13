@@ -35,10 +35,18 @@ final class DataLinksHelper
             $selfLink = $mappings[$type]->getResourceUrl();
 
             if (!empty($selfLink)) {
-                $data[JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK] = str_replace(
+                $data[JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
                     $idProperties,
                     $idValues,
                     $selfLink
+                );
+            }
+
+            foreach ($mappings[$type]->getUrls() as $name => $url) {
+                $data[JsonApiTransformer::LINKS_KEY][$name][JsonApiTransformer::LINKS_HREF] = str_replace(
+                    $idProperties,
+                    $idValues,
+                    $url
                 );
             }
         }
@@ -111,10 +119,10 @@ final class DataLinksHelper
                 array_filter(
                     [
                         JsonApiTransformer::LINKS_KEY => self::setResponseDataRelationshipSelfLinks(
-                            $propertyName,
-                            $mappings,
-                            $parent
-                        ),
+                                $propertyName,
+                                $mappings,
+                                $parent
+                            ),
                     ]
                 ),
                 [JsonApiTransformer::DATA_KEY => PropertyHelper::setResponseDataTypeAndId($mappings, $value)]
@@ -140,7 +148,11 @@ final class DataLinksHelper
             $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
             if (!empty($selfLink)) {
-                $data[JsonApiTransformer::SELF_LINK] = str_replace($idProperties, $idValues, $selfLink);
+                $data[JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
+                    $idProperties,
+                    $idValues,
+                    $selfLink
+                );
             }
         }
 
@@ -161,7 +173,7 @@ final class DataLinksHelper
 
             if (!empty($relatedUrl)) {
                 list($idValues, $idProperties) = self::getPropertyAndValues($mappings, $parent, $parentType);
-                $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK] = str_replace(
+                $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
                     $idProperties,
                     $idValues,
                     $relatedUrl

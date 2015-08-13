@@ -22,6 +22,9 @@ use NilPortugues\Serializer\Serializer;
  */
 class JsonTransformer extends Transformer
 {
+    const META_KEY = 'meta';
+    const LINKS = 'links';
+
     /**
      * @param Mapper $mapper
      */
@@ -39,6 +42,16 @@ class JsonTransformer extends Transformer
      */
     public function serialize($value)
     {
+        return json_encode($this->serialization($value), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param $value
+     *
+     * @return mixed
+     */
+    protected function serialization($value)
+    {
         if (null !== $this->mappings) {
             /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
             foreach ($this->mappings as $class => $mapping) {
@@ -51,7 +64,30 @@ class JsonTransformer extends Transformer
         RecursiveDeleteHelper::deleteKeys($value, [Serializer::CLASS_IDENTIFIER_KEY]);
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);
         $this->recursiveSetKeysToUnderScore($value);
+        $this->setResponseMeta($value);
+        $this->setResponseLinks($value);
 
-        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $value;
+    }
+
+    /**
+     * @param array $response
+     */
+    private function setResponseMeta(array &$response)
+    {
+        if (!empty($this->meta)) {
+            $response[self::META_KEY] = $this->meta;
+        }
+    }
+
+    /**
+     * @param array $response
+     */
+    private function setResponseLinks(array &$response)
+    {
+        $links = $this->buildLinks();
+        if (!empty($links)) {
+            $response[self::LINKS] = $this->addHrefToLinks($links);
+        }
     }
 }

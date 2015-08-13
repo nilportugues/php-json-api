@@ -92,16 +92,14 @@ class HalJsonTransformer extends Transformer
 
     /**
      * @param array $data
+     *d
      *
      * @return array
      */
     private function serialization(array $data)
     {
-        $copy = $data;
-        unset($data[Serializer::CLASS_IDENTIFIER_KEY]);
-
         $this->setEmbeddedResources($data);
-        $this->setResponseLinks($copy, $data);
+        $this->setResponseLinks($data);
 
         return $data;
     }
@@ -129,6 +127,17 @@ class HalJsonTransformer extends Transformer
                             $this->mappings[$type]->getResourceUrl()
                         );
 
+                        $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY] = array_merge(
+                            $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY],
+                            $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type))
+                        );
+
+                        $data[self::LINKS_KEY][$propertyName][self::LINKS_HREF] = str_replace(
+                            $idProperties,
+                            $idValues,
+                            $this->mappings[$type]->getResourceUrl()
+                        );
+
                         unset($data[$propertyName]);
                     }
                 }
@@ -137,7 +146,10 @@ class HalJsonTransformer extends Transformer
                     foreach ($value as &$arrayValue) {
                         if (is_array($arrayValue)) {
                             foreach ($arrayValue as $inArrayProperty => &$inArrayValue) {
-                                if (is_array($inArrayValue) && !empty($inArrayValue[Serializer::CLASS_IDENTIFIER_KEY])) {
+                                if (is_array(
+                                        $inArrayValue
+                                    ) && !empty($inArrayValue[Serializer::CLASS_IDENTIFIER_KEY])
+                                ) {
                                     $this->setEmbeddedResources($inArrayValue);
 
                                     $data[self::EMBEDDED_KEY][$propertyName][$inArrayProperty] = $inArrayValue;
@@ -166,27 +178,37 @@ class HalJsonTransformer extends Transformer
     }
 
     /**
-     * @param array $copy
+     * @param array  $copy
+     * @param string $type
+     *
+     * @return mixed
+     */
+    protected function getResponseAdditionalLinks(array $copy, $type)
+    {
+        $otherUrls = $this->mappings[$type]->getUrls();
+        list($idValues, $idProperties) = DataLinksHelper::getPropertyAndValues(
+            $this->mappings,
+            $copy,
+            $type
+        );
+
+        return str_replace($idProperties, $idValues, $otherUrls);
+    }
+
+    /**
      * @param array $data
      */
-    private function setResponseLinks(array &$copy, array &$data)
+    protected function setResponseLinks(array &$data)
     {
-        if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
-            $links = array_filter(
-                [
-                    self::SELF_LINK => $this->getSelfUrl(),
-                    self::FIRST_LINK => $this->getFirstUrl(),
-                    self::LAST_LINK => $this->getLastUrl(),
-                    self::PREV_LINK => $this->getPrevUrl(),
-                    self::NEXT_LINK => $this->getNextUrl(),
-                ]
+        if (!empty($data[Serializer::CLASS_IDENTIFIER_KEY])) {
+            $data[self::LINKS_KEY] = array_merge(
+                $this->addHrefToLinks($this->buildLinks()),
+                (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
+                $this->addHrefToLinks($this->getResponseAdditionalLinks($data, $data[Serializer::CLASS_IDENTIFIER_KEY]))
             );
 
-            if (!empty($links)) {
-                foreach ($links as &$link) {
-                    $link = [self::LINKS_HREF => $link];
-                }
-                $data[self::LINKS_KEY] = $links;
+            if (empty($data[self::LINKS_KEY])) {
+                unset($data[self::LINKS_KEY]);
             }
         }
     }
@@ -198,9 +220,14 @@ class HalJsonTransformer extends Transformer
      */
     private function postSerialization(array &$data)
     {
-        RecursiveFormatterHelper::formatScalarValues($data);
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
+        RecursiveDeleteHelper::deleteKeys($data, [Serializer::MAP_TYPE]);
+
+        RecursiveFormatterHelper::formatScalarValues($data);
+
         self::flattenObjectsWithSingleKeyScalars($data);
+
+        $this->recursiveSetKeysToUnderScore($data);
         $this->setResponseMeta($data);
 
         return $data;
