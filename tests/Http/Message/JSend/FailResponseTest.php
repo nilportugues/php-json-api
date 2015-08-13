@@ -16,7 +16,7 @@ class FailResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testFailResponse()
     {
-        $response = new FailResponse(json_encode(['user_name' => 'Must contain alphanumeric values only']));
+        $response = new FailResponse(json_encode(['data' => ['user_name' => 'Must contain alphanumeric values only']]));
 
         $data = json_decode($response->getBody(), true);
 

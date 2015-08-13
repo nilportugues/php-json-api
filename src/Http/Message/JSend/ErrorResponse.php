@@ -28,8 +28,12 @@ class ErrorResponse extends AbstractResponse
             'status' => 'error',
             'code' => $code,
             'message' => (string) $message,
-            'data' => $data,
+            'data' => '',
         ]));
+
+        if ($data) {
+            $body = str_replace('"data": ""', substr(substr($data, 1), 0, -1), $body);
+        }
 
         $this->response = parent::instance($body, 500, $this->headers);
     }

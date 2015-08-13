@@ -16,7 +16,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $response = new Response(json_encode(['user_name' => 'Nil Portugués']));
+        $response = new Response(json_encode(['data' => ['user_name' => 'Nil Portugués']]));
 
         $data = json_decode($response->getBody(), true);
 

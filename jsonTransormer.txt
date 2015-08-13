@@ -51,12 +51,18 @@ $mappings = [
             'self' => 'http://example.com/posts/{postId}',
             'comments' => 'http://example.com/posts/{postId}/comments',
         ],
+        //(Optional) Used by JSONAPI
         'relationships' => [
             'author' => [
                 'related' => 'http://example.com/posts/{postId}/author',
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
         ],
+        //(Optional) Used by HAL+JSON
+        'curies' => [
+            'name' => 'example',
+            'href' => "http://docs.example.com/relations/{rel}",
+        ]
     ],
     [
         'class' => PostId::class,

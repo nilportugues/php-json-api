@@ -24,10 +24,8 @@ class Response extends AbstractResponse
      */
     public function __construct($content)
     {
-        $body = json_encode(['status' => 'success', 'data' => '{{content}}']);
-
         $this->response = parent::instance(
-            str_replace('"{{content}}"', $content, $body),
+            sprintf('{"status": "success", %s}', substr(substr($content, 1), 0, -1)),
             200,
             $this->headers
         );

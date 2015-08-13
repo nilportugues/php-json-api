@@ -22,6 +22,8 @@ use NilPortugues\Serializer\Serializer;
  */
 class JsonTransformer extends Transformer
 {
+    const META_KEY = 'meta';
+
     /**
      * @param Mapper $mapper
      */
@@ -39,6 +41,16 @@ class JsonTransformer extends Transformer
      */
     public function serialize($value)
     {
+        return json_encode($this->serialization($value), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * @param $value
+     *
+     * @return mixed
+     */
+    protected function serialization($value)
+    {
         if (null !== $this->mappings) {
             /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
             foreach ($this->mappings as $class => $mapping) {
@@ -51,7 +63,18 @@ class JsonTransformer extends Transformer
         RecursiveDeleteHelper::deleteKeys($value, [Serializer::CLASS_IDENTIFIER_KEY]);
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);
         $this->recursiveSetKeysToUnderScore($value);
+        $this->setResponseMeta($value);
 
-        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return $value;
+    }
+
+    /**
+     * @param array $response
+     */
+    private function setResponseMeta(array &$response)
+    {
+        if (!empty($this->meta)) {
+            $response[self::META_KEY] = $this->meta;
+        }
     }
 }

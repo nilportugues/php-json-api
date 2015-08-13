@@ -25,10 +25,8 @@ class FailResponse extends AbstractResponse
      */
     public function __construct($content)
     {
-        $body = json_encode(['status' => 'fail', 'data' => '{{content}}']);
-
         $this->response = parent::instance(
-            str_replace('"{{content}}"', $content, $body),
+            sprintf('{"status": "fail", %s}', substr(substr($content, 1), 0, -1)),
             400,
             $this->headers
         );
