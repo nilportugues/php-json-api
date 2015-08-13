@@ -108,7 +108,7 @@ JSON;
                 // (Optional) Used by HAL+JSON
                 'curies' => [
                     'name' => 'example',
-                    'href' => 'http://docs.example.com/relations/{rel}',
+                    'href' => 'http://example.com/docs/rels/{rel}',
                 ],
             ],
             [
@@ -128,7 +128,7 @@ JSON;
                 // (Optional) Used by HAL+JSON
                 'curies' => [
                     'name' => 'example',
-                    'href' => 'http://docs.example.com/relations/{rel}',
+                    'href' => 'http://example.com/docs/rels/{rel}',
                 ],
             ],
             [
@@ -147,7 +147,7 @@ JSON;
                 // (Optional) Used by HAL+JSON
                 'curies' => [
                     'name' => 'example',
-                    'href' => 'http://docs.example.com/relations/{rel}',
+                    'href' => 'http://example.com/docs/rels/{rel}',
                 ],
             ],
             [
@@ -166,7 +166,7 @@ JSON;
                 // (Optional) Used by HAL+JSON
                 'curies' => [
                     'name' => 'example',
-                    'href' => 'http://docs.example.com/relations/{rel}',
+                    'href' => 'http://example.com/docs/rels/{rel}',
                 ],
             ],
             [
@@ -183,7 +183,7 @@ JSON;
                 // (Optional) Used by HAL+JSON
                 'curies' => [
                     'name' => 'example',
-                    'href' => 'http://docs.example.com/relations/{rel}',
+                    'href' => 'http://example.com/docs/rels/{rel}',
                 ],
             ],
             [
@@ -200,7 +200,7 @@ JSON;
                 // (Optional) Used by HAL+JSON
                 'curies' => [
                     'name' => 'example',
-                    'href' => 'http://docs.example.com/relations/{rel}',
+                    'href' => 'http://example.com/docs/rels/{rel}',
                 ],
             ],
         ];
@@ -209,85 +209,92 @@ JSON;
 
         $expected = <<<JSON
 {
-    "post_id": 9,
-    "headline": "Hello World",
-    "body": "Your first post",
-    "_embedded": {
-        "author": {
-            "user_id": 1,
-            "name": "Post Author",
-            "_links": {
-                "self": {
-                    "href": "http://example.com/users/1"
-                },
-                "friends": {
-                    "href": "http://example.com/users/1/friends"
-                },
-                "comments": {
-                    "href": "http://example.com/users/1/comments"
-                }
+   "post_id":9,
+   "headline":"Hello World",
+   "body":"Your first post",
+   "_embedded":{
+      "author":{
+         "user_id":1,
+         "name":"Post Author",
+         "_links":{
+            "self":{
+               "href":"http://example.com/users/1"
+            },
+            "example:friends":{
+               "href":"http://example.com/users/1/friends"
+            },
+            "example:comments":{
+               "href":"http://example.com/users/1/comments"
             }
-        },
-        "comments": [
-            {
-                "comment_id": 1000,
-                "dates": {
-                    "created_at": "2015-07-18T12:13:00+00:00",
-                    "accepted_at": "2015-07-19T00:00:00+00:00"
-                },
-                "comment": "Have no fear, sers, your king is safe.",
-                "_embedded": {
-                    "user": {
-                        "user_id": 2,
-                        "name": "Barristan Selmy",
-                        "_links": {
-                            "self": {
-                                "href": "http://example.com/users/2"
-                            },
-                            "friends": {
-                                "href": "http://example.com/users/2/friends"
-                            },
-                            "comments": {
-                                "href": "http://example.com/users/2/comments"
-                            }
-                        }
-                    }
-                },
-                "_links": {
-                    "user": {
-                        "href": "http://example.com/users/2"
-                    },
-                    "self": {
-                        "href": "http://example.com/comments/1000"
-                    }
-                }
+         }
+      },
+      "comments":[
+         {
+            "comment_id":1000,
+            "dates":{
+               "created_at":"2015-07-18T12:13:00+00:00",
+               "accepted_at":"2015-07-19T00:00:00+00:00"
+            },
+            "comment":"Have no fear, sers, your king is safe.",
+            "_embedded":{
+               "user":{
+                  "user_id":2,
+                  "name":"Barristan Selmy",
+                  "_links":{
+                     "self":{
+                        "href":"http://example.com/users/2"
+                     },
+                     "example:friends":{
+                        "href":"http://example.com/users/2/friends"
+                     },
+                     "example:comments":{
+                        "href":"http://example.com/users/2/comments"
+                     }
+                  }
+               }
+            },
+            "_links":{
+               "example:user":{
+                  "href":"http://example.com/users/2"
+               },
+               "self":{
+                  "href":"http://example.com/comments/1000"
+               }
             }
-        ]
-    },
-    "_links": {
-        "self": {
-            "href": "http://example.com/posts/9"
-        },
-        "first": {
-            "href": "http://example.com/posts/1"
-        },
-        "next": {
-            "href": "http://example.com/posts/10"
-        },
-        "author": {
-            "href": "http://example.com/users/1"
-        },
-        "comments": {
-            "href": "http://example.com/posts/9/comments"
-        }
-    },
-    "_meta": {
-        "author": {
-            "name": "Nil Portugu\u00e9s Calder\u00f3",
-            "email": "contact@nilportugues.com"
-        },
-        "is_devel": true
-    }
+         }
+      ]
+   },
+   "_links":{
+      "curies":[
+         {
+            "name":"example",
+            "href":"http://example.com/docs/rels/{rel}",
+            "templated":true
+         }
+      ],
+      "self":{
+         "href":"http://example.com/posts/9"
+      },
+      "first":{
+         "href":"http://example.com/posts/1"
+      },
+      "next":{
+         "href":"http://example.com/posts/10"
+      },
+      "example:author":{
+         "href":"http://example.com/users/1"
+      },
+      "example:comments":{
+         "href":"http://example.com/posts/9/comments"
+      }
+   },
+   "_meta":{
+      "author":{
+         "name":"Nil Portugués Calderó",
+         "email":"contact@nilportugues.com"
+      },
+      "is_devel":true
+   }
 }
 JSON;
         $post = new Post(
@@ -324,6 +331,7 @@ JSON;
         $transformer->setSelfUrl('http://example.com/posts/9');
         $transformer->setFirstUrl('http://example.com/posts/1');
         $transformer->setNextUrl('http://example.com/posts/10');
+
 
         $this->assertEquals(
             json_decode($expected, true),

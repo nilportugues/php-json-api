@@ -52,6 +52,11 @@ class Mapping
     private $filterKeys = [];
 
     /**
+     * @var array
+     */
+    private $curies = [];
+
+    /**
      * @param       $className
      * @param null  $resourceUrlPattern
      * @param array $idProperties
@@ -332,5 +337,24 @@ class Mapping
     public function getUrls()
     {
         return $this->otherUrls;
+    }
+
+    /**
+     * @param array $curies
+     *
+     * @throws MappingException
+     */
+    public function setCuries(array $curies)
+    {
+        if (empty($curies['name']) || empty($curies['href'])) {
+            throw new MappingException('Curies must define "name" and "href" properties');
+        }
+
+        $this->curies = $curies;
+    }
+
+    public function getCuries()
+    {
+        return $this->curies;
     }
 }
