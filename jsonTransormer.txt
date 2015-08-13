@@ -49,6 +49,7 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/posts/{postId}',
+            'comments' => 'http://example.com/posts/{postId}/comments',
         ],
         'relationships' => [
             'author' => [

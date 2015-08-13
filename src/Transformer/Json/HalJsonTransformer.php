@@ -129,6 +129,12 @@ class HalJsonTransformer extends Transformer
                             $this->mappings[$type]->getResourceUrl()
                         );
 
+                        $data[self::LINKS_KEY][$propertyName][self::LINKS_HREF] = str_replace(
+                            $idProperties,
+                            $idValues,
+                            $this->mappings[$type]->getResourceUrl()
+                        );
+
                         unset($data[$propertyName]);
                     }
                 }
@@ -186,7 +192,7 @@ class HalJsonTransformer extends Transformer
                 foreach ($links as &$link) {
                     $link = [self::LINKS_HREF => $link];
                 }
-                $data[self::LINKS_KEY] = $links;
+                $data[self::LINKS_KEY] = array_merge($links, $data[self::LINKS_KEY]);
             }
         }
     }
@@ -201,6 +207,7 @@ class HalJsonTransformer extends Transformer
         RecursiveFormatterHelper::formatScalarValues($data);
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
         self::flattenObjectsWithSingleKeyScalars($data);
+        $this->recursiveSetKeysToUnderScore($data);
         $this->setResponseMeta($data);
 
         return $data;
