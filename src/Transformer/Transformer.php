@@ -37,11 +37,28 @@ abstract class Transformer implements StrategyInterface
     protected $selfUrl = '';
 
     /**
+     * @var array
+     */
+    protected $meta = [];
+
+    /**
      * @param Mapper $mapper
      */
     public function __construct(Mapper $mapper)
     {
         $this->mappings = $mapper->getClassMap();
+    }
+
+    /**
+     * @throws TransformerException
+     */
+    protected function noMappingGuard()
+    {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
     }
 
     /**
@@ -211,5 +228,26 @@ abstract class Transformer implements StrategyInterface
     public function getSelfUrl()
     {
         return $this->selfUrl;
+    }
+
+    /**
+     * @param string       $key
+     * @param array|string $value
+     */
+    public function addMeta($key, $value)
+    {
+        $this->meta[$key] = $value;
+    }
+
+    /**
+     * @param array $meta
+     *
+     * @return $this
+     */
+    public function setMeta(array $meta)
+    {
+        $this->meta = $meta;
+
+        return $this;
     }
 }

@@ -14,7 +14,7 @@ use NilPortugues\Api\Transformer\Json\JsonApiTransformer;
 use NilPortugues\Serializer\Serializer;
 
 /**
- * Class DataIncludedHelper.
+ * Class DataEmbeddedHelper.
  */
 final class DataIncludedHelper
 {
