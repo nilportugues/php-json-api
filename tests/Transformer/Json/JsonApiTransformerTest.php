@@ -214,7 +214,6 @@ JSON;
         );
 
         $transformer = new JsonApiTransformer($mapper);
-        $transformer->setApiVersion('1.0');
         $transformer->setMeta(
             [
                 'author' => [
@@ -293,6 +292,9 @@ JSON;
         "links": {
             "self": "/post/1"
         }
+    },
+    "jsonapi": {
+        "version": "1.0"
     }
 }
 JSON;
@@ -363,6 +365,9 @@ JSON;
         "links": {
             "self": "/post/1"
         }
+    },
+    "jsonapi": {
+        "version": "1.0"
     }
 }
 JSON;
@@ -431,6 +436,9 @@ JSON;
         "links": {
             "self": "/post/1"
         }
+    },
+    "jsonapi": {
+        "version": "1.0"
     }
 }
 JSON;
@@ -498,6 +506,9 @@ JSON;
         "links": {
             "self": "/post/1"
         }
+    },
+    "jsonapi": {
+        "version": "1.0"
     }
 }
 JSON;
@@ -531,6 +542,9 @@ JSON;
         "links": {
             "self": "/post/1"
         }
+    },
+    "jsonapi": {
+        "version": "1.0"
     }
 }
 JSON;
@@ -588,6 +602,9 @@ JSON;
             "links": {
                 "self": "/post/1"
             }
+        },
+        "jsonapi": {
+            "version": "1.0"
         }
     },
     {
@@ -601,6 +618,9 @@ JSON;
             "links": {
                 "self": "/post/2"
             }
+        },
+        "jsonapi": {
+            "version": "1.0"
         }
     }
 ]

@@ -7,7 +7,6 @@ use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\DataLinksHelper;
 use NilPortugues\Api\Transformer\Transformer;
-use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 
 /**
@@ -47,11 +46,7 @@ class HalJsonTransformer extends Transformer
      */
     public function serialize($value)
     {
-        if (empty($this->mappings) || !is_array($this->mappings)) {
-            throw new TransformerException(
-                'No mappings were found. Mappings are required by the transformer to work.'
-            );
-        }
+        $this->noMappingGuard();
 
         if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
             $data = [];

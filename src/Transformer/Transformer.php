@@ -50,6 +50,18 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
+     * @throws TransformerException
+     */
+    protected function noMappingGuard()
+    {
+        if (empty($this->mappings) || !is_array($this->mappings)) {
+            throw new TransformerException(
+                'No mappings were found. Mappings are required by the transformer to work.'
+            );
+        }
+    }
+
+    /**
      * Represents the provided $value as a serialized value in string format.
      *
      * @param mixed $value
