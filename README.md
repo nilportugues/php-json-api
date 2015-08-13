@@ -349,7 +349,6 @@ $transformer = new \NilPortugues\Api\Transformer\Json\JsonApiTransformer($mapper
 
 //Output transformation
 $serializer = new Serializer($transformer);
-$serializer->setApiVersion('1.0');
 $serializer->setSelfUrl('http://example.com/posts/9');
 $serializer->setNextUrl('http://example.com/posts/10');
 $serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
@@ -532,7 +531,6 @@ $transformer = new \NilPortugues\Api\Transformer\Json\JsonApiTransformer($mapper
 
 //Output transformation
 $serializer = new Serializer($transformer);
-$serializer->setApiVersion('1.0');
 $serializer->setSelfUrl('http://example.com/posts/9');
 $serializer->setNextUrl('http://example.com/posts/10');
 $serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
@@ -568,6 +566,64 @@ Content-type: application/hal+json
 ```
 
 ```json
+{
+    "postId": 9,
+    "headline": "Hello World",
+    "body": "Your first post",
+    "_embedded": {
+        "author": {
+            "userId": 1,
+            "name": "Post Author",
+            "_links": {
+                "self": {
+                    "href": "http://example.com/users/1"
+                }
+            }
+        },
+        "comments": [
+            {
+                "commentId": 1000,
+                "dates": {
+                    "created_at": "2015-08-13T12:57:33+02:00",
+                    "accepted_at": "2015-08-13T13:32:33+02:00"
+                },
+                "comment": "Have no fear, sers, your king is safe.",
+                "_embedded": {
+                    "user": {
+                        "userId": 2,
+                        "name": "Barristan Selmy",
+                        "_links": {
+                            "self": {
+                                "href": "http://example.com/users/2"
+                            }
+                        }
+                    }
+                },
+                "_links": {
+                    "self": {
+                        "href": "http://example.com/comments/1000"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "self": {
+            "href": "http://example.com/posts/9"
+        },
+        "next": {
+            "href": "http://example.com/posts/10"
+        }
+    },
+    "_meta": {
+        "author": [
+            {
+                "name": "Nil Portugués Calderó",
+                "email": "contact@nilportugues.com"
+            }
+        ]
+    }
+}
 ```
 
 

@@ -37,6 +37,11 @@ abstract class Transformer implements StrategyInterface
     protected $selfUrl = '';
 
     /**
+     * @var array
+     */
+    protected $meta = [];
+
+    /**
      * @param Mapper $mapper
      */
     public function __construct(Mapper $mapper)
@@ -211,5 +216,26 @@ abstract class Transformer implements StrategyInterface
     public function getSelfUrl()
     {
         return $this->selfUrl;
+    }
+
+    /**
+     * @param string       $key
+     * @param array|string $value
+     */
+    public function addMeta($key, $value)
+    {
+        $this->meta[$key] = $value;
+    }
+
+    /**
+     * @param array $meta
+     *
+     * @return $this
+     */
+    public function setMeta(array $meta)
+    {
+        $this->meta = $meta;
+
+        return $this;
     }
 }

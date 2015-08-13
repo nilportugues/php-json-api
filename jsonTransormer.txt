@@ -129,10 +129,9 @@ $mapper = new Mapper($mappings);
 
 
 $serializer = new HalJsonTransformer($mapper);
-//$serializer->setApiVersion('1.0');
-//$serializer->setSelfUrl('http://example.com/posts/9');
-//$serializer->setNextUrl('http://example.com/posts/10');
-//$serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+$serializer->setSelfUrl('http://example.com/posts/9');
+$serializer->setNextUrl('http://example.com/posts/10');
+$serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 
 $jsonResponse = (new Serializer($serializer))->serialize($post);

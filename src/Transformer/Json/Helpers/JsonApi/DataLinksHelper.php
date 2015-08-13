@@ -53,7 +53,7 @@ final class DataLinksHelper
      *
      * @return array
      */
-    private static function getPropertyAndValues(array &$mappings, array &$value, $type)
+    public static function getPropertyAndValues(array &$mappings, array &$value, $type)
     {
         $values = [];
         $idProperties = PropertyHelper::getIdProperties($mappings, $type);

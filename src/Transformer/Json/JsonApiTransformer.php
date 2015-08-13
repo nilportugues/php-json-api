@@ -41,39 +41,6 @@ class JsonApiTransformer extends Transformer
     const NEXT_LINK = 'next';
 
     /**
-     * @var array
-     */
-    private $meta = [];
-    /**
-     * @var string
-     */
-    private $apiVersion = '';
-
-    /**
-     * @param string $apiVersion
-     *
-     * @return $this
-     */
-    public function setApiVersion($apiVersion)
-    {
-        $this->apiVersion = $apiVersion;
-
-        return $this;
-    }
-
-    /**
-     * @param array $meta
-     *
-     * @return $this
-     */
-    public function setMeta(array $meta)
-    {
-        $this->meta = $meta;
-
-        return $this;
-    }
-
-    /**
      * @param array $value
      *
      * @throws \NilPortugues\Api\Transformer\TransformerException
@@ -210,9 +177,7 @@ class JsonApiTransformer extends Transformer
      */
     private function setResponseVersion(array &$response)
     {
-        if (!empty($this->apiVersion)) {
-            $response[self::JSON_API_KEY][self::VERSION_KEY] = $this->apiVersion;
-        }
+        $response[self::JSON_API_KEY][self::VERSION_KEY] = '1.0';
     }
 
     /**
@@ -226,14 +191,5 @@ class JsonApiTransformer extends Transformer
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $data;
-    }
-
-    /**
-     * @param string       $key
-     * @param array|string $value
-     */
-    public function addMeta($key, $value)
-    {
-        $this->meta[$key] = $value;
     }
 }
