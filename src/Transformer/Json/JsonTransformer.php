@@ -12,7 +12,6 @@ namespace NilPortugues\Api\Transformer\Json;
 
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
-use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
@@ -60,12 +59,12 @@ class JsonTransformer extends Transformer
             }
         }
 
-        RecursiveFormatterHelper::formatScalarValues($value);
-        RecursiveDeleteHelper::deleteKeys($value, [Serializer::CLASS_IDENTIFIER_KEY]);
-        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($value);
-        $this->recursiveSetKeysToUnderScore($value);
         $this->setResponseMeta($value);
         $this->setResponseLinks($value);
+        self::formatScalarValues($value);
+        RecursiveDeleteHelper::deleteKeys($value, [Serializer::CLASS_IDENTIFIER_KEY]);
+        self::flattenObjectsWithSingleKeyScalars($value);
+        $this->recursiveSetKeysToUnderScore($value);
 
         return $value;
     }
@@ -85,7 +84,13 @@ class JsonTransformer extends Transformer
      */
     private function setResponseLinks(array &$response)
     {
-        $links = $this->buildLinks();
+        // print_r($this->buildLinks());
+
+        $links = array_filter(array_merge(
+            $this->buildLinks(),
+            $this->getResponseAdditionalLinks($response, $response[Serializer::CLASS_IDENTIFIER_KEY])
+        ));
+
         if (!empty($links)) {
             $response[self::LINKS] = $this->addHrefToLinks($links);
         }

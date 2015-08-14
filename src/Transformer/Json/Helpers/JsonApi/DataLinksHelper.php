@@ -31,7 +31,7 @@ final class DataLinksHelper
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
         if (!empty($mappings[$type])) {
-            list($idValues, $idProperties) = self::getPropertyAndValues($mappings, $value, $type);
+            list($idValues, $idProperties) = self::getIdPropertyAndValues($mappings, $value, $type);
             $selfLink = $mappings[$type]->getResourceUrl();
 
             if (!empty($selfLink)) {
@@ -61,18 +61,9 @@ final class DataLinksHelper
      *
      * @return array
      */
-    public static function getPropertyAndValues(array &$mappings, array &$value, $type)
+    public static function getIdPropertyAndValues(array &$mappings, array &$value, $type)
     {
-        $values = [];
-        $idProperties = PropertyHelper::getIdProperties($mappings, $type);
-
-        foreach ($idProperties as &$propertyName) {
-            $values[] = PropertyHelper::getIdValue($value[$propertyName]);
-            $propertyName = sprintf('{%s}', $propertyName);
-        }
-        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($values);
-
-        return [$values, $idProperties];
+        return RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $value, $type);
     }
 
     /**
@@ -114,7 +105,7 @@ final class DataLinksHelper
         array &$data,
         array &$value
     ) {
-        if (!in_array($propertyName, PropertyHelper::getIdProperties($mappings, $type), true)) {
+        if (!in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
             $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = array_merge(
                 array_filter(
                     [
@@ -131,9 +122,9 @@ final class DataLinksHelper
     }
 
     /**
-     * @param string $propertyName
-     * @param array  $mappings
-     * @param array  $parent
+     * @param string                              $propertyName
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param array                               $parent
      *
      * @return array
      */
@@ -143,7 +134,7 @@ final class DataLinksHelper
         $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
         if (!empty($mappings[$parentType])) {
-            list($idValues, $idProperties) = self::getPropertyAndValues($mappings, $parent, $parentType);
+            list($idValues, $idProperties) = self::getIdPropertyAndValues($mappings, $parent, $parentType);
 
             $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
@@ -172,7 +163,7 @@ final class DataLinksHelper
             $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
             if (!empty($relatedUrl)) {
-                list($idValues, $idProperties) = self::getPropertyAndValues($mappings, $parent, $parentType);
+                list($idValues, $idProperties) = self::getIdPropertyAndValues($mappings, $parent, $parentType);
                 $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
                     $idProperties,
                     $idValues,

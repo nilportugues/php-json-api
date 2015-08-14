@@ -15,6 +15,59 @@ use NilPortugues\Serializer\Serializer;
 final class RecursiveFormatterHelper
 {
     /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param array                               $value
+     * @param string                              $type
+     *
+     * @return array
+     */
+    public static function getIdPropertyAndValues(array &$mappings, array &$value, $type)
+    {
+        $values = [];
+        $idProperties = self::getIdProperties($mappings, $type);
+
+        foreach ($idProperties as &$propertyName) {
+            $values[] = self::getIdValue($value[$propertyName]);
+            $propertyName = sprintf('{%s}', $propertyName);
+        }
+        self::flattenObjectsWithSingleKeyScalars($values);
+
+        return [$values, $idProperties];
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param string                              $type
+     *
+     * @return array
+     */
+    public static function getIdProperties(array &$mappings, $type)
+    {
+        $idProperties = [];
+
+        if (!empty($mappings[$type])) {
+            $idProperties = $mappings[$type]->getIdProperties();
+        }
+
+        return $idProperties;
+    }
+
+    /**
+     * @param array $id
+     *
+     * @return array
+     */
+    public static function getIdValue(array $id)
+    {
+        self::formatScalarValues($id);
+        if (is_array($id)) {
+            RecursiveDeleteHelper::deleteKeys($id, [Serializer::CLASS_IDENTIFIER_KEY]);
+        }
+
+        return $id;
+    }
+
+    /**
      * Replaces the Serializer array structure representing scalar values to the actual scalar value using recursion.
      *
      * @param array $array

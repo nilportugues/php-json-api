@@ -110,6 +110,9 @@ class HalJsonTransformer extends Transformer
         return $data;
     }
 
+    /**
+     * @param array $data
+     */
     private function setEmbeddedResources(array &$data)
     {
         foreach ($data as $propertyName => &$value) {
@@ -125,7 +128,7 @@ class HalJsonTransformer extends Transformer
                     if (false === in_array($propertyName, $idProperties)) {
                         $data[self::EMBEDDED_KEY][$propertyName] = $value;
 
-                        list($idValues, $idProperties) = DataLinksHelper::getPropertyAndValues(
+                        list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
                             $this->mappings,
                             $value,
                             $type
@@ -168,7 +171,7 @@ class HalJsonTransformer extends Transformer
                                     $curie = $this->mappings[$type]->getCuries();
                                     $this->curies[$curie['name']] = $curie;
 
-                                    list($idValues, $idProperties) = DataLinksHelper::getPropertyAndValues(
+                                    list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
                                         $this->mappings,
                                         $inArrayValue,
                                         $type
@@ -199,7 +202,7 @@ class HalJsonTransformer extends Transformer
     protected function getResponseAdditionalLinks(array $copy, $type)
     {
         $otherUrls = $this->mappings[$type]->getUrls();
-        list($idValues, $idProperties) = DataLinksHelper::getPropertyAndValues(
+        list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
             $this->mappings,
             $copy,
             $type
@@ -265,7 +268,7 @@ class HalJsonTransformer extends Transformer
      *
      * @param array $array
      */
-    public static function flattenObjectsWithSingleKeyScalars(array &$array)
+    protected static function flattenObjectsWithSingleKeyScalars(array &$array)
     {
         if (1 === count($array) && is_scalar(end($array))) {
             $array = array_pop($array);
@@ -280,7 +283,7 @@ class HalJsonTransformer extends Transformer
      * @param array  $array
      * @param string $method
      */
-    private static function loopScalarValues(array &$array, $method)
+    protected static function loopScalarValues(array &$array, $method)
     {
         foreach ($array as $propertyName => &$value) {
             if (is_array($value) && self::LINKS_KEY !== $propertyName) {

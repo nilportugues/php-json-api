@@ -5,6 +5,7 @@ namespace NilPortugues\Api\Transformer;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
+use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\DataLinksHelper;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
 
@@ -16,6 +17,7 @@ abstract class Transformer implements StrategyInterface
     const PREV_LINK = 'prev';
     const NEXT_LINK = 'next';
     const LINKS_HREF = 'href';
+    const LINKS_KEY = 'links';
 
     /**
      * @var Mapping[]
@@ -290,5 +292,84 @@ abstract class Transformer implements StrategyInterface
     public function setNextUrl($nextUrl)
     {
         $this->nextUrl = (string) $nextUrl;
+    }
+
+    /**
+     * @param array  $copy
+     * @param string $type
+     *
+     * @return array
+     */
+    protected function getResponseAdditionalLinks(array $copy, $type)
+    {
+        if (!empty($this->mappings[$type])) {
+            $otherUrls = $this->mappings[$type]->getUrls();
+            list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
+                $this->mappings,
+                $copy,
+                $type
+            );
+
+            return str_replace($idProperties, $idValues, $otherUrls);
+        }
+
+        return [];
+    }
+
+    /**
+     * Replaces the Serializer array structure representing scalar values to the actual scalar value using recursion.
+     *
+     * @param array $array
+     */
+    protected static function formatScalarValues(array &$array)
+    {
+        $array = self::arrayToScalarValue($array);
+
+        if (is_array($array) && !array_key_exists(Serializer::SCALAR_VALUE, $array)) {
+            self::loopScalarValues($array, 'formatScalarValues');
+        }
+    }
+
+    /**
+     * @param array $array
+     *
+     * @return array
+     */
+    protected static function arrayToScalarValue(array &$array)
+    {
+        if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
+            $array = $array[Serializer::SCALAR_VALUE];
+        }
+
+        return $array;
+    }
+
+    /**
+     * @param array  $array
+     * @param string $method
+     */
+    protected static function loopScalarValues(array &$array, $method)
+    {
+        foreach ($array as $propertyName => &$value) {
+            if (is_array($value) && self::LINKS_KEY !== $propertyName) {
+                self::$method($value);
+            }
+        }
+    }
+
+    /**
+     * Simplifies the data structure by removing an array level if data is scalar and has one element in array.
+     *
+     * @param array $array
+     */
+    protected static function flattenObjectsWithSingleKeyScalars(array &$array)
+    {
+        if (1 === count($array) && is_scalar(end($array))) {
+            $array = array_pop($array);
+        }
+
+        if (is_array($array)) {
+            self::loopScalarValues($array, 'flattenObjectsWithSingleKeyScalars');
+        }
     }
 }
