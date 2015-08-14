@@ -135,10 +135,14 @@ class JsonApiTransformer extends Transformer
     protected function setResponseLinks(array $value, array &$data)
     {
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
-            $data[self::LINKS_KEY] = array_merge(
+            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+            $urls = $this->mappings[$type]->getUrls();
+
+            $data[self::LINKS_KEY] = array_filter(array_merge(
                 $this->addHrefToLinks($this->buildLinks()),
-                (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : []
-            );
+                (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
+                (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
+            ));
 
             if (empty($data[self::LINKS_KEY])) {
                 unset($data[self::LINKS_KEY]);
@@ -175,46 +179,5 @@ class JsonApiTransformer extends Transformer
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $data;
-    }
-
-    /**
-     * Replaces the Serializer array structure representing scalar values to the actual scalar value using recursion.
-     *
-     * @param array $array
-     */
-    private static function formatScalarValues(array &$array)
-    {
-        $array = self::arrayToScalarValue($array);
-
-        if (is_array($array) && !array_key_exists(Serializer::SCALAR_VALUE, $array)) {
-            self::loopScalarValues($array, 'formatScalarValues');
-        }
-    }
-
-    /**
-     * @param array $array
-     *
-     * @return array
-     */
-    private static function arrayToScalarValue(array &$array)
-    {
-        if (array_key_exists(Serializer::SCALAR_VALUE, $array)) {
-            $array = $array[Serializer::SCALAR_VALUE];
-        }
-
-        return $array;
-    }
-
-    /**
-     * @param array  $array
-     * @param string $method
-     */
-    private static function loopScalarValues(array &$array, $method)
-    {
-        foreach ($array as $propertyName => &$value) {
-            if (is_array($value) && self::LINKS_KEY !== $propertyName) {
-                self::$method($value);
-            }
-        }
     }
 }

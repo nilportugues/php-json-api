@@ -218,7 +218,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
     "links": {
         "self": { "href": "http://example.com/posts/9"},
         "first": { "href": "http://example.com/posts/1"},
-        "next": { "href": "http://example.com/posts/10"}
+        "next": { "href": "http://example.com/posts/10"},
+        "comments": { "href": "http://example.com/posts/9/comments"}
     },
     "meta": {
         "author": {

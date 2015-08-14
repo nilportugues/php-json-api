@@ -29,7 +29,7 @@ final class DataAttributesHelper
     {
         $attributes = [];
         $type = $array[Serializer::CLASS_IDENTIFIER_KEY];
-        $idProperties = PropertyHelper::getIdProperties($mappings, $type);
+        $idProperties = RecursiveFormatterHelper::getIdProperties($mappings, $type);
 
         foreach ($array as $propertyName => $value) {
             if (in_array($propertyName, $idProperties, true)) {

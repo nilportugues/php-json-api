@@ -132,11 +132,10 @@ JSON;
                     'postId',
                 ],
                 'urls' => [
+                    // Mandatory
                     'self' => 'http://example.com/posts/{postId}',
-                    'related' => 'http://example.com/posts/{postId}/author',
-                    'relationships' => [
-                        'self' => 'http://example.com/posts/{postId}/relationships/author',
-                    ],
+                    // Optional
+                    'comments' => 'http://example.com/posts/{postId}/comments',
                 ],
             ],
         ];
@@ -151,6 +150,9 @@ JSON;
             "user_id": 1,
             "name": "Post Author"
         }
+    },
+    "links": {
+        "comments": {"href": "http://example.com/posts/9/comments" }
     }
 }
 JSON;

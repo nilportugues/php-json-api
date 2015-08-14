@@ -332,7 +332,6 @@ JSON;
         $transformer->setFirstUrl('http://example.com/posts/1');
         $transformer->setNextUrl('http://example.com/posts/10');
 
-
         $this->assertEquals(
             json_decode($expected, true),
             json_decode((new Serializer($transformer))->serialize($post), true)
