@@ -150,41 +150,6 @@ abstract class Transformer implements StrategyInterface
     }
 
     /**
-     * Array's type value becomes the key of the provided array using recursion.
-     *
-     * @param array $array
-     */
-    protected function recursiveSetTypeAsKey(array &$array)
-    {
-        if (is_array($array)) {
-            foreach ($array as &$value) {
-                if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
-                    $key = $value[Serializer::CLASS_IDENTIFIER_KEY];
-                    unset($value[Serializer::CLASS_IDENTIFIER_KEY]);
-                    $value = [$this->namespaceAsArrayKey($key) => $value];
-
-                    $this->recursiveSetTypeAsKey($value);
-                }
-            }
-        }
-    }
-
-    /**
-     * Given a class name will return its name without the namespace and in under_score to be used as a key in an array.
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    protected function namespaceAsArrayKey($key)
-    {
-        $keys = explode('\\', $key);
-        $className = end($keys);
-
-        return RecursiveFormatterHelper::camelCaseToUnderscore($className);
-    }
-
-    /**
      * @return array
      */
     protected function buildLinks()

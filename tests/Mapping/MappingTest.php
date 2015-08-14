@@ -11,6 +11,7 @@
 namespace NilPortugues\Tests\Api\Mapping;
 
 use NilPortugues\Api\Mapping\Mapping;
+use NilPortugues\Api\Mapping\MappingException;
 use NilPortugues\Tests\Api\Dummy\SimpleObject\Post;
 
 class MappingTest extends \PHPUnit_Framework_TestCase
@@ -120,5 +121,14 @@ class MappingTest extends \PHPUnit_Framework_TestCase
     {
         $this->mapping->setSelfUrl('/api/post/{postId}');
         $this->assertEquals('/api/post/{postId}', $this->mapping->getSelfUrl());
+    }
+
+    /**
+     *
+     */
+    public function testCuriesWillThrowException()
+    {
+        $this->setExpectedException(MappingException::class);
+        $this->mapping->setCuries([]);
     }
 }

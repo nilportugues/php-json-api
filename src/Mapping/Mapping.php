@@ -308,22 +308,6 @@ class Mapping
     }
 
     /**
-     * @param string $propertyName
-     *
-     * @return array
-     */
-    public function getRelationshipUrls($propertyName)
-    {
-        $copy = $this->relationshipSelfUrl[$propertyName];
-
-        if (!empty($copy[$propertyName]['self'])) {
-            unset($copy[$propertyName]['self']);
-        }
-
-        return $copy;
-    }
-
-    /**
      * @param array $urls
      */
     public function setUrls(array $urls)

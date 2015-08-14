@@ -62,28 +62,4 @@ class Mapper
     {
         return $this->classMap;
     }
-
-    /**
-     * @return array
-     */
-    public function getAliasMap()
-    {
-        return $this->aliasMap;
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return string
-     *
-     * @throws MappingException
-     */
-    public function getClassFromAlias($alias)
-    {
-        if (empty($this->aliasMap[$alias])) {
-            throw new MappingException('Alias not found in alias map');
-        }
-
-        return $this->aliasMap[$alias];
-    }
 }
