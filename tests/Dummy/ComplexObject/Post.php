@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace NilPortugues\Tests\Api\Dummy\ComplexObject;
+namespace NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject;
 
-use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\PostId;
-use NilPortugues\Tests\Api\Dummy\ComplexObject\ValueObject\UserId;
+use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\PostId;
+use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\UserId;
 
 class Post
 {
