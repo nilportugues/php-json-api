@@ -28,12 +28,20 @@
     <testsuites>
         <testsuite name="Test Suite">
             <directory>./tests</directory>
+            <directory>./lib1/tests</directory>
+            <directory>./lib2/tests</directory>
+            <directory>./lib3/tests</directory>
+            <directory>./lib4/tests</directory>
         </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
             <directory>./src/</directory>
+            <directory>./lib1/src</directory>
+            <directory>./lib2/src</directory>
+            <directory>./lib3/src</directory>
+            <directory>./lib4/src</directory>
             <exclude>
                 <directory>./example/</directory>
                 <directory>./vendor/</directory>

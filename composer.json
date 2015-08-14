@@ -2,9 +2,9 @@
     "name": "nilportugues/json-api",
     "type": "library",
     "description": "Serializer transformers outputting valid API responses in JSON, JSON API and HAL+JSON API formats.",
-    "keywords": ["json", "api", "jsonapi", "hal", "jsend", "serializer", "transformer", "psr7", "response"],
+    "keywords": ["json", "api", "jsonapi", "serializer", "transformer", "psr7", "response"],
     "homepage": "http://nilportugues.com",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Nil Portugués Calderó",
@@ -15,6 +15,7 @@
     "require": {
         "php": ">=5.5.0",
         "nilportugues/serializer": "dev-master",
+        "nilportugues/api-transformer": "dev-master",
         "psr/http-message": "~1.0",
         "zendframework/zend-diactoros": "^1.1.0"
     },
@@ -25,12 +26,12 @@
     },
     "autoload": {
         "psr-4": {
-            "NilPortugues\\Api\\": "src/"
+            "NilPortugues\\Api\\JsonApi\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "NilPortugues\\Tests\\Api\\": "tests/"
+            "NilPortugues\\Tests\\Api\\JsonApi\\": "tests/"
         }
     },
     "config": {
