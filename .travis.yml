@@ -6,9 +6,15 @@ php:
   - "hhvm"
 
 before_script:
-  - composer install --dev
+  - composer require --dev satooshi/php-coveralls:dev-master
+  - composer install
+  
+after_script:
+  - export COVERALLS_RUN_LOCALLY=1
+  - php bin/coveralls -v
 
-script: ./bin/phpunit --coverage-text
+script: 
+  - bin/phpunit --coverage-text
 
 matrix:
      allow_failures:
