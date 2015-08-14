@@ -117,78 +117,55 @@ class HalJsonTransformer extends Transformer
     {
         foreach ($data as $propertyName => &$value) {
             if (is_array($value)) {
-                if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
-                    $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+                $this->setEmbeddedForResource($data, $value, $propertyName);
 
-                    $curie = $this->mappings[$type]->getCuries();
-                    $this->curies[$curie['name']] = $curie;
+                $this->setEmbeddedForResourceArray($data, $value, $propertyName);
+            }
+        }
+    }
 
-                    $idProperties = $this->mappings[$type]->getIdProperties();
+    /**
+     * @param array  $data
+     * @param array  $value
+     * @param string $propertyName
+     */
+    private function setEmbeddedForResource(array &$data, array &$value, $propertyName)
+    {
+        if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
+            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-                    if (false === in_array($propertyName, $idProperties)) {
-                        $data[self::EMBEDDED_KEY][$propertyName] = $value;
+            $curie = $this->mappings[$type]->getCuries();
+            $this->curies[$curie['name']] = $curie;
 
-                        list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
-                            $this->mappings,
-                            $value,
-                            $type
-                        );
+            $idProperties = $this->mappings[$type]->getIdProperties();
 
-                        $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = str_replace(
-                            $idProperties,
-                            $idValues,
-                            $this->mappings[$type]->getResourceUrl()
-                        );
+            if (false === in_array($propertyName, $idProperties)) {
+                $data[self::EMBEDDED_KEY][$propertyName] = $value;
 
-                        $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY] = array_merge(
-                            $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY],
-                            $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type))
-                        );
+                list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
+                    $this->mappings,
+                    $value,
+                    $type
+                );
 
-                        $data[self::LINKS_KEY][$this->getPropertyNameWithCurie($type, $propertyName)][self::LINKS_HREF] = str_replace(
-                            $idProperties,
-                            $idValues,
-                            $this->mappings[$type]->getResourceUrl()
-                        );
+                $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = str_replace(
+                    $idProperties,
+                    $idValues,
+                    $this->mappings[$type]->getResourceUrl()
+                );
 
-                        unset($data[$propertyName]);
-                    }
-                }
+                $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY] = array_merge(
+                    $data[self::EMBEDDED_KEY][$propertyName][self::LINKS_KEY],
+                    $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type))
+                );
 
-                if (!empty($value[Serializer::MAP_TYPE])) {
-                    foreach ($value as &$arrayValue) {
-                        if (is_array($arrayValue)) {
-                            foreach ($arrayValue as $inArrayProperty => &$inArrayValue) {
-                                if (is_array(
-                                        $inArrayValue
-                                    ) && !empty($inArrayValue[Serializer::CLASS_IDENTIFIER_KEY])
-                                ) {
-                                    $this->setEmbeddedResources($inArrayValue);
+                $data[self::LINKS_KEY][$this->getPropertyNameWithCurie($type, $propertyName)][self::LINKS_HREF] = str_replace(
+                    $idProperties,
+                    $idValues,
+                    $this->mappings[$type]->getResourceUrl()
+                );
 
-                                    $data[self::EMBEDDED_KEY][$propertyName][$inArrayProperty] = $inArrayValue;
-                                    $type = $inArrayValue[Serializer::CLASS_IDENTIFIER_KEY];
-
-                                    $curie = $this->mappings[$type]->getCuries();
-                                    $this->curies[$curie['name']] = $curie;
-
-                                    list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
-                                        $this->mappings,
-                                        $inArrayValue,
-                                        $type
-                                    );
-
-                                    $data[self::EMBEDDED_KEY][$propertyName][$inArrayProperty][self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = str_replace(
-                                        $idProperties,
-                                        $idValues,
-                                        $this->mappings[$type]->getResourceUrl()
-                                    );
-
-                                    unset($data[$propertyName]);
-                                }
-                            }
-                        }
-                    }
-                }
+                unset($data[$propertyName]);
             }
         }
     }
@@ -223,6 +200,76 @@ class HalJsonTransformer extends Transformer
     }
 
     /**
+     * @param string $type
+     * @param string $propertyName
+     *
+     * @return string
+     */
+    private function getPropertyNameWithCurie($type, $propertyName)
+    {
+        $curie = $this->mappings[$type]->getCuries();
+        if (!empty($curie)) {
+            $propertyName = sprintf(
+                '%s:%s',
+                $curie['name'],
+                RecursiveFormatterHelper::camelCaseToUnderscore($propertyName)
+            );
+        }
+
+        return $propertyName;
+    }
+
+    /**
+     * @param array  $data
+     * @param array  $value
+     * @param string $propertyName
+     */
+    private function setEmbeddedForResourceArray(array &$data, array &$value, $propertyName)
+    {
+        if (!empty($value[Serializer::MAP_TYPE])) {
+            foreach ($value as &$arrayValue) {
+                if (is_array($arrayValue)) {
+                    foreach ($arrayValue as $inArrayProperty => &$inArrayValue) {
+                        if ($this->isResourceInArray($inArrayValue)) {
+                            $this->setEmbeddedResources($inArrayValue);
+
+                            $data[self::EMBEDDED_KEY][$propertyName][$inArrayProperty] = $inArrayValue;
+                            $type = $inArrayValue[Serializer::CLASS_IDENTIFIER_KEY];
+
+                            $curie = $this->mappings[$type]->getCuries();
+                            $this->curies[$curie['name']] = $curie;
+
+                            list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
+                                $this->mappings,
+                                $inArrayValue,
+                                $type
+                            );
+
+                            $data[self::EMBEDDED_KEY][$propertyName][$inArrayProperty][self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = str_replace(
+                                $idProperties,
+                                $idValues,
+                                $this->mappings[$type]->getResourceUrl()
+                            );
+
+                            unset($data[$propertyName]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param mixed $inArrayValue
+     *
+     * @return bool
+     */
+    private function isResourceInArray($inArrayValue)
+    {
+        return is_array($inArrayValue) && !empty($inArrayValue[Serializer::CLASS_IDENTIFIER_KEY]);
+    }
+
+    /**
      * @param array $data
      */
     protected function setResponseLinks(array &$data)
@@ -241,6 +288,25 @@ class HalJsonTransformer extends Transformer
                 unset($data[self::LINKS_KEY]);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function buildCuries()
+    {
+        $curies = [];
+        $this->curies = (array) array_filter($this->curies);
+
+        if (!empty($this->curies)) {
+            $curies = [self::LINKS_CURIES => array_values($this->curies)];
+
+            foreach ($curies[self::LINKS_CURIES] as &$value) {
+                $value[self::LINKS_TEMPLATED_KEY] = true;
+            }
+        }
+
+        return (!empty($curies)) ? $curies : [];
     }
 
     /**
@@ -300,44 +366,5 @@ class HalJsonTransformer extends Transformer
         if (!empty($this->meta)) {
             $response[self::META_KEY] = $this->meta;
         }
-    }
-
-    /**
-     * @param string $type
-     * @param string $propertyName
-     *
-     * @return string
-     */
-    private function getPropertyNameWithCurie($type, $propertyName)
-    {
-        $curie = $this->mappings[$type]->getCuries();
-        if (!empty($curie)) {
-            $propertyName = sprintf(
-                '%s:%s',
-                $curie['name'],
-                RecursiveFormatterHelper::camelCaseToUnderscore($propertyName)
-            );
-        }
-
-        return $propertyName;
-    }
-
-    /**
-     * @return array
-     */
-    private function buildCuries()
-    {
-        $curies = [];
-        $this->curies = (array) array_filter($this->curies);
-
-        if (!empty($this->curies)) {
-            $curies = [self::LINKS_CURIES => array_values($this->curies)];
-
-            foreach ($curies[self::LINKS_CURIES] as &$value) {
-                $value[self::LINKS_TEMPLATED_KEY] = true;
-            }
-        }
-
-        return (!empty($curies)) ? $curies : [];
     }
 }

@@ -79,6 +79,7 @@ final class DataLinksHelper
 
         foreach ($array as $propertyName => $value) {
             if (is_array($value) && array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
                 $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
                 self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);

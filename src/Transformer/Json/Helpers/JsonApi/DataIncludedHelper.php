@@ -13,9 +13,6 @@ namespace NilPortugues\Api\Transformer\Json\Helpers\JsonApi;
 use NilPortugues\Api\Transformer\Json\JsonApiTransformer;
 use NilPortugues\Serializer\Serializer;
 
-/**
- * Class DataEmbeddedHelper.
- */
 final class DataIncludedHelper
 {
     /**
@@ -66,6 +63,8 @@ final class DataIncludedHelper
     ) {
         foreach ($value as $propertyName => $attribute) {
             if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
+                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+
                 if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
                     self::setResponseDataIncluded($mappings, $value, $data);
 
@@ -116,11 +115,11 @@ final class DataIncludedHelper
     }
 
     /**
-     * @param $includedData
+     * @param array $includedData
      *
      * @return bool
      */
-    private static function hasIdKey($includedData)
+    private static function hasIdKey(array &$includedData)
     {
         return array_key_exists(JsonApiTransformer::ID_KEY, $includedData)
         && !empty($includedData[JsonApiTransformer::ID_KEY]);
