@@ -22,7 +22,8 @@
     "require-dev": {
         "phpunit/phpunit": "4.4.*",
         "fabpot/php-cs-fixer": "^1.9",
-        "mmoreram/php-formatter": "dev-master"
+        "mmoreram/php-formatter": "dev-master",
+        "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
         "psr-4": {
