@@ -16,10 +16,11 @@ If you notice compliance oversights, please send a patch via pull request.
 
 ## Author
 
-Nil Portugués Calderó
+Get in touch with me using one of the following means:
 
- - <contact@nilportugues.com>
- - [http://nilportugues.com](http://nilportugues.com)
+ - Emailing me at <contact@nilportugues.com>.
+ - Opening an [Issue](https://github.com/nilportugues/jsonapi-transformer/issues/new).
+ - Using Gitter: [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nilportugues/jsonapi-transformer?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge).
 
 ## License
 The code base is licensed under the MIT license.
