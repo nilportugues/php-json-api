@@ -5,7 +5,6 @@ namespace NilPortugues\Api\Transformer;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
-use NilPortugues\Api\Transformer\Json\Helpers\JsonApi\DataLinksHelper;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Serializer\Strategy\StrategyInterface;
 
@@ -269,7 +268,7 @@ abstract class Transformer implements StrategyInterface
     {
         if (!empty($this->mappings[$type])) {
             $otherUrls = $this->mappings[$type]->getUrls();
-            list($idValues, $idProperties) = DataLinksHelper::getIdPropertyAndValues(
+            list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
                 $this->mappings,
                 $copy,
                 $type

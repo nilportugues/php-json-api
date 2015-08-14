@@ -15,6 +15,21 @@ use NilPortugues\Serializer\Serializer;
 final class RecursiveFormatterHelper
 {
     /**
+     * Given a class name will return its name without the namespace and in under_score to be used as a key in an array.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    public static function namespaceAsArrayKey($key)
+    {
+        $keys = explode('\\', $key);
+        $className = end($keys);
+
+        return self::camelCaseToUnderscore($className);
+    }
+
+    /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $value
      * @param string                              $type

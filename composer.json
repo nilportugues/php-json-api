@@ -25,12 +25,26 @@
     },
     "autoload": {
         "psr-4": {
-            "NilPortugues\\Api\\": "src/"
+            "NilPortugues\\Api\\Http\\": "src/Http/",
+            "NilPortugues\\Api\\Mapping\\": "src/Mapping/",
+            "NilPortugues\\Api\\Transformer\\": "src/Transformer/",
+
+            "NilPortugues\\Api\\HalJson\\": "lib1/src/",
+            "NilPortugues\\Api\\JSend\\": "lib2/src/",
+            "NilPortugues\\Api\\Json\\": "lib3/src/",
+            "NilPortugues\\Api\\JsonApi\\": "lib4/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "NilPortugues\\Tests\\Api\\": "tests/"
+            "NilPortugues\\Tests\\Api\\Mapping\\": "tests/Mapping/",
+            "NilPortugues\\Tests\\Api\\Transformer\\": "tests/Transformer/",
+            "NilPortugues\\Tests\\Api\\Dummy\\": "tests/Dummy/",
+
+            "NilPortugues\\Tests\\Api\\HalJson\\": "lib1/tests/",
+            "NilPortugues\\Tests\\Api\\JSend\\": "lib2/tests/",
+            "NilPortugues\\Tests\\Api\\Json\\": "lib3/tests/",
+            "NilPortugues\\Tests\\Api\\JsonApi\\": "lib4/tests/"
         }
     },
     "config": {
