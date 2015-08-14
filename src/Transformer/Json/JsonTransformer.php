@@ -86,10 +86,12 @@ class JsonTransformer extends Transformer
     {
         // print_r($this->buildLinks());
 
-        $links = array_filter(array_merge(
-            $this->buildLinks(),
-            $this->getResponseAdditionalLinks($response, $response[Serializer::CLASS_IDENTIFIER_KEY])
-        ));
+        $links = array_filter(
+            array_merge(
+                $this->buildLinks(),
+                $this->getResponseAdditionalLinks($response, $response[Serializer::CLASS_IDENTIFIER_KEY])
+            )
+        );
 
         if (!empty($links)) {
             $response[self::LINKS] = $this->addHrefToLinks($links);

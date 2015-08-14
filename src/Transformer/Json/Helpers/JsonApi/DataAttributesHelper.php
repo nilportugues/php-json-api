@@ -20,6 +20,55 @@ use NilPortugues\Serializer\Serializer;
 final class DataAttributesHelper
 {
     /**
+     * @link http://jsonapi.org/format/#document-member-names-reserved-characters
+     *
+     * @var array
+     */
+    private static $forbiddenMemberNameCharacters = [
+        '+',
+        ',',
+        '.',
+        '[',
+        ']',
+        '!',
+        '"',
+        '#',
+        '$',
+        '%',
+        '&',
+        '\'',
+        '(',
+        ')',
+        '*',
+        '/',
+        ':',
+        ';',
+        '<',
+        '=',
+        '>',
+        '?',
+        '@',
+        '\\',
+        '^',
+        '`',
+        '{',
+        '|',
+        '}',
+        '~',
+    ];
+
+    /**
+     * @link http://jsonapi.org/format/#document-member-names-allowed-characters
+     *
+     * @var array
+     */
+    private static $forbiddenAsFirstOrLastCharacter = [
+        '-',
+        '_',
+        ' ',
+    ];
+
+    /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $array
      *
@@ -36,7 +85,7 @@ final class DataAttributesHelper
                 continue;
             }
 
-            $keyName = RecursiveFormatterHelper::camelCaseToUnderscore($propertyName);
+            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
             if (self::isScalarValue($value) && empty($mappings[$value[Serializer::SCALAR_TYPE]])) {
                 $attributes[$keyName] = $value;
@@ -51,6 +100,33 @@ final class DataAttributesHelper
         }
 
         return [JsonApiTransformer::ATTRIBUTES_KEY => $attributes];
+    }
+
+    /**
+     * @param string $attributeName
+     *
+     * @return string
+     */
+    public static function transformToValidMemberName($attributeName)
+    {
+        $attributeName = str_replace(self::$forbiddenMemberNameCharacters, '', $attributeName);
+
+        $attributeName = ltrim($attributeName, implode('', self::$forbiddenAsFirstOrLastCharacter));
+        $attributeName = rtrim($attributeName, implode('', self::$forbiddenAsFirstOrLastCharacter));
+
+        return $attributeName;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    private static function isScalarValue($value)
+    {
+        return is_array($value)
+        && array_key_exists(Serializer::SCALAR_TYPE, $value)
+        && array_key_exists(Serializer::SCALAR_VALUE, $value);
     }
 
     /**
@@ -83,17 +159,5 @@ final class DataAttributesHelper
         }
 
         return !$foundIdentifierKey;
-    }
-
-    /**
-     * @param mixed $value
-     *
-     * @return bool
-     */
-    private static function isScalarValue($value)
-    {
-        return is_array($value)
-        && array_key_exists(Serializer::SCALAR_TYPE, $value)
-        && array_key_exists(Serializer::SCALAR_VALUE, $value);
     }
 }

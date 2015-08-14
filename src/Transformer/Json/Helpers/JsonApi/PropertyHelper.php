@@ -61,8 +61,8 @@ final class PropertyHelper
 
     /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
-     * @param                                     $propertyName
-     * @param                                     $type
+     * @param string                              $propertyName
+     * @param string                              $type
      *
      * @return bool
      */

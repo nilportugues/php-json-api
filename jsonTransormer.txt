@@ -174,7 +174,7 @@ $mappings = [
 $mapper = new Mapper($mappings);
 
 
-$serializer = new JsonTransformer($mapper);
+$serializer = new JsonApiTransformer($mapper);
 $serializer->setSelfUrl('http://example.com/posts/9');
 $serializer->setNextUrl('http://example.com/posts/10');
 $serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
@@ -182,7 +182,7 @@ $serializer->addMeta('author', [['name' => 'Nil Portugués Calderó', 'email' =>
 
 $jsonResponse = (new Serializer($serializer))->serialize($post);
 
-$response = new NilPortugues\Api\Http\Message\Json\Response($jsonResponse);
+$response = new NilPortugues\Api\Http\Message\JsonApi\Response($jsonResponse);
 
 header(
     sprintf(

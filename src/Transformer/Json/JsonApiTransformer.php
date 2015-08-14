@@ -81,6 +81,7 @@ class JsonApiTransformer extends Transformer
         foreach ($this->mappings as $class => $mapping) {
             RecursiveFilterHelper::deletePropertiesNotInFilter($this->mappings, $value, $class);
             RecursiveDeleteHelper::deleteProperties($this->mappings, $value, $class);
+            $this->buildValidPropertyAlias($mapping);
             RecursiveRenamerHelper::renameKeyValue($this->mappings, $value, $class);
         }
 
@@ -138,11 +139,13 @@ class JsonApiTransformer extends Transformer
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
             $urls = $this->mappings[$type]->getUrls();
 
-            $data[self::LINKS_KEY] = array_filter(array_merge(
-                $this->addHrefToLinks($this->buildLinks()),
-                (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
-                (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
-            ));
+            $data[self::LINKS_KEY] = array_filter(
+                array_merge(
+                    $this->addHrefToLinks($this->buildLinks()),
+                    (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
+                    (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
+                )
+            );
 
             if (empty($data[self::LINKS_KEY])) {
                 unset($data[self::LINKS_KEY]);
@@ -179,5 +182,19 @@ class JsonApiTransformer extends Transformer
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $data;
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping $mapping
+     *
+     * @link http://jsonapi.org/format/#document-member-names-allowed-characters
+     */
+    private function buildValidPropertyAlias($mapping)
+    {
+        $aliases = $mapping->getAliasedProperties();
+        foreach ($aliases as &$alias) {
+            $alias = DataAttributesHelper::transformToValidMemberName($alias);
+        }
+        $mapping->setPropertyNameAliases($aliases);
     }
 }
