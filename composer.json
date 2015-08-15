@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.5.0",
         "nilportugues/serializer": "1.0.0-alpha",
-        "nilportugues/api-transformer": "1.0.1-alpha",
+        "nilportugues/api-transformer": "~1.0",
         "psr/http-message": "~1.0",
         "zendframework/zend-diactoros": "^1.1.0"
     },
