@@ -159,7 +159,7 @@ $mapper = new Mapper($mappings);
 Calling the transformer will output a **valid JSON API response** using the correct formatting:
 
 ```php
-use NilPortugues\Api\JsonApi\JsonApiTransformer
+use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Http\Message\Response;
 use NilPortugues\Serializer\Serializer;
 
