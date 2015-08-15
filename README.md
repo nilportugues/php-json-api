@@ -14,6 +14,359 @@ Use [Composer](https://getcomposer.org) to install the package:
 $ composer require nilportugues/json-api
 ```
 
+## Usage
+Given a PHP Object, and a series of mappings, the **JSON API Transformer** will represent the given data following the `http://jsonapi.org` specification.
+
+For instance, given the following piece of code, defining a Blog Post and some comments:
+
+```php
+$post = new Post(
+  new PostId(9),
+  'Hello World',
+  'Your first post',
+  new User(
+      new UserId(1),
+      'Post Author'
+  ),
+  [
+      new Comment(
+          new CommentId(1000),
+          'Have no fear, sers, your king is safe.',
+          new User(new UserId(2), 'Barristan Selmy'),
+          [
+              'created_at' => (new DateTime('2015/07/18 12:13:00'))->format('c'),
+              'accepted_at' => (new DateTime('2015/07/19 00:00:00'))->format('c'),
+          ]
+      ),
+  ]
+);
+```
+
+And a Mapping array for all the involved classes:
+
+```php
+use NilPortugues\Api\Mapping\Mapper;
+
+$mappings = [
+    [
+        'class' => Post::class,
+        'alias' => 'Message',
+        'aliased_properties' => [
+            'author' => 'author',
+            'title' => 'headline',
+            'content' => 'body',
+        ],
+        'hide_properties' => [
+
+        ],
+        'id_properties' => [
+            'postId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/posts/{postId}',
+            'comments' => 'http://example.com/posts/{postId}/comments'
+        ],
+        // (Optional)
+        'relationships' => [
+            'author' => [
+                'related' => 'http://example.com/posts/{postId}/author',
+                'self' => 'http://example.com/posts/{postId}/relationships/author',
+            ]
+        ],
+    ],
+    [
+        'class' => PostId::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'postId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/posts/{postId}',
+            'relationships' => [
+                Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
+            ],
+        ],
+    ],
+    [
+        'class' => User::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'userId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/users/{userId}',
+            'friends' => 'http://example.com/users/{userId}/friends',
+            'comments' => 'http://example.com/users/{userId}/comments',
+        ],
+    ],
+    [
+        'class' => UserId::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'userId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/users/{userId}',
+            'friends' => 'http://example.com/users/{userId}/friends',
+            'comments' => 'http://example.com/users/{userId}/comments',
+        ],
+    ],
+    [
+        'class' => Comment::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'commentId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/comments/{commentId}',
+        ],
+        'relationships' => [
+            'post' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+            ]
+        ],
+    ],
+    [
+        'class' => CommentId::class,
+        'alias' => '',
+        'aliased_properties' => [],
+        'hide_properties' => [],
+        'id_properties' => [
+            'commentId',
+        ],
+        'urls' => [
+            'self' => 'http://example.com/comments/{commentId}',
+        ],
+        'relationships' => [
+            'post' => [
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+            ]
+        ],
+    ],
+];
+
+$mapper = new Mapper($mappings);
+```
+
+Calling the transformer will output a **valid JSON API response** using the correct formatting:
+
+```php
+use NilPortugues\Api\JsonApi\JsonApiTransformer
+use NilPortugues\Api\JsonApi\Http\Message\Response;
+use NilPortugues\Serializer\Serializer;
+
+$transformer = new JsonApiTransformer($mapper);
+
+//Output transformation
+$serializer = new Serializer($transformer);
+$serializer->setSelfUrl('http://example.com/posts/9');
+$serializer->setNextUrl('http://example.com/posts/10');
+$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+
+$output = $serializer->serialize($post);
+
+//PSR7 Response with headers and content.
+$response = new Response($output);
+
+header(
+    sprintf(
+        'HTTP/%s %s %s',
+        $response->getProtocolVersion(),
+        $response->getStatusCode(),
+        $response->getReasonPhrase()
+    )
+);
+foreach($response->getHeaders() as $header => $values) {
+    header(sprintf("%s:%s\n", $header, implode(', ', $values)));
+}
+
+echo $response->getBody();
+```
+
+**Output:**
+
+```
+HTTP/1.1 200 OK
+Cache-Control: private, max-age=0, must-revalidate
+Content-type: application/vnd.api+json
+```
+
+```json
+{
+    "data": {
+        "type": "message",
+        "id": "9",
+        "attributes": {
+            "headline": "Hello World",
+            "body": "Your first post"
+        },
+        "links": {
+            "self": {
+                "href": "http://example.com/posts/9"
+            },
+            "comments": {
+                "href": "http://example.com/posts/9/comments"
+            }
+        },
+        "relationships": {
+            "author": {
+                "links": {
+                    "self": {
+                        "href": "http://example.com/posts/9/relationships/author"
+                    },
+                    "related": {
+                        "href": "http://example.com/posts/9/author"
+                    }
+                },
+                "data": {
+                    "type": "user",
+                    "id": "1"
+                }
+            }
+        }
+    },
+    "included": [
+        {
+            "type": "user",
+            "id": "1",
+            "attributes": {
+                "name": "Post Author"
+            },
+            "links": {
+                "self": {
+                    "href": "http://example.com/users/1"
+                },
+                "friends": {
+                    "href": "http://example.com/users/1/friends"
+                },
+                "comments": {
+                    "href": "http://example.com/users/1/comments"
+                }
+            }
+        },
+        {
+            "type": "user",
+            "id": "2",
+            "attributes": {
+                "name": "Barristan Selmy"
+            },
+            "links": {
+                "self": {
+                    "href": "http://example.com/users/2"
+                },
+                "friends": {
+                    "href": "http://example.com/users/2/friends"
+                },
+                "comments": {
+                    "href": "http://example.com/users/2/comments"
+                }
+            }
+        },
+        {
+            "type": "comment",
+            "id": "1000",
+            "attributes": {
+                "dates": {
+                    "created_at": "2015-08-13T21:11:07+02:00",
+                    "accepted_at": "2015-08-13T21:46:07+02:00"
+                },
+                "comment": "Have no fear, sers, your king is safe."
+            },
+            "links": {
+                "self": {
+                    "href": "http://example.com/comments/1000"
+                }
+            }
+        }
+    ],
+    "links": {
+        "self": {
+            "href": "http://example.com/posts/9"
+        },
+        "next": {
+            "href": "http://example.com/posts/10"
+        }
+    },
+    "meta": {
+        "author": [
+            {
+                "name": "Nil Portugués Calderó",
+                "email": "contact@nilportugues.com"
+            }
+        ]
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}
+```
+
+#### Request objects
+
+JSON API comes with a helper Request class, `NilPortugues\Api\JsonApi\Http\Message\Request(ServerRequestInterface $request)`, implementing the PSR-7 Request Interface. Using this request object will provide you access to all the interactions expected in a JSON API:
+
+##### JSON API Query Parameters:
+
+- &filter[resource]=field1,field2
+- &include[resource]
+- &include[resource.field1]
+- &sort=field1,-field2
+- &sort=-field1,field2
+- &page[number]
+- &page[limit]
+- &page[cursor]
+- &page[offset]
+- &page[size]
+
+
+##### NilPortugues\Api\JsonApi\Http\Message\Request
+
+Given the query parameters listed above, Request implements helper methods that parse and return data already prepared.
+
+```php
+namespace NilPortugues\Api\JsonApi\Http\Message;
+
+final class Request
+{
+    public function __construct(ServerRequestInterface $request) { ... }
+    public function getQueryParam($name, $default = null) { ... }
+    public function getIncludedRelationships($baseRelationshipPath) { ... }
+    public function getSortFields() { ... }
+    public function getAttribute($name, $default = null) { ... }
+    public function getSortDirection() { ... }
+    public function getPageNumber() { ... }
+    public function getPageLimit() { ... }
+    public function getPageOffset() { ... }
+    public function getPageSize() { ... }
+    public function getPageCursor() { ... }
+    public function getFilters() { ... }
+}
+```
+
+#### Response objects
+
+The following PSR-7 Response objects providing the right headers and HTTP status codes are available:
+
+- `NilPortugues\Api\JsonApi\Http\Message\ErrorResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceCreatedResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceDeletedResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceNotFoundResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourcePatchErrorResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourcePostErrorResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceProcessingResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceUpdatedResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\Response($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\UnsupportedActionResponse($json)`
+
+
 
 ## Quality
 
