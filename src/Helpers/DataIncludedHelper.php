@@ -100,16 +100,58 @@ final class DataIncludedHelper
             $includedData = PropertyHelper::setResponseDataTypeAndId($mappings, $value);
 
             if (self::hasIdKey($includedData)) {
-                $data[JsonApiTransformer::INCLUDED_KEY][] = array_filter(
-                    array_merge(
-                        [
-                            JsonApiTransformer::TYPE_KEY => $includedData[JsonApiTransformer::TYPE_KEY],
-                            JsonApiTransformer::ID_KEY => $includedData[JsonApiTransformer::ID_KEY],
-                            JsonApiTransformer::ATTRIBUTES_KEY => $attributes,
-                        ],
-                        DataLinksHelper::setResponseDataLinks($mappings, $value)
-                    )
+                $arrayData = array_merge(
+                    [
+                        JsonApiTransformer::TYPE_KEY => $includedData[JsonApiTransformer::TYPE_KEY],
+                        JsonApiTransformer::ID_KEY => $includedData[JsonApiTransformer::ID_KEY],
+                        JsonApiTransformer::ATTRIBUTES_KEY => $attributes,
+                        JsonApiTransformer::RELATIONSHIPS_KEY => [],
+                    ],
+                    DataLinksHelper::setResponseDataLinks($mappings, $value)
                 );
+
+                $relationshipData = [];
+                self::addRelationshipsToIncludedResources(
+                    $mappings,
+                    $relationshipData,
+                    $value,
+                    $value[Serializer::CLASS_IDENTIFIER_KEY],
+                    $attributes
+                );
+
+                if ($relationshipData) {
+                    $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = array_merge(
+                        $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY],
+                        $relationshipData
+                    );
+                }
+
+                $data[JsonApiTransformer::INCLUDED_KEY][] = array_filter($arrayData);
+            }
+        }
+    }
+
+    /**
+     * @param array  $mappings
+     * @param array  $data
+     * @param array  $value
+     * @param string $type
+     */
+    private static function addRelationshipsToIncludedResources(
+        array &$mappings,
+        array &$data,
+        array &$value,
+        $type
+    ) {
+        foreach ($value as $propertyName => $attribute) {
+            if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
+                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+
+                if (is_array($attribute) && array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
+                    $data[$propertyName][JsonApiTransformer::DATA_KEY] = PropertyHelper::setResponseDataTypeAndId($mappings, $attribute);
+
+                    continue;
+                }
             }
         }
     }

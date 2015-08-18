@@ -210,6 +210,14 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                 },
                 "comment": "Have no fear, sers, your king is safe."
             },
+            "relationships": {
+                "user": {
+                    "data": {
+                        "type": "user",
+                        "id": "2"
+                    }
+                }
+            },
             "links": {
                 "self": { "href": "http://example.com/comments/1000" }
             }
