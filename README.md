@@ -86,8 +86,11 @@ $mappings = [
         ],
         'urls' => [
             'self' => 'http://example.com/posts/{postId}',
-            'relationships' => [
-                Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
+         ],
+         'relationships' => [
+              'comment' => [
+                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
+              ],
             ],
         ],
     ],
