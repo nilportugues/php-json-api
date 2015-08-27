@@ -13,4 +13,19 @@ namespace NilPortugues\Api\JsonApi\Http\Message;
 class ResourceCreatedResponse extends AbstractResponse
 {
     protected $httpCode = 201;
+
+    /**
+     * @param string $json
+     */
+    public function __construct($json)
+    {
+        $data = json_decode($json, true);
+
+        if (null !== $data && !empty($data['data']['links']['self'])) {
+            $data = $data['data']['links']['self'];
+            $this->headers['Location'] = (!empty($data['href'])) ? $data['href'] : $data;
+        }
+
+        $this->response = self::instance($json, $this->httpCode, $this->headers);
+    }
 }
