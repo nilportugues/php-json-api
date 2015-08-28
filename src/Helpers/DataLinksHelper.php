@@ -150,7 +150,7 @@ final class DataLinksHelper
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if(is_scalar($parentType)) {
+            if (is_scalar($parentType)) {
                 $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
                 if (!empty($relatedUrl)) {

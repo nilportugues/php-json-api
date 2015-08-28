@@ -45,11 +45,7 @@ class JsonApiTransformer extends Transformer
         $this->noMappingGuard();
 
         if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
-            $data = [];
-            unset($value[Serializer::MAP_TYPE]);
-            foreach ($value[Serializer::SCALAR_VALUE] as $v) {
-                $data[] = $this->serializeObject($v);
-            }
+            $data = $this->serializedArray($value);
         } else {
             $data = $this->serializeObject($value);
         }
@@ -201,5 +197,32 @@ class JsonApiTransformer extends Transformer
             $alias = DataAttributesHelper::transformToValidMemberName($alias);
         }
         $mapping->setPropertyNameAliases($aliases);
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    protected function serializedArray(array $value)
+    {
+        unset($value[Serializer::MAP_TYPE]);
+
+        $dataValues = [];
+        $includedValues = [];
+
+        foreach ($value[Serializer::SCALAR_VALUE] as $v) {
+            $v = $this->serializeObject($v);
+            $dataValues[] = $v[self::DATA_KEY];
+            if (!empty($v[self::INCLUDED_KEY])) {
+                $includedValues = array_merge($includedValues, $v[self::INCLUDED_KEY]);
+            }
+        }
+        $includedValues = array_unique($includedValues, SORT_REGULAR);
+
+        $data = [self::DATA_KEY => $dataValues, self::INCLUDED_KEY => array_values($includedValues)];
+        $this->setResponseVersion($data);
+
+        return array_filter($data);
     }
 }

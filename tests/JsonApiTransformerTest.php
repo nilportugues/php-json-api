@@ -639,40 +639,39 @@ JSON;
         $jsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
-[
-    {
-        "data": {
-            "type": "post",
-            "id": "1",
-            "attributes": {
-                "title": "post title 1",
-                "body": "post body 1"
-            },
-            "links": {
-                "self": { "href": "/post/1" }
+{
+   "data":[
+      {
+         "type":"post",
+         "id":"1",
+         "attributes":{
+            "title":"post title 1",
+            "body":"post body 1"
+         },
+         "links":{
+            "self":{
+               "href":"/post/1"
             }
-        },
-        "jsonapi": {
-            "version": "1.0"
-        }
-    },
-    {
-        "data": {
-            "type": "post",
-            "id": "2",
-            "attributes": {
-                "title": "post title 2",
-                "body": "post body 2"
-            },
-            "links": {
-                "self": { "href": "/post/2" }
+         }
+      },
+      {
+         "type":"post",
+         "id":"2",
+         "attributes":{
+            "title":"post title 2",
+            "body":"post body 2"
+         },
+         "links":{
+            "self":{
+               "href":"/post/2"
             }
-        },
-        "jsonapi": {
-            "version": "1.0"
-        }
-    }
-]
+         }
+      }
+   ],
+   "jsonapi":{
+      "version":"1.0"
+   }
+}
 JSON;
 
         $this->assertEquals(
