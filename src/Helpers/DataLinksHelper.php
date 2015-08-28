@@ -149,15 +149,18 @@ final class DataLinksHelper
     {
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
-            $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
-            if (!empty($relatedUrl)) {
-                list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $parent, $parentType);
-                $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
-                    $idProperties,
-                    $idValues,
-                    $relatedUrl
-                );
+            if(is_scalar($parentType)) {
+                $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
+
+                if (!empty($relatedUrl)) {
+                    list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $parent, $parentType);
+                    $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
+                        $idProperties,
+                        $idValues,
+                        $relatedUrl
+                    );
+                }
             }
         }
     }
