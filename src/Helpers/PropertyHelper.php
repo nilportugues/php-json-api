@@ -28,6 +28,11 @@ final class PropertyHelper
     public static function setResponseDataTypeAndId(array &$mappings, array &$value)
     {
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+
+        if (!is_scalar($type)) {
+            return self::setResponseDataTypeAndId($mappings, $type);
+        }
+
         $finalType = ($mappings[$type]->getClassAlias()) ? $mappings[$type]->getClassAlias() : $type;
 
         $ids = [];

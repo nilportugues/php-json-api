@@ -30,7 +30,7 @@ final class DataLinksHelper
         $data = [];
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-        if (!empty($mappings[$type])) {
+        if (is_scalar($type) && !empty($mappings[$type])) {
             list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $value, $type);
             $selfLink = $mappings[$type]->getResourceUrl();
 

@@ -41,7 +41,7 @@ class ResourceCreatedResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
         $this->assertEquals(['http://example.com/photos/550e8400-e29b-41d4-a716-446655440000'], $response->getHeader('Location'));
     }
-    
+
     public function testResponse()
     {
         $json = json_encode([]);

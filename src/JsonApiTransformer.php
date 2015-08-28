@@ -121,10 +121,12 @@ class JsonApiTransformer extends Transformer
     {
         $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
 
-        foreach ($this->mappings[$type]->getIdProperties() as $propertyName) {
-            unset($copy[$propertyName]);
+        if (is_scalar($type)) {
+            foreach ($this->mappings[$type]->getIdProperties() as $propertyName) {
+                unset($copy[$propertyName]);
+            }
+            unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
         }
-        unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
 
         return $copy;
     }
@@ -137,18 +139,21 @@ class JsonApiTransformer extends Transformer
     {
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-            $urls = $this->mappings[$type]->getUrls();
 
-            $data[self::LINKS_KEY] = array_filter(
-                array_merge(
-                    $this->addHrefToLinks($this->buildLinks()),
-                    (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
-                    (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
-                )
-            );
+            if (is_scalar($type)) {
+                $urls = $this->mappings[$type]->getUrls();
 
-            if (empty($data[self::LINKS_KEY])) {
-                unset($data[self::LINKS_KEY]);
+                $data[self::LINKS_KEY] = array_filter(
+                    array_merge(
+                        $this->addHrefToLinks($this->buildLinks()),
+                        (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
+                        (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
+                    )
+                );
+
+                if (empty($data[self::LINKS_KEY])) {
+                    unset($data[self::LINKS_KEY]);
+                }
             }
         }
     }
