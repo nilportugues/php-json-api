@@ -166,12 +166,12 @@ Calling the transformer will output a **valid JSON API response** using the corr
 ```php
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Http\Message\Response;
-use NilPortugues\Serializer\Serializer;
+use NilPortugues\Serializer\DeepCopySerializer;
 
 $transformer = new JsonApiTransformer($mapper);
 
 //Output transformation
-$serializer = new Serializer($transformer);
+$serializer = new DeepCopySerializer($transformer);
 $serializer->setSelfUrl('http://example.com/posts/9');
 $serializer->setNextUrl('http://example.com/posts/10');
 $serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
