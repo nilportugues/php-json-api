@@ -133,6 +133,13 @@ class JsonApiTransformer extends Transformer
      */
     protected function setResponseLinks(array $value, array &$data)
     {
+        $data[self::LINKS_KEY] = array_filter(
+            array_merge(
+                $this->addHrefToLinks($this->buildLinks()),
+                (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : []
+            )
+        );
+
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
@@ -141,16 +148,15 @@ class JsonApiTransformer extends Transformer
 
                 $data[self::LINKS_KEY] = array_filter(
                     array_merge(
-                        $this->addHrefToLinks($this->buildLinks()),
-                        (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : [],
+                        (empty($data[self::LINKS_KEY])) ? [] : $data[self::LINKS_KEY],
                         (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
                     )
                 );
-
-                if (empty($data[self::LINKS_KEY])) {
-                    unset($data[self::LINKS_KEY]);
-                }
             }
+        }
+
+        if (empty($data[self::LINKS_KEY])) {
+            unset($data[self::LINKS_KEY]);
         }
     }
 
@@ -221,6 +227,7 @@ class JsonApiTransformer extends Transformer
         $includedValues = array_unique($includedValues, SORT_REGULAR);
 
         $data = [self::DATA_KEY => $dataValues, self::INCLUDED_KEY => array_values($includedValues)];
+        $this->setResponseLinks($value, $data);
         $this->setResponseVersion($data);
 
         return array_filter($data);
