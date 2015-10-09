@@ -45,101 +45,101 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $mappings = [
             [
-                'class' => Post::class,
+                'class'              => Post::class,
                 'aliased_properties' => [
                 ],
-                'hide_properties' => [
+                'hide_properties'    => [
 
                 ],
-                'id_properties' => [
+                'id_properties'      => [
                     'postId',
                 ],
-                'urls' => [
+                'urls'               => [
                     // Mandatory
-                    'self' => 'http://example.com/posts/{postId}',
+                    'self'     => 'http://example.com/posts/{postId}',
                     // Optional
                     'comments' => 'http://example.com/posts/{postId}/comments',
                 ],
                 // (Optional) Used by JSONAPI
-                'relationships' => [
+                'relationships'      => [
                     'author' => [
                         'related' => 'http://example.com/posts/{postId}/author',
-                        'self' => 'http://example.com/posts/{postId}/relationships/author',
+                        'self'    => 'http://example.com/posts/{postId}/relationships/author',
                     ],
                 ],
             ],
             [
-                'class' => PostId::class,
-                'alias' => '',
+                'class'              => PostId::class,
+                'alias'              => '',
                 'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
+                'hide_properties'    => [],
+                'id_properties'      => [
                     'postId',
                 ],
-                'urls' => [
-                    'self' => 'http://example.com/posts/{postId}',
+                'urls'               => [
+                    'self'          => 'http://example.com/posts/{postId}',
                     'relationships' => [
                         Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
                     ],
                 ],
             ],
             [
-                'class' => User::class,
-                'alias' => '',
+                'class'              => User::class,
+                'alias'              => '',
                 'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
+                'hide_properties'    => [],
+                'id_properties'      => [
                     'userId',
                 ],
-                'urls' => [
-                    'self' => 'http://example.com/users/{userId}',
-                    'friends' => 'http://example.com/users/{userId}/friends',
+                'urls'               => [
+                    'self'     => 'http://example.com/users/{userId}',
+                    'friends'  => 'http://example.com/users/{userId}/friends',
                     'comments' => 'http://example.com/users/{userId}/comments',
                 ],
             ],
             [
-                'class' => UserId::class,
-                'alias' => '',
+                'class'              => UserId::class,
+                'alias'              => '',
                 'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
+                'hide_properties'    => [],
+                'id_properties'      => [
                     'userId',
                 ],
-                'urls' => [
-                    'self' => 'http://example.com/users/{userId}',
-                    'friends' => 'http://example.com/users/{userId}/friends',
+                'urls'               => [
+                    'self'     => 'http://example.com/users/{userId}',
+                    'friends'  => 'http://example.com/users/{userId}/friends',
                     'comments' => 'http://example.com/users/{userId}/comments',
                 ],
             ],
             [
-                'class' => Comment::class,
-                'alias' => '',
+                'class'              => Comment::class,
+                'alias'              => '',
                 'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
+                'hide_properties'    => [],
+                'id_properties'      => [
                     'commentId',
                 ],
-                'urls' => [
+                'urls'               => [
                     'self' => 'http://example.com/comments/{commentId}',
                 ],
-                'relationships' => [
+                'relationships'      => [
                     'post' => [
                         'self' => 'http://example.com/posts/{postId}/relationships/comments',
                     ],
                 ],
             ],
             [
-                'class' => CommentId::class,
-                'alias' => '',
+                'class'              => CommentId::class,
+                'alias'              => '',
                 'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
+                'hide_properties'    => [],
+                'id_properties'      => [
                     'commentId',
                 ],
-                'urls' => [
+                'urls'               => [
                     'self' => 'http://example.com/comments/{commentId}',
                 ],
-                'relationships' => [
+                'relationships'      => [
                     'post' => [
                         'self' => 'http://example.com/posts/{postId}/relationships/comments',
                     ],
@@ -279,7 +279,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
    }
 }
 JSON;
-        $post = new Post(
+        $post     = new Post(
             new PostId(9),
             'Hello World',
             'Your first post',
@@ -293,7 +293,7 @@ JSON;
                     'Have no fear, sers, your king is safe.',
                     new User(new UserId(2), 'Barristan Selmy'),
                     [
-                        'created_at' => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
+                        'created_at'  => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
                         'accepted_at' => (new DateTime('2015-07-19T00:00:00+00:00'))->format('c'),
                     ]
                 ),
@@ -304,7 +304,7 @@ JSON;
         $transformer->setMeta(
             [
                 'author' => [
-                    'name' => 'Nil Portugués Calderó',
+                    'name'  => 'Nil Portugués Calderó',
                     'email' => 'contact@nilportugues.com',
                 ],
             ]
@@ -650,7 +650,7 @@ JSON;
         $post = new SimplePost(1, 'post title', 'post body', 2);
 
         for ($i = 1; $i <= 5; ++$i) {
-            $userId = $i * 5;
+            $userId    = $i * 5;
             $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
             $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
         }

@@ -86,6 +86,11 @@ final class DataIncludedHelper
                 $attributes[$propertyName] = $attribute;
             }
         }
+
+
+        if(!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
+            $data[JsonApiTransformer::INCLUDED_KEY] = array_values(array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR));
+        }
     }
 
     /**
