@@ -66,12 +66,17 @@ final class DataLinksHelper
         $data = [JsonApiTransformer::RELATIONSHIPS_KEY => []];
 
         foreach ($array as $propertyName => $value) {
-            if (is_array($value) && array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
-                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
-                $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-
-                self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);
-                self::relationshipLinksRelated($propertyName, $mappings, $parent, $data);
+            if (is_array($value)) {
+                self::addRelationshipData($mappings, $parent, $value, $propertyName, $data);
+                if (array_key_exists(Serializer::MAP_TYPE, $value)) {
+                    $newData = [];
+                    foreach ($value[Serializer::SCALAR_VALUE] as $d) {
+                        self::addRelationshipData($mappings, $parent, $d, $propertyName, $newData);
+                        if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
+                            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
+                        }
+                    }
+                }
             }
         }
 
@@ -162,6 +167,28 @@ final class DataLinksHelper
                     );
                 }
             }
+        }
+    }
+
+    /**
+     * @param array $mappings
+     * @param array $parent
+     * @param       $value
+     * @param       $propertyName
+     * @param       $data
+     */
+    protected static function addRelationshipData(
+        array &$mappings,
+        array &$parent,
+        &$value,
+        &$propertyName,
+        &$data
+    ) {
+        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+            $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+            self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);
+            self::relationshipLinksRelated($propertyName, $mappings, $parent, $data);
         }
     }
 }

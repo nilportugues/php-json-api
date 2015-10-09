@@ -151,94 +151,132 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 
         $expected = <<<JSON
 {
-    "data": {
-        "type": "post",
-        "id": "9",
-        "attributes": {
-            "title": "Hello World",
-            "content": "Your first post"
-        },
-        "links": {
-            "self": { "href": "http://example.com/posts/9" },
-            "comments": { "href": "http://example.com/posts/9/comments" }
-        },
-        "relationships": {
-            "author": {
-                "links": {
-                    "self": { "href": "http://example.com/posts/9/relationships/author" },
-                    "related": { "href": "http://example.com/posts/9/author"}
-                },
-                "data": {
-                    "type": "user",
-                    "id": "1"
-                }
-            }
-        }
-    },
-    "included": [
-        {
-            "type": "user",
-            "id": "1",
-            "attributes": {
-                "name": "Post Author"
+   "data":{
+      "type":"post",
+      "id":"9",
+      "attributes":{
+         "title":"Hello World",
+         "content":"Your first post"
+      },
+      "links":{
+         "self":{
+            "href":"http://example.com/posts/9"
+         },
+         "comments":{
+            "href":"http://example.com/posts/9/comments"
+         }
+      },
+      "relationships":{
+         "author":{
+            "links":{
+               "self":{
+                  "href":"http://example.com/posts/9/relationships/author"
+               },
+               "related":{
+                  "href":"http://example.com/posts/9/author"
+               }
             },
-            "links": {
-                "self": { "href": "http://example.com/users/1" },
-                "friends": { "href": "http://example.com/users/1/friends" },
-                "comments": { "href": "http://example.com/users/1/comments" }
+            "data":{
+               "type":"user",
+               "id":"1"
             }
-        },
-        {
-            "type": "user",
-            "id": "2",
-            "attributes": {
-                "name": "Barristan Selmy"
-            },
-            "links": {
-                "self": { "href": "http://example.com/users/2" },
-                "friends": { "href": "http://example.com/users/2/friends" },
-                "comments": { "href": "http://example.com/users/2/comments" }
+         },
+         "comments":[
+            {
+               "data":{
+                  "type":"comment",
+                  "id":"1000"
+               }
             }
-        },
-        {
-            "type": "comment",
-            "id": "1000",
-            "attributes": {
-                "dates": {
-                    "created_at": "2015-07-18T12:13:00+00:00",
-                    "accepted_at": "2015-07-19T00:00:00+00:00"
-                },
-                "comment": "Have no fear, sers, your king is safe."
+         ]
+      }
+   },
+   "included":[
+      {
+         "type":"user",
+         "id":"1",
+         "attributes":{
+            "name":"Post Author"
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/users/1"
             },
-            "relationships": {
-                "user": {
-                    "data": {
-                        "type": "user",
-                        "id": "2"
-                    }
-                }
+            "friends":{
+               "href":"http://example.com/users/1/friends"
             },
-            "links": {
-                "self": { "href": "http://example.com/comments/1000" }
+            "comments":{
+               "href":"http://example.com/users/1/comments"
             }
-        }
-    ],
-    "links": {
-        "self": { "href": "http://example.com/posts/9"},
-        "first": { "href": "http://example.com/posts/1"},
-        "next": { "href": "http://example.com/posts/10"},
-        "comments": { "href": "http://example.com/posts/9/comments"}
-    },
-    "meta": {
-        "author": {
-            "name": "Nil Portugués Calderó",
-            "email": "contact@nilportugues.com"
-        },
-        "is_devel" : true
-    },
-    "jsonapi": {
-        "version": "1.0"
-    }
+         }
+      },
+      {
+         "type":"user",
+         "id":"2",
+         "attributes":{
+            "name":"Barristan Selmy"
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/users/2"
+            },
+            "friends":{
+               "href":"http://example.com/users/2/friends"
+            },
+            "comments":{
+               "href":"http://example.com/users/2/comments"
+            }
+         }
+      },
+      {
+         "type":"comment",
+         "id":"1000",
+         "attributes":{
+            "dates":{
+               "created_at":"2015-07-18T12:13:00+00:00",
+               "accepted_at":"2015-07-19T00:00:00+00:00"
+            },
+            "comment":"Have no fear, sers, your king is safe."
+         },
+         "relationships":{
+            "user":{
+               "data":{
+                  "type":"user",
+                  "id":"2"
+               }
+            }
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/comments/1000"
+            }
+         }
+      }
+   ],
+   "links":{
+      "self":{
+         "href":"http://example.com/posts/9"
+      },
+      "first":{
+         "href":"http://example.com/posts/1"
+      },
+      "next":{
+         "href":"http://example.com/posts/10"
+      },
+      "comments":{
+         "href":"http://example.com/posts/9/comments"
+      }
+   },
+   "meta":{
+      "author":{
+         "name":"Nil Portugués Calderó",
+         "email":"contact@nilportugues.com"
+      },
+      "is_devel":true
+   },
+   "jsonapi":{
+      "version":"1.0"
+   }
 }
 JSON;
         $post = new Post(
