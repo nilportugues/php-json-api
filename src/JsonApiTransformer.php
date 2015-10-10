@@ -101,6 +101,11 @@ class JsonApiTransformer extends Transformer
         ];
 
         DataIncludedHelper::setResponseDataIncluded($this->mappings, $this->removeTypeAndId($value), $data);
+        
+if ($data[JsonApiTransformer::RELATIONSHIPS_KEY]){                    $data[JsonApiTransformer::RELATIONSHIPS_KEY] = array_values(array_unique(                  $data[JsonApiTransformer::RELATIONSHIPS_KEY],
+SORT_REGULAR));
+}           
+         
         $this->setResponseLinks($value, $data);
         $this->setResponseMeta($data);
         $this->setResponseVersion($data);
