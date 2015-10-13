@@ -72,6 +72,30 @@ final class DataLinksHelper
                     $newData = [];
                     foreach ($value[Serializer::SCALAR_VALUE] as $d) {
                         self::addRelationshipData($mappings, $parent, $d, $propertyName, $newData);
+
+                        if (!empty($d[Serializer::CLASS_IDENTIFIER_KEY])) {
+                            $type = $d[Serializer::CLASS_IDENTIFIER_KEY];
+
+                            if (!in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
+                                $parentType = $d[Serializer::CLASS_IDENTIFIER_KEY];
+
+                                list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
+                                    $mappings,
+                                    $d,
+                                    $parentType
+                                );
+
+                                $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
+
+                                if (!empty($selfLink)) {
+                                    $href = str_replace($idProperties, $idValues, $selfLink);
+                                    if ($selfLink != $href) {
+                                        $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $href;
+                                    }
+                                }
+                            }
+                        }
+
                         if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
                             $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
                         }
@@ -81,6 +105,28 @@ final class DataLinksHelper
         }
 
         return (array) array_filter($data);
+    }
+
+    /**
+     * @param array $mappings
+     * @param array $parent
+     * @param       $value
+     * @param       $propertyName
+     * @param       $data
+     */
+    protected static function addRelationshipData(
+        array &$mappings,
+        array &$parent,
+        &$value,
+        &$propertyName,
+        &$data
+    ) {
+        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+            $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
+            self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);
+            self::relationshipLinksRelated($propertyName, $mappings, $parent, $data);
+        }
     }
 
     /**
@@ -128,7 +174,11 @@ final class DataLinksHelper
         $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
         if (is_scalar($parentType) && !empty($mappings[$parentType])) {
-            list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $parent, $parentType);
+            list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
+                $mappings,
+                $parent,
+                $parentType
+            );
 
             $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
@@ -159,7 +209,11 @@ final class DataLinksHelper
                 $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
                 if (!empty($relatedUrl)) {
-                    list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $parent, $parentType);
+                    list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
+                        $mappings,
+                        $parent,
+                        $parentType
+                    );
                     $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
                         $idProperties,
                         $idValues,
@@ -167,28 +221,6 @@ final class DataLinksHelper
                     );
                 }
             }
-        }
-    }
-
-    /**
-     * @param array $mappings
-     * @param array $parent
-     * @param       $value
-     * @param       $propertyName
-     * @param       $data
-     */
-    protected static function addRelationshipData(
-        array &$mappings,
-        array &$parent,
-        &$value,
-        &$propertyName,
-        &$data
-    ) {
-        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
-            $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
-            $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-            self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);
-            self::relationshipLinksRelated($propertyName, $mappings, $parent, $data);
         }
     }
 }

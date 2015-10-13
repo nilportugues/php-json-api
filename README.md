@@ -70,7 +70,7 @@ $mappings = [
         ],
         // (Optional)
         'relationships' => [
-            'author' => [
+            'author' => [ //this key must match with the property or alias of the same name in Post class.
                 'related' => 'http://example.com/posts/{postId}/author',
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
@@ -88,7 +88,7 @@ $mappings = [
             'self' => 'http://example.com/posts/{postId}',
          ],
          'relationships' => [
-              'comment' => [
+              'comment' => [ //this key must match with the property or alias of the same name in PostId class.
                  'self' => 'http://example.com/posts/{postId}/relationships/comments',
               ],
             ],
@@ -134,7 +134,7 @@ $mappings = [
             'self' => 'http://example.com/comments/{commentId}',
         ],
         'relationships' => [
-            'post' => [
+            'post' => [ //this key must match with the property or alias of the same name in Commend class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
         ],
@@ -151,7 +151,7 @@ $mappings = [
             'self' => 'http://example.com/comments/{commentId}',
         ],
         'relationships' => [
-            'post' => [
+            'post' => [ //this key must match with the property or alias of the same name in CommendId class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
         ],
