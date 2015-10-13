@@ -101,6 +101,7 @@ class JsonApiTransformer extends Transformer
         ];
 
         DataIncludedHelper::setResponseDataIncluded($this->mappings, $this->removeTypeAndId($value), $data);
+       
         $this->setResponseLinks($value, $data);
         $this->setResponseMeta($data);
         $this->setResponseVersion($data);
