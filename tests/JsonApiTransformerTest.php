@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\JsonApi;
 
 use DateTime;
@@ -123,9 +124,6 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'self' => 'http://example.com/comments/{commentId}',
                 ],
                 'relationships' => [
-                    'post' => [
-                        'self' => 'http://example.com/posts/{postId}/relationships/comments',
-                    ],
                 ],
             ],
             [
@@ -138,11 +136,6 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'urls' => [
                     'self' => 'http://example.com/comments/{commentId}',
-                ],
-                'relationships' => [
-                    'post' => [
-                        'self' => 'http://example.com/posts/{postId}/relationships/comments',
-                    ],
                 ],
             ],
         ];
