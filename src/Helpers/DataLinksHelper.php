@@ -36,19 +36,20 @@ final class DataLinksHelper
             $selfLink = $mappings[$type]->getResourceUrl();
 
             if (!empty($selfLink)) {
-                $data[JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
-                    $idProperties,
-                    $idValues,
-                    $selfLink
-                );
+
+                $url = self::buildUrl($mappings, $idProperties, $idValues, $selfLink, $type);
+
+                if($url !== $selfLink) {
+                    $data[JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $url;
+                }
             }
 
             foreach ($mappings[$type]->getUrls() as $name => $url) {
-                $data[JsonApiTransformer::LINKS_KEY][$name][JsonApiTransformer::LINKS_HREF] = str_replace(
-                    $idProperties,
-                    $idValues,
-                    $url
-                );
+                $newUrl = str_replace($idProperties, $idValues, $url);
+                if($newUrl !== $url) {
+                    $data[JsonApiTransformer::LINKS_KEY][$name][JsonApiTransformer::LINKS_HREF] = $newUrl;
+                }
+
             }
         }
 
@@ -184,11 +185,11 @@ final class DataLinksHelper
             $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
             if (!empty($selfLink)) {
-                $data[JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
-                    $idProperties,
-                    $idValues,
-                    $selfLink
-                );
+                $url = self::buildUrl($mappings, $idProperties, $idValues, $selfLink, $parentType);
+
+                if ($url !== $selfLink) {
+                    $data[JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $url;
+                }
             }
         }
 
@@ -215,13 +216,101 @@ final class DataLinksHelper
                         $parent,
                         $parentType
                     );
-                    $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = str_replace(
-                        $idProperties,
-                        $idValues,
-                        $relatedUrl
-                    );
+
+
+                    $url = self::buildUrl($mappings, $idProperties, $idValues, $relatedUrl, $parentType);
+
+                    if ($url !== $relatedUrl) {
+                        $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::RELATED_LINK][JsonApiTransformer::LINKS_HREF] = $url;
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param       $idProperties
+     * @param       $idValues
+     * @param       $url
+     * @param       $type
+     *
+     * @return mixed
+     */
+    private static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
+    {
+        $outputUrl = str_replace($idProperties, $idValues, $url);
+        if($outputUrl !== $url) {
+            return $outputUrl;
+        }
+
+        $alias = $mappings[$type]->getClassAlias();
+        if($alias) {
+            $originalAlias = $alias;
+
+            //CamelCase
+            $className = self::underscoreToCamelCase(RecursiveFormatterHelper::camelCaseToUnderscore($originalAlias));
+            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
+            if($url !== $outputUrl) {
+                return $outputUrl;
+            }
+
+            //variable camelCase
+            $className[0] = strtolower($className[0]);
+            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
+            if($url !== $outputUrl) {
+                return $outputUrl;
+            }
+
+            //to_under_score
+            $className = RecursiveFormatterHelper::camelCaseToUnderscore($originalAlias);
+            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
+            if($url !== $outputUrl) {
+                return $outputUrl;
+            }
+        }
+
+        $className = $mappings[$type]->getClassName();
+        $className = explode("\\", $className);
+        $className = array_pop($className);
+
+        if($className) {
+            $originalClassName = $className;
+
+            //CamelCase
+            $className = self::underscoreToCamelCase(RecursiveFormatterHelper::camelCaseToUnderscore($originalClassName));
+            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
+            if($url !== $outputUrl) {
+                return $outputUrl;
+            }
+
+            //variable camelCase
+            $className[0] = strtolower($className[0]);
+            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
+            if($url !== $outputUrl) {
+                return $outputUrl;
+            }
+
+            //to_under_score
+            $className = RecursiveFormatterHelper::camelCaseToUnderscore($originalClassName);
+            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
+            if($url !== $outputUrl) {
+                return $outputUrl;
+            }
+        }
+
+        return $url;
+    }
+
+    /**
+     * Converts a underscore string to camelCase.
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    protected static function underscoreToCamelCase($string)
+    {
+        return str_replace(" ", "", ucwords(strtolower(str_replace(["_", "-"], " ", $string))));
     }
 }

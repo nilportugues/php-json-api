@@ -710,4 +710,77 @@ JSON;
             json_decode((new Serializer($jsonApiSerializer))->serialize($postArray), true)
         );
     }
+
+
+
+    /**
+     *
+     */
+    public function testItWillBuildUrlUsingAliasOrTypeNameIfIdFieldNotPresentInUrl()
+    {
+        $post = $this->createSimplePost();
+
+        $postMapping = new Mapping(SimplePost::class, '/post/{post}', ['postId']);
+        $postMapping->setHiddenProperties(['title', 'body']);
+
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
+
+        $expected = <<<JSON
+{
+    "data": {
+        "type": "post",
+        "id": "1",
+        "attributes": {
+            "author_id": 2,
+            "comments": [
+                {
+                    "comment_id": 10,
+                    "comment": "I am writing comment no. 1",
+                    "user_id": "User 5",
+                    "created_at": "2015-07-19T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 20,
+                    "comment": "I am writing comment no. 2",
+                    "user_id": "User 10",
+                    "created_at": "2015-07-20T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 30,
+                    "comment": "I am writing comment no. 3",
+                    "user_id": "User 15",
+                    "created_at": "2015-07-21T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 40,
+                    "comment": "I am writing comment no. 4",
+                    "user_id": "User 20",
+                    "created_at": "2015-07-22T12:48:00+02:00"
+                },
+                {
+                    "comment_id": 50,
+                    "comment": "I am writing comment no. 5",
+                    "user_id": "User 25",
+                    "created_at": "2015-07-23T12:48:00+02:00"
+                }
+            ]
+        },
+        "links": {
+            "self": { "href": "/post/1" }
+        }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}
+JSON;
+
+        $this->assertEquals(
+            json_decode($expected, true),
+            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+        );
+    }
 }
