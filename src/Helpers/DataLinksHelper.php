@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -36,20 +35,18 @@ final class DataLinksHelper
             $selfLink = $mappings[$type]->getResourceUrl();
 
             if (!empty($selfLink)) {
-
                 $url = self::buildUrl($mappings, $idProperties, $idValues, $selfLink, $type);
 
-                if($url !== $selfLink) {
+                if ($url !== $selfLink) {
                     $data[JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $url;
                 }
             }
 
             foreach ($mappings[$type]->getUrls() as $name => $url) {
                 $newUrl = str_replace($idProperties, $idValues, $url);
-                if($newUrl !== $url) {
+                if ($newUrl !== $url) {
                     $data[JsonApiTransformer::LINKS_KEY][$name][JsonApiTransformer::LINKS_HREF] = $newUrl;
                 }
-
             }
         }
 
@@ -217,7 +214,6 @@ final class DataLinksHelper
                         $parentType
                     );
 
-
                     $url = self::buildUrl($mappings, $idProperties, $idValues, $relatedUrl, $parentType);
 
                     if ($url !== $relatedUrl) {
@@ -230,76 +226,126 @@ final class DataLinksHelper
 
     /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
-     * @param       $idProperties
-     * @param       $idValues
-     * @param       $url
-     * @param       $type
+     * @param                                     $idProperties
+     * @param                                     $idValues
+     * @param                                     $url
+     * @param                                     $type
      *
      * @return mixed
      */
     private static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
     {
         $outputUrl = str_replace($idProperties, $idValues, $url);
-        if($outputUrl !== $url) {
+        if ($outputUrl !== $url) {
             return $outputUrl;
         }
 
-        $alias = $mappings[$type]->getClassAlias();
-        if($alias) {
-            $originalAlias = $alias;
-
-            //CamelCase
-            $className = self::underscoreToCamelCase(RecursiveFormatterHelper::camelCaseToUnderscore($originalAlias));
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
-                return $outputUrl;
-            }
-
-            //variable camelCase
-            $className[0] = strtolower($className[0]);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
-                return $outputUrl;
-            }
-
-            //to_under_score
-            $className = RecursiveFormatterHelper::camelCaseToUnderscore($originalAlias);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
-                return $outputUrl;
-            }
+        $outputUrl = self::secondPassBuildUrl($mappings[$type]->getClassAlias(), $idValues, $url);
+        if ($outputUrl !== $url) {
+            return $outputUrl;
         }
 
         $className = $mappings[$type]->getClassName();
-        $className = explode("\\", $className);
+        $className = explode('\\', $className);
         $className = array_pop($className);
 
-        if($className) {
-            $originalClassName = $className;
+        $outputUrl = self::secondPassBuildUrl($className, $idValues, $url);
+        if ($outputUrl !== $url) {
+            return $outputUrl;
+        }
 
-            //CamelCase
-            $className = self::underscoreToCamelCase(RecursiveFormatterHelper::camelCaseToUnderscore($originalClassName));
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+        return $url;
+    }
+
+    /**
+     * @param $idPropertyName
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    private static function secondPassBuildUrl($idPropertyName, $idValues, $url)
+    {
+        if (!empty($idPropertyName)) {
+            $outputUrl = self::toCamelCase($idPropertyName, $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
 
-            //variable camelCase
-            $className[0] = strtolower($className[0]);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $outputUrl = self::toLowerFirstCamelCase($idPropertyName, $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
 
-            //to_under_score
-            $className = RecursiveFormatterHelper::camelCaseToUnderscore($originalClassName);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $outputUrl = self::toUnderScore($idPropertyName, $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
         }
 
         return $url;
+    }
+
+    /**
+     * @param $original
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    private static function toCamelCase($original, $idValues, $url)
+    {
+        $className = self::underscoreToCamelCase(self::camelCaseToUnderscore($original));
+
+        return str_replace('{'.$className.'}', $idValues, $url);
+    }
+
+    /**
+     * @param $original
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    private static function toLowerFirstCamelCase($original, $idValues, $url)
+    {
+        $className = self::underscoreToCamelCase(self::camelCaseToUnderscore($original));
+        $className[0] = strtolower($className[0]);
+
+        return str_replace('{'.$className.'}', $idValues, $url);
+    }
+
+    /**
+     * @param $original
+     * @param $idValues
+     * @param $url
+     *
+     * @return mixed
+     */
+    private static function toUnderScore($original, $idValues, $url)
+    {
+        $className = self::camelCaseToUnderscore($original);
+
+        return str_replace('{'.$className.'}', $idValues, $url);
+    }
+
+    /**
+     * Transforms a given string from camelCase to under_score style.
+     *
+     * @param string $camel
+     * @param string $splitter
+     *
+     * @return string
+     */
+    protected static function camelCaseToUnderscore($camel, $splitter = '_')
+    {
+        $camel = preg_replace(
+            '/(?!^)[[:upper:]][[:lower:]]/',
+            '$0',
+            preg_replace('/(?!^)[[:upper:]]+/', $splitter.'$0', $camel)
+        );
+
+        return strtolower($camel);
     }
 
     /**
@@ -311,6 +357,6 @@ final class DataLinksHelper
      */
     protected static function underscoreToCamelCase($string)
     {
-        return str_replace(" ", "", ucwords(strtolower(str_replace(["_", "-"], " ", $string))));
+        return str_replace(' ', '', ucwords(strtolower(str_replace(['_', '-'], ' ', $string))));
     }
 }
