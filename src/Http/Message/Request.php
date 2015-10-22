@@ -180,11 +180,11 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getFilters()
     {
-        $filters = $this->getQueryParam('filter', null);
+        $filters = (array) $this->getQueryParam('filter', null);
 
         foreach ($filters as &$filter) {
             $filter = explode(',', $filter);
