@@ -182,7 +182,7 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getFilters()
     {
