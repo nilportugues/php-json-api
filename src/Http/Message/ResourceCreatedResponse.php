@@ -20,7 +20,7 @@ class ResourceCreatedResponse extends AbstractResponse
      */
     public function __construct($json)
     {
-        $data = json_decode($json, true);
+        $data = \json_decode($json, true);
 
         if (null !== $data && !empty($data['data']['links']['self'])) {
             $data = $data['data']['links']['self'];

@@ -17,7 +17,7 @@ class ResourceNotFoundResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = json_encode([]);
+        $json = \json_encode([]);
         $response = new ResourceNotFoundResponse($json);
 
         $this->assertEquals(404, $response->getStatusCode());

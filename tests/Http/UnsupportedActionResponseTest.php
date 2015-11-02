@@ -17,7 +17,7 @@ class UnsupportedActionResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = json_encode([]);
+        $json = \json_encode([]);
         $response = new UnsupportedActionResponse($json);
 
         $this->assertEquals(403, $response->getStatusCode());

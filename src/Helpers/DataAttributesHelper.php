@@ -82,7 +82,7 @@ final class DataAttributesHelper
         $idProperties = RecursiveFormatterHelper::getIdProperties($mappings, $type);
 
         foreach ($array as $propertyName => $value) {
-            if (in_array($propertyName, $idProperties, true)) {
+            if (\in_array($propertyName, $idProperties, true)) {
                 continue;
             }
 
@@ -93,7 +93,7 @@ final class DataAttributesHelper
                 continue;
             }
 
-            if (is_array($value) && !array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+            if (\is_array($value) && !array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
                 if (self::containsClassIdentifierKey($value)) {
                     $attributes[$keyName] = $value;
                 }
@@ -110,10 +110,10 @@ final class DataAttributesHelper
      */
     public static function transformToValidMemberName($attributeName)
     {
-        $attributeName = str_replace(self::$forbiddenMemberNameCharacters, '', $attributeName);
+        $attributeName = \str_replace(self::$forbiddenMemberNameCharacters, '', $attributeName);
 
-        $attributeName = ltrim($attributeName, implode('', self::$forbiddenAsFirstOrLastCharacter));
-        $attributeName = rtrim($attributeName, implode('', self::$forbiddenAsFirstOrLastCharacter));
+        $attributeName = \ltrim($attributeName, \implode('', self::$forbiddenAsFirstOrLastCharacter));
+        $attributeName = \rtrim($attributeName, \implode('', self::$forbiddenAsFirstOrLastCharacter));
 
         return $attributeName;
     }
@@ -125,9 +125,9 @@ final class DataAttributesHelper
      */
     private static function isScalarValue($value)
     {
-        return is_array($value)
-        && array_key_exists(Serializer::SCALAR_TYPE, $value)
-        && array_key_exists(Serializer::SCALAR_VALUE, $value);
+        return \is_array($value)
+        && \array_key_exists(Serializer::SCALAR_TYPE, $value)
+        && \array_key_exists(Serializer::SCALAR_VALUE, $value);
     }
 
     /**
@@ -142,16 +142,16 @@ final class DataAttributesHelper
             return $foundIdentifierKey || false;
         }
 
-        if (in_array(Serializer::CLASS_IDENTIFIER_KEY, $input, true)) {
+        if (\in_array(Serializer::CLASS_IDENTIFIER_KEY, $input, true)) {
             return true;
         }
 
         if (!empty($input[Serializer::SCALAR_VALUE])) {
             $input = $input[Serializer::SCALAR_VALUE];
 
-            if (is_array($input)) {
+            if (\is_array($input)) {
                 foreach ($input as $value) {
-                    if (is_array($value)) {
+                    if (\is_array($value)) {
                         $foundIdentifierKey = $foundIdentifierKey
                             || self::containsClassIdentifierKey($value, $foundIdentifierKey);
                     }

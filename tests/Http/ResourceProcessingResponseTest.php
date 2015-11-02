@@ -17,7 +17,7 @@ class ResourceProcessingResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = json_encode([]);
+        $json = \json_encode([]);
         $response = new ResourceProcessingResponse($json);
 
         $this->assertEquals(202, $response->getStatusCode());

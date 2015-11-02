@@ -17,7 +17,7 @@ class ResourceCreatedResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponseWithLocation()
     {
-        $json = json_encode([
+        $json = \json_encode([
             'data' => [
                     'type' => 'photos',
                     'id' => '550e8400-e29b-41d4-a716-446655440000',
@@ -40,7 +40,7 @@ class ResourceCreatedResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testResponse()
     {
-        $json = json_encode([]);
+        $json = \json_encode([]);
         $response = new ResourceCreatedResponse($json);
 
         $this->assertEquals(201, $response->getStatusCode());

@@ -31,25 +31,23 @@ final class DataLinksHelper
         $data = [];
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-        if (is_scalar($type) && !empty($mappings[$type])) {
+        if (\is_scalar($type) && !empty($mappings[$type])) {
             list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $value, $type);
             $selfLink = $mappings[$type]->getResourceUrl();
 
             if (!empty($selfLink)) {
-
                 $url = self::buildUrl($mappings, $idProperties, $idValues, $selfLink, $type);
 
-                if($url !== $selfLink) {
+                if ($url !== $selfLink) {
                     $data[JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $url;
                 }
             }
 
             foreach ($mappings[$type]->getUrls() as $name => $url) {
-                $newUrl = str_replace($idProperties, $idValues, $url);
-                if($newUrl !== $url) {
+                $newUrl = \str_replace($idProperties, $idValues, $url);
+                if ($newUrl !== $url) {
                     $data[JsonApiTransformer::LINKS_KEY][$name][JsonApiTransformer::LINKS_HREF] = $newUrl;
                 }
-
             }
         }
 
@@ -68,9 +66,9 @@ final class DataLinksHelper
         $data = [JsonApiTransformer::RELATIONSHIPS_KEY => []];
 
         foreach ($array as $propertyName => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 self::addRelationshipData($mappings, $parent, $value, $propertyName, $data);
-                if (array_key_exists(Serializer::MAP_TYPE, $value)) {
+                if (\array_key_exists(Serializer::MAP_TYPE, $value)) {
                     $newData = [];
                     foreach ($value[Serializer::SCALAR_VALUE] as $d) {
                         self::addRelationshipData($mappings, $parent, $d, $propertyName, $newData);
@@ -90,7 +88,7 @@ final class DataLinksHelper
                                 $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
                                 if (!empty($selfLink)) {
-                                    $href = str_replace($idProperties, $idValues, $selfLink);
+                                    $href = \str_replace($idProperties, $idValues, $selfLink);
                                     if ($selfLink != $href) {
                                         $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $href;
                                     }
@@ -106,7 +104,7 @@ final class DataLinksHelper
             }
         }
 
-        return (array) array_filter($data);
+        return (array) \array_filter($data);
     }
 
     /**
@@ -123,7 +121,7 @@ final class DataLinksHelper
         &$propertyName,
         &$data
     ) {
-        if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+        if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
             $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
             self::relationshipLinksSelf($mappings, $parent, $propertyName, $type, $data, $value);
@@ -148,8 +146,8 @@ final class DataLinksHelper
         array &$value
     ) {
         if (!in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
-            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = array_merge(
-                array_filter(
+            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = \array_merge(
+                \array_filter(
                     [
                         JsonApiTransformer::LINKS_KEY => self::setResponseDataRelationshipSelfLinks(
                                 $propertyName,
@@ -175,7 +173,7 @@ final class DataLinksHelper
         $data = [];
         $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
-        if (is_scalar($parentType) && !empty($mappings[$parentType])) {
+        if (\is_scalar($parentType) && !empty($mappings[$parentType])) {
             list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
                 $mappings,
                 $parent,
@@ -207,7 +205,7 @@ final class DataLinksHelper
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if (is_scalar($parentType)) {
+            if (\is_scalar($parentType)) {
                 $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
                 if (!empty($relatedUrl)) {
@@ -216,7 +214,6 @@ final class DataLinksHelper
                         $parent,
                         $parentType
                     );
-
 
                     $url = self::buildUrl($mappings, $idProperties, $idValues, $relatedUrl, $parentType);
 
@@ -230,71 +227,71 @@ final class DataLinksHelper
 
     /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
-     * @param       $idProperties
-     * @param       $idValues
-     * @param       $url
-     * @param       $type
+     * @param                                     $idProperties
+     * @param                                     $idValues
+     * @param                                     $url
+     * @param                                     $type
      *
      * @return mixed
      */
     private static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
     {
-        $outputUrl = str_replace($idProperties, $idValues, $url);
-        if($outputUrl !== $url) {
+        $outputUrl = \str_replace($idProperties, $idValues, $url);
+        if ($outputUrl !== $url) {
             return $outputUrl;
         }
 
         $alias = $mappings[$type]->getClassAlias();
-        if($alias) {
+        if ($alias) {
             $originalAlias = $alias;
 
             //CamelCase
             $className = self::underscoreToCamelCase(RecursiveFormatterHelper::camelCaseToUnderscore($originalAlias));
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $outputUrl = \str_replace('{'.$className.'}', $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
 
             //variable camelCase
-            $className[0] = strtolower($className[0]);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $className[0] = \strtolower($className[0]);
+            $outputUrl = \str_replace('{'.$className.'}', $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
 
             //to_under_score
             $className = RecursiveFormatterHelper::camelCaseToUnderscore($originalAlias);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $outputUrl = \str_replace('{'.$className.'}', $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
         }
 
         $className = $mappings[$type]->getClassName();
-        $className = explode("\\", $className);
-        $className = array_pop($className);
+        $className = \explode('\\', $className);
+        $className = \array_pop($className);
 
-        if($className) {
+        if ($className) {
             $originalClassName = $className;
 
             //CamelCase
             $className = self::underscoreToCamelCase(RecursiveFormatterHelper::camelCaseToUnderscore($originalClassName));
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $outputUrl = \str_replace('{'.$className.'}', $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
 
             //variable camelCase
-            $className[0] = strtolower($className[0]);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $className[0] = \strtolower($className[0]);
+            $outputUrl = \str_replace('{'.$className.'}', $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
 
             //to_under_score
             $className = RecursiveFormatterHelper::camelCaseToUnderscore($originalClassName);
-            $outputUrl = str_replace('{'.$className.'}', $idValues, $url);
-            if($url !== $outputUrl) {
+            $outputUrl = \str_replace('{'.$className.'}', $idValues, $url);
+            if ($url !== $outputUrl) {
                 return $outputUrl;
             }
         }
@@ -311,6 +308,6 @@ final class DataLinksHelper
      */
     protected static function underscoreToCamelCase($string)
     {
-        return str_replace(" ", "", ucwords(strtolower(str_replace(["_", "-"], " ", $string))));
+        return \str_replace(' ', '', \ucwords(\strtolower(\str_replace(['_', '-'], ' ', $string))));
     }
 }

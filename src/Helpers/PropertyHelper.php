@@ -37,16 +37,16 @@ final class PropertyHelper
         $finalType = ($mappings[$type]->getClassAlias()) ? $mappings[$type]->getClassAlias() : $type;
 
         $ids = [];
-        foreach (array_keys($value) as $propertyName) {
-            if (in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
+        foreach (\array_keys($value) as $propertyName) {
+            if (\in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
                 $id = RecursiveFormatterHelper::getIdValue($value[$propertyName]);
-                $ids[] = (is_array($id)) ? implode(JsonApiTransformer::ID_SEPARATOR, $id) : $id;
+                $ids[] = (\is_array($id)) ? \implode(JsonApiTransformer::ID_SEPARATOR, $id) : $id;
             }
         }
 
         return [
             JsonApiTransformer::TYPE_KEY => RecursiveFormatterHelper::namespaceAsArrayKey($finalType),
-            JsonApiTransformer::ID_KEY => implode(JsonApiTransformer::ID_SEPARATOR, $ids),
+            JsonApiTransformer::ID_KEY => \implode(JsonApiTransformer::ID_SEPARATOR, $ids),
         ];
     }
 

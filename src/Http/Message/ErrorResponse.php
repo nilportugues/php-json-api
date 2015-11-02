@@ -29,7 +29,7 @@ class ErrorResponse extends AbstractResponse
      */
     public function __construct($message, $code = 400, $data = null)
     {
-        $body = json_encode(
+        $body = \json_encode(
             [
                 'errors' => [
                     'id' => '',

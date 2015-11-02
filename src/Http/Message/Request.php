@@ -42,11 +42,11 @@ final class Request extends \Zend\Diactoros\Request
      */
     public function getIncludedRelationships()
     {
-        $relationshipNames = explode(',', $this->getQueryParam('include', ''));
+        $relationshipNames = \explode(',', $this->getQueryParam('include', ''));
         $relationships = [];
 
         foreach ($relationshipNames as $relationship) {
-            $data = explode('.', $relationship);
+            $data = \explode('.', $relationship);
             $type = $data[0];
             $attribute = (!empty($data[1])) ? $data[1] : null;
 
@@ -69,11 +69,11 @@ final class Request extends \Zend\Diactoros\Request
         $fields = null;
 
         if (!empty($sort)) {
-            $fields = explode(',', $sort);
+            $fields = \explode(',', $sort);
             if (!empty($fields)) {
                 foreach ($fields as &$field) {
                     if ('-' === $field[0]) {
-                        $field = ltrim($field, '-');
+                        $field = \ltrim($field, '-');
                     }
                 }
             }
@@ -94,7 +94,7 @@ final class Request extends \Zend\Diactoros\Request
         if (!empty($sort)) {
             $direction = [];
 
-            $fields = explode(',', $sort);
+            $fields = \explode(',', $sort);
             if (!empty($fields)) {
                 foreach ($fields as $field) {
                     $direction[ltrim($field, '-')] = ('-' === $field[0]) ? 'descending' : 'ascending';
@@ -188,8 +188,8 @@ final class Request extends \Zend\Diactoros\Request
         $filters = $this->getQueryParam('filter', null);
 
         foreach ($filters as &$filter) {
-            $filter = explode(',', $filter);
-            $filter = array_map('trim', $filter);
+            $filter = \explode(',', $filter);
+            $filter = \array_map('trim', $filter);
         }
 
         return $filters;

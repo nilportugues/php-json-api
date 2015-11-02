@@ -44,13 +44,13 @@ class JsonApiTransformer extends Transformer
     {
         $this->noMappingGuard();
 
-        if (is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
+        if (\is_array($value) && !empty($value[Serializer::MAP_TYPE])) {
             $data = $this->serializedArray($value);
         } else {
             $data = $this->serializeObject($value);
         }
 
-        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        return \json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -92,7 +92,7 @@ class JsonApiTransformer extends Transformer
     private function serialization(array &$value)
     {
         $data = [
-            self::DATA_KEY => array_merge(
+            self::DATA_KEY => \array_merge(
                 PropertyHelper::setResponseDataTypeAndId($this->mappings, $value),
                 DataAttributesHelper::setResponseDataAttributes($this->mappings, $value),
                 DataLinksHelper::setResponseDataLinks($this->mappings, $value),
@@ -118,7 +118,7 @@ class JsonApiTransformer extends Transformer
     {
         $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
 
-        if (is_scalar($type)) {
+        if (\is_scalar($type)) {
             foreach ($this->mappings[$type]->getIdProperties() as $propertyName) {
                 unset($copy[$propertyName]);
             }
@@ -134,8 +134,8 @@ class JsonApiTransformer extends Transformer
      */
     protected function setResponseLinks(array $value, array &$data)
     {
-        $data[self::LINKS_KEY] = array_filter(
-            array_merge(
+        $data[self::LINKS_KEY] = \array_filter(
+            \array_merge(
                 $this->addHrefToLinks($this->buildLinks()),
                 (!empty($data[self::LINKS_KEY])) ? $data[self::LINKS_KEY] : []
             )
@@ -144,11 +144,11 @@ class JsonApiTransformer extends Transformer
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if (is_scalar($type)) {
+            if (\is_scalar($type)) {
                 $urls = $this->mappings[$type]->getUrls();
 
-                $data[self::LINKS_KEY] = array_filter(
-                    array_merge(
+                $data[self::LINKS_KEY] = \array_filter(
+                    \array_merge(
                         (empty($data[self::LINKS_KEY])) ? [] : $data[self::LINKS_KEY],
                         (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
                     )
@@ -222,15 +222,15 @@ class JsonApiTransformer extends Transformer
             $v = $this->serializeObject($v);
             $dataValues[] = $v[self::DATA_KEY];
             if (!empty($v[self::INCLUDED_KEY])) {
-                $includedValues = array_merge($includedValues, $v[self::INCLUDED_KEY]);
+                $includedValues = \array_merge($includedValues, $v[self::INCLUDED_KEY]);
             }
         }
-        $includedValues = array_unique($includedValues, SORT_REGULAR);
+        $includedValues = \array_unique($includedValues, SORT_REGULAR);
 
-        $data = [self::DATA_KEY => $dataValues, self::INCLUDED_KEY => array_values($includedValues)];
+        $data = [self::DATA_KEY => $dataValues, self::INCLUDED_KEY => \array_values($includedValues)];
         $this->setResponseLinks($value, $data);
         $this->setResponseVersion($data);
 
-        return array_filter($data);
+        return \array_filter($data);
     }
 }

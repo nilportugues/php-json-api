@@ -17,7 +17,7 @@ class ResourcePostErrorResponseTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = json_encode([]);
+        $json = \json_encode([]);
         $response = new ResourcePostErrorResponse($json);
 
         $this->assertEquals(409, $response->getStatusCode());

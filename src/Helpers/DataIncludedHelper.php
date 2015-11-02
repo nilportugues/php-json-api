@@ -24,8 +24,8 @@ final class DataIncludedHelper
     public static function setResponseDataIncluded(array &$mappings, array $array, array &$data)
     {
         foreach ($array as $value) {
-            if (is_array($value)) {
-                if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
+            if (\is_array($value)) {
+                if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
                     $attributes = [];
                     $relationships = [];
                     $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
@@ -35,9 +35,9 @@ final class DataIncludedHelper
                     continue;
                 }
 
-                if (is_array($value)) {
+                if (\is_array($value)) {
                     foreach ($value as $inArrayValue) {
-                        if (is_array($inArrayValue)) {
+                        if (\is_array($inArrayValue)) {
                             self::setResponseDataIncluded($mappings, $inArrayValue, $data);
                         }
                     }
@@ -66,10 +66,10 @@ final class DataIncludedHelper
             if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
                 $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
 
-                if (array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
+                if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
                     self::setResponseDataIncluded($mappings, $value, $data);
 
-                    $relationships[$propertyName] = array_merge(
+                    $relationships[$propertyName] = \array_merge(
                         DataLinksHelper::setResponseDataLinks($mappings, $attribute),
                         [
                             JsonApiTransformer::DATA_KEY => [
@@ -97,11 +97,11 @@ final class DataIncludedHelper
      */
     private static function addToIncludedArray(array &$mappings, array &$data, array &$attributes, array &$value)
     {
-        if (count($attributes) > 0) {
+        if (\count($attributes) > 0) {
             $includedData = PropertyHelper::setResponseDataTypeAndId($mappings, $value);
 
             if (self::hasIdKey($includedData)) {
-                $arrayData = array_merge(
+                $arrayData = \array_merge(
                     [
                         JsonApiTransformer::TYPE_KEY => $includedData[JsonApiTransformer::TYPE_KEY],
                         JsonApiTransformer::ID_KEY => $includedData[JsonApiTransformer::ID_KEY],
@@ -121,19 +121,19 @@ final class DataIncludedHelper
                 );
 
                 if ($relationshipData) {
-                    $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = array_merge(
+                    $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = \array_merge(
                         $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY],
                         $relationshipData
                     );
                 }
 
-                $data[JsonApiTransformer::INCLUDED_KEY][] = array_filter($arrayData);
+                $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
             }
         }
 
         if (!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
-            $data[JsonApiTransformer::INCLUDED_KEY] = array_values(
-                array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
+            $data[JsonApiTransformer::INCLUDED_KEY] = \array_values(
+                \array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
             );
         }
     }
@@ -154,7 +154,7 @@ final class DataIncludedHelper
             if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
                 $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
 
-                if (is_array($attribute) && array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
+                if (\is_array($attribute) && \array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
                     $data[$propertyName][JsonApiTransformer::DATA_KEY] = PropertyHelper::setResponseDataTypeAndId($mappings, $attribute);
 
                     continue;
@@ -170,7 +170,7 @@ final class DataIncludedHelper
      */
     private static function hasIdKey(array &$includedData)
     {
-        return array_key_exists(JsonApiTransformer::ID_KEY, $includedData)
+        return \array_key_exists(JsonApiTransformer::ID_KEY, $includedData)
         && !empty($includedData[JsonApiTransformer::ID_KEY]);
     }
 }

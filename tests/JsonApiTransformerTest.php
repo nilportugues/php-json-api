@@ -308,8 +308,8 @@ JSON;
         $transformer->setNextUrl('http://example.com/posts/10');
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($transformer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($transformer))->serialize($post), true)
         );
     }
 
@@ -380,8 +380,8 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -453,8 +453,8 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -524,8 +524,8 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -594,8 +594,8 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -630,8 +630,8 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -706,12 +706,10 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($postArray), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($postArray), true)
         );
     }
-
-
 
     /**
      *
@@ -779,8 +777,8 @@ JSON;
 JSON;
 
         $this->assertEquals(
-            json_decode($expected, true),
-            json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
         );
     }
 }
