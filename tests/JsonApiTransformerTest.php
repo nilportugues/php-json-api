@@ -8,13 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Tests\JsonApi;
 
 use DateTime;
+use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Mapping\Mapping;
-use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\Transformer\TransformerException;
 use NilPortugues\Serializer\Serializer;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Comment;

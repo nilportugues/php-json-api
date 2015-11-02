@@ -8,10 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 /**
  * Class AbstractRequest.
@@ -19,11 +20,11 @@ use Psr\Http\Message\ServerRequestInterface;
 final class Request extends \Zend\Diactoros\Request
 {
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param ServerRequestInterface $request
      */
-    public function __construct(ServerRequestInterface $request)
+    public function __construct(ServerRequestInterface $request = null)
     {
-        $this->request = $request;
+        $this->request = ($request) ? $request : (new DiactorosFactory())->createRequest(SymfonyRequest::createFromGlobals());
     }
 
     /**
@@ -181,11 +182,11 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getFilters()
     {
-        $filters = $this->getQueryParam('filter', null);
+        $filters = (array) $this->getQueryParam('filter', null);
 
         foreach ($filters as &$filter) {
             $filter = \explode(',', $filter);
