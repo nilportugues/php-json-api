@@ -124,14 +124,12 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @param int $default
-     *
      * @return int
      */
-    public function getPageLimit($default = 10)
+    public function getPageLimit()
     {
         $page = $this->getQueryParam('page');
-        $limit = $default;
+        $limit = null;
 
         if (!empty($page['limit'])) {
             $limit = (int) $page['limit'];
@@ -156,12 +154,14 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @return int|null
+     * @param int $default
+     *
+     * @return int
      */
-    public function getPageSize()
+    public function getPageSize($default = 10)
     {
         $page = $this->getQueryParam('page');
-        $size = null;
+        $size = $default;
 
         if (!empty($page['size'])) {
             $size = (int) $page['size'];
