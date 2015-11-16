@@ -63,8 +63,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                 // (Optional) Used by JSONAPI
                 'relationships' => [
                     'author' => [
-                        'related' => 'http://example.com/posts/{postId}/author',
-                        'self' => 'http://example.com/posts/{postId}/relationships/author',
+                        'related' => ['name' => 'http://example.com/posts/{postId}/author'],
+                        'self' => ['name' => 'http://example.com/posts/{postId}/relationships/author'],
                     ],
                 ],
             ],
@@ -77,9 +77,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'postId',
                 ],
                 'urls' => [
-                    'self' => 'http://example.com/posts/{postId}',
+                    'self' => ['name' => 'http://example.com/posts/{postId}'],
                     'relationships' => [
-                        Comment::class => 'http://example.com/posts/{postId}/relationships/comments',
+                        Comment::class => ['name' => 'http://example.com/posts/{postId}/relationships/comments'],
                     ],
                 ],
             ],
@@ -92,9 +92,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'userId',
                 ],
                 'urls' => [
-                    'self' => 'http://example.com/users/{userId}',
-                    'friends' => 'http://example.com/users/{userId}/friends',
-                    'comments' => 'http://example.com/users/{userId}/comments',
+                    'self' => ['name' => 'http://example.com/users/{userId}'],
+                    'friends' => ['name' => 'http://example.com/users/{userId}/friends'],
+                    'comments' => ['name' => 'http://example.com/users/{userId}/comments'],
                 ],
             ],
             [
@@ -106,9 +106,9 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'userId',
                 ],
                 'urls' => [
-                    'self' => 'http://example.com/users/{userId}',
-                    'friends' => 'http://example.com/users/{userId}/friends',
-                    'comments' => 'http://example.com/users/{userId}/comments',
+                    'self' => ['name' => 'http://example.com/users/{userId}'],
+                    'friends' => ['name' => 'http://example.com/users/{userId}/friends'],
+                    'comments' => ['name' => 'http://example.com/users/{userId}/comments'],
                 ],
             ],
             [
@@ -120,7 +120,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'commentId',
                 ],
                 'urls' => [
-                    'self' => 'http://example.com/comments/{commentId}',
+                    'self' => ['name' => 'http://example.com/comments/{commentId}'],
                 ],
                 'relationships' => [
                 ],
@@ -134,7 +134,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                     'commentId',
                 ],
                 'urls' => [
-                    'self' => 'http://example.com/comments/{commentId}',
+                    'self' => ['name' => 'http://example.com/comments/{commentId}'],
                 ],
             ],
         ];
@@ -305,6 +305,7 @@ JSON;
         $transformer->setSelfUrl('http://example.com/posts/9');
         $transformer->setFirstUrl('http://example.com/posts/1');
         $transformer->setNextUrl('http://example.com/posts/10');
+
 
         $this->assertEquals(
             \json_decode($expected, true),

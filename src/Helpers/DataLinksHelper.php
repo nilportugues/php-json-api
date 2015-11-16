@@ -8,9 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
+use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Serializer\Serializer;
 
@@ -31,7 +33,18 @@ final class DataLinksHelper
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
         if (\is_scalar($type) && !empty($mappings[$type])) {
-            list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues($mappings, $value, $type);
+            $copy = $value;
+            RecursiveFormatterHelper::formatScalarValues($copy);
+            if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
+                unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
+            }
+
+            $idProperties = array_keys($copy);
+            foreach ($idProperties as &$property) {
+                $property = sprintf('{%s}', $property);
+            }
+            $idValues = array_values($copy);
+
             $selfLink = $mappings[$type]->getResourceUrl();
 
             if (!empty($selfLink)) {
@@ -42,8 +55,15 @@ final class DataLinksHelper
                 }
             }
 
+            self::removeArraysFromKeyValueReplacement($idProperties, $idValues);
+
             foreach ($mappings[$type]->getUrls() as $name => $url) {
+                if (is_array($url) && !empty($url['name'])) {
+                    $url = $url['name'];
+                }
+
                 $newUrl = \str_replace($idProperties, $idValues, $url);
+
                 if ($newUrl !== $url) {
                     $data[JsonApiTransformer::LINKS_KEY][$name][JsonApiTransformer::LINKS_HREF] = $newUrl;
                 }
@@ -173,11 +193,17 @@ final class DataLinksHelper
         $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
         if (\is_scalar($parentType) && !empty($mappings[$parentType])) {
-            list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
-                $mappings,
-                $parent,
-                $parentType
-            );
+            $copy = $parent;
+            RecursiveFormatterHelper::formatScalarValues($copy);
+            if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
+                unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
+            }
+
+            $idProperties = array_keys($copy);
+            foreach ($idProperties as &$property) {
+                $property = sprintf('{%s}', $property);
+            }
+            $idValues = array_values($copy);
 
             $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
 
@@ -208,11 +234,17 @@ final class DataLinksHelper
                 $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
 
                 if (!empty($relatedUrl)) {
-                    list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
-                        $mappings,
-                        $parent,
-                        $parentType
-                    );
+                    $copy = $parent;
+                    RecursiveFormatterHelper::formatScalarValues($copy);
+                    if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
+                        unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
+                    }
+
+                    $idProperties = array_keys($copy);
+                    foreach ($idProperties as &$property) {
+                        $property = sprintf('{%s}', $property);
+                    }
+                    $idValues = array_values($copy);
 
                     $url = self::buildUrl($mappings, $idProperties, $idValues, $relatedUrl, $parentType);
 
@@ -235,6 +267,12 @@ final class DataLinksHelper
      */
     private static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
     {
+        self::removeArraysFromKeyValueReplacement($idProperties, $idValues);
+
+        if (is_array($url) && !empty($url['name'])) {
+            $url = $url['name'];
+        }
+
         $outputUrl = \str_replace($idProperties, $idValues, $url);
         if ($outputUrl !== $url) {
             return $outputUrl;
@@ -266,6 +304,14 @@ final class DataLinksHelper
      */
     private static function secondPassBuildUrl($idPropertyName, $idValues, $url)
     {
+        if (is_array($url) && !empty($url['name'])) {
+            $url = $url['name'];
+        }
+
+        if (is_array($idValues)) {
+            $idValues = array_shift($idValues);
+        }
+
         if (!empty($idPropertyName)) {
             $outputUrl = self::toCamelCase($idPropertyName, $idValues, $url);
             if ($url !== $outputUrl) {
@@ -358,5 +404,22 @@ final class DataLinksHelper
     protected static function underscoreToCamelCase($string)
     {
         return \str_replace(' ', '', \ucwords(\strtolower(\str_replace(['_', '-'], ' ', $string))));
+    }
+
+    /**
+     * @param array $idProperties
+     * @param array $idValues
+     */
+    private static function removeArraysFromKeyValueReplacement(array &$idProperties, array &$idValues)
+    {
+        RecursiveDeleteHelper::deleteKeys($idValues, [Serializer::CLASS_IDENTIFIER_KEY]);
+        RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($idValues);
+
+        foreach ($idValues as $key => $value) {
+            if (is_array($value)) {
+                unset($idProperties[$key]);
+                unset($idValues[$key]);
+            }
+        }
     }
 }
