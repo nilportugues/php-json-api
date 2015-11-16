@@ -200,4 +200,19 @@ final class Request extends \Zend\Diactoros\Request
 
         return $filters;
     }
+    
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        $fields = (array) $this->getQueryParam('fields', null);
+
+        foreach ($fields as &$filter) {
+            $filter = \explode(',', $filter);
+            $filter = \array_map('trim', $filter);
+        }
+
+        return $fields;
+    }    
 }
