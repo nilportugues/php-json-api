@@ -189,6 +189,7 @@ class JsonApiTransformer extends Transformer
         $this->formatScalarValues($data);
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
 
+
         return $data;
     }
 
@@ -231,6 +232,10 @@ class JsonApiTransformer extends Transformer
         $this->setResponseLinks($value, $data);
         $this->setResponseVersion($data);
 
-        return \array_filter($data);
+        if (empty($data['data'])) {
+            $data = array_merge(['data' => []], $data);
+        }
+
+        return $data;
     }
 }
