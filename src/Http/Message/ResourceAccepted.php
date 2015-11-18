@@ -11,12 +11,12 @@
 
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
-class ResourceDeletedResponse extends AbstractResponse
+class ResourceAccepted extends AbstractResponse
 {
     /**
      * @var int
      */
-    protected $httpCode = 204;
+    protected $httpCode = 202;
 
     /**
      *

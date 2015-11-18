@@ -8,18 +8,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
-use NilPortugues\Api\JsonApi\Http\Message\ResourcePatchErrorResponse;
+use NilPortugues\Api\JsonApi\Http\Message\ResourceNotFound;
 
-class ResourcePatchErrorResponseTest extends \PHPUnit_Framework_TestCase
+class ResourceNotFoundTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
         $json = \json_encode([]);
-        $response = new ResourcePatchErrorResponse($json);
+        $response = new ResourceNotFound($json);
 
-        $this->assertEquals(409, $response->getStatusCode());
+        $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
     }
 }

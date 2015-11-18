@@ -3,23 +3,23 @@
 /**
  * Author: Nil Portugués Calderó <contact@nilportugues.com>
  * Date: 8/1/15
- * Time: 12:28 PM.
+ * Time: 12:27 PM.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
-use NilPortugues\Api\JsonApi\Http\Message\ResourcePostErrorResponse;
+use NilPortugues\Api\JsonApi\Http\Message\BadRequest;
 
-class ResourcePostErrorResponseTest extends \PHPUnit_Framework_TestCase
+class BadRequestTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = \json_encode([]);
-        $response = new ResourcePostErrorResponse($json);
+        $response = new BadRequest('Internal Server Error', 400);
 
-        $this->assertEquals(409, $response->getStatusCode());
+        $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
     }
 }

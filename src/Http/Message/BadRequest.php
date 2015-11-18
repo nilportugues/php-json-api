@@ -12,9 +12,9 @@
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
 /**
- * Class ErrorResponse.
+ * Class BadRequest.
  */
-class ErrorResponse extends AbstractResponse
+class BadRequest extends AbstractResponse
 {
     protected $httpCode = 400;
 

@@ -193,14 +193,9 @@ final class Request extends \Zend\Diactoros\Request
     {
         $filters = (array) $this->getQueryParam('filter', null);
 
-        foreach ($filters as &$filter) {
-            $filter = \explode(',', $filter);
-            $filter = \array_map('trim', $filter);
-        }
-
         return $filters;
     }
-    
+
     /**
      * @return array
      */
@@ -214,5 +209,5 @@ final class Request extends \Zend\Diactoros\Request
         }
 
         return $fields;
-    }    
+    }
 }

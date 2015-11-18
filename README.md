@@ -328,7 +328,7 @@ JSON API comes with a helper Request class, `NilPortugues\Api\JsonApi\Http\Messa
 
 ##### JSON API Query Parameters:
 
-- **&fields[resource]=field1,field2** will only should the specified fields for a given resource.
+- **&fields[resource]=field1,field2** will only show the specified fields for a given resource.
 - **&include[resource]**  show the relationship for a given resource even if it is filtered out by fields parameter.
 - **&include[resource.field1]** show the relationship field even if it is filtered out by fields parameter.
 - **&sort=field1,-field2** sort by field2 as DESC and field1 as ASC.
@@ -369,16 +369,16 @@ final class Request
 
 The following PSR-7 Response objects providing the right headers and HTTP status codes are available:
 
-- `NilPortugues\Api\JsonApi\Http\Message\ErrorResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceCreatedResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceDeletedResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceNotFoundResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourcePatchErrorResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourcePostErrorResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceProcessingResponse($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceUpdatedResponse($json)`
 - `NilPortugues\Api\JsonApi\Http\Message\Response($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\UnsupportedActionResponse($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceAccepted($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceCreated($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceDeleted($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceNotFound($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceConflicted($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceProcessing($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\ResourceUpdated($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\BadRequest($json)`
+- `NilPortugues\Api\JsonApi\Http\Message\UnsupportedAction($json)`
 
 
 

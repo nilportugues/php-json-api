@@ -11,7 +11,7 @@
 
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
-class ResourceProcessingResponse extends AbstractResponse
+class ResourceProcessing extends AbstractResponse
 {
     protected $httpCode = 202;
 }

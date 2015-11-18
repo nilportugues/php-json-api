@@ -8,11 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
-use NilPortugues\Api\JsonApi\Http\Message\ResourceCreatedResponse;
+use NilPortugues\Api\JsonApi\Http\Message\ResourceCreated;
 
-class ResourceCreatedResponseTest extends \PHPUnit_Framework_TestCase
+class ResourceCreatedTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponseWithLocation()
     {
@@ -30,7 +31,7 @@ class ResourceCreatedResponseTest extends \PHPUnit_Framework_TestCase
                 ],
         ], JSON_UNESCAPED_SLASHES);
 
-        $response = new ResourceCreatedResponse($json);
+        $response = new ResourceCreated($json);
 
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
@@ -40,7 +41,7 @@ class ResourceCreatedResponseTest extends \PHPUnit_Framework_TestCase
     public function testResponse()
     {
         $json = \json_encode([]);
-        $response = new ResourceCreatedResponse($json);
+        $response = new ResourceCreated($json);
 
         $this->assertEquals(201, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));

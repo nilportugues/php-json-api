@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\JsonApi;
 
 use DateTime;
@@ -305,7 +306,6 @@ JSON;
         $transformer->setSelfUrl('http://example.com/posts/9');
         $transformer->setFirstUrl('http://example.com/posts/1');
         $transformer->setNextUrl('http://example.com/posts/10');
-
 
         $this->assertEquals(
             \json_decode($expected, true),

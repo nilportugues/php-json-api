@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
 use NilPortugues\Api\JsonApi\Http\Message\Request;
@@ -26,7 +27,8 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $_GET = [
-            'filter' => ['user' => 'user_name,email'],
+            'fields' => ['user' => 'user_name,email'],
+            'filter' => ['user' => 'filter'],
             'include' => 'friends.username,comments',
             'sort' => '-age,gender',
             'page' => [
@@ -92,8 +94,13 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('abc', $this->request->getPageCursor());
     }
 
-    public function testGetFilters()
+    public function testGetFields()
     {
-        $this->assertSame(['user' => ['user_name', 'email']], $this->request->getFilters());
+        $this->assertSame(['user' => ['user_name', 'email']], $this->request->getFields());
+    }
+
+    public function testGetFilter()
+    {
+        $this->assertSame(['user' => 'filter'], $this->request->getFilters());
     }
 }

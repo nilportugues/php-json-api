@@ -8,18 +8,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
-use NilPortugues\Api\JsonApi\Http\Message\UnsupportedActionResponse;
+use NilPortugues\Api\JsonApi\Http\Message\ResourceUpdated;
 
-class UnsupportedActionResponseTest extends \PHPUnit_Framework_TestCase
+class ResourceUpdatedTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
         $json = \json_encode([]);
-        $response = new UnsupportedActionResponse($json);
+        $response = new ResourceUpdated($json);
 
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
     }
 }
