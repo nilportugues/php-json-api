@@ -30,6 +30,10 @@ final class PropertyHelper
     {
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
+        if (empty($mappings[$type])) {
+            return [];
+        }
+
         if (!is_scalar($type)) {
             return self::setResponseDataTypeAndId($mappings, $type);
         }

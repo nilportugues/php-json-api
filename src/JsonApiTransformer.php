@@ -189,7 +189,6 @@ class JsonApiTransformer extends Transformer
         $this->formatScalarValues($data);
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
 
-
         return $data;
     }
 
@@ -228,7 +227,10 @@ class JsonApiTransformer extends Transformer
         }
         $includedValues = \array_unique($includedValues, SORT_REGULAR);
 
-        $data = [self::DATA_KEY => $dataValues, self::INCLUDED_KEY => \array_values($includedValues)];
+        $data[self::DATA_KEY] = $dataValues;
+        $data[self::INCLUDED_KEY] = \array_values($includedValues);
+        $data = array_filter($data);
+
         $this->setResponseLinks($value, $data);
         $this->setResponseVersion($data);
 

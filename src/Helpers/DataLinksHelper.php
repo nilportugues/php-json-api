@@ -165,8 +165,8 @@ final class DataLinksHelper
         array &$value
     ) {
         if (!in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
-            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = \array_merge(
-                \array_filter(
+            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = array_merge(
+                array_filter(
                     [
                         JsonApiTransformer::LINKS_KEY => self::setResponseDataRelationshipSelfLinks(
                                 $propertyName,
@@ -175,8 +175,14 @@ final class DataLinksHelper
                             ),
                     ]
                 ),
-                [JsonApiTransformer::DATA_KEY => PropertyHelper::setResponseDataTypeAndId($mappings, $value)]
+                array_filter(
+                    [JsonApiTransformer::DATA_KEY => PropertyHelper::setResponseDataTypeAndId($mappings, $value)]
+                )
             );
+
+            if (count($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName]) === 0) {
+                unset($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName]);
+            }
         }
     }
 
