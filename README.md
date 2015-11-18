@@ -328,17 +328,17 @@ JSON API comes with a helper Request class, `NilPortugues\Api\JsonApi\Http\Messa
 
 ##### JSON API Query Parameters:
 
-- &filter[resource]=field1,field2
-- &include[resource]
-- &include[resource.field1]
-- &sort=field1,-field2
-- &sort=-field1,field2
-- &page[number]
-- &page[limit]
-- &page[cursor]
-- &page[offset]
-- &page[size]
-
+- **&fields[resource]=field1,field2** will only should the specified fields for a given resource.
+- **&include[resource]**  show the relationship for a given resource even if it is filtered out by fields parameter.
+- **&include[resource.field1]** show the relationship field even if it is filtered out by fields parameter.
+- **&sort=field1,-field2** sort by field2 as DESC and field1 as ASC.
+- **&sort=-field1,field2** sort by field1 as DESC and field2 as ASC.
+- **&page[number]** will return the current page elements in a *page-based* pagination strategy.
+- **&page[size]** will return the total amout of elements in a *page-based* pagination strategy.
+- **&page[limit]** will return the limit in a *offset-based* pagination strategy.
+- **&page[offset]** will return the offset value in a *offset-based* pagination strategy.
+- **&page[cursor]** will return the cursor value  in a *cursor-based* pagination strategy.
+- **&filter** will return data passed in the filter param.
 
 ##### NilPortugues\Api\JsonApi\Http\Message\Request
 
@@ -361,6 +361,7 @@ final class Request
     public function getPageSize() { ... }
     public function getPageCursor() { ... }
     public function getFilters() { ... }
+    public function getFields() { ... }
 }
 ```
 
