@@ -86,12 +86,12 @@ final class DataAttributesHelper
                 continue;
             }
 
+            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
+
             if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY]) && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])) {
-                $attributes[$propertyName] = $value;
+                $attributes[$keyName] = $value;
                 continue;
             }
-
-            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
             if (self::isScalarValue($value) && empty($mappings[$value[Serializer::SCALAR_TYPE]])) {
                 $attributes[$keyName] = $value;
