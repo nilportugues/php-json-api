@@ -13,5 +13,8 @@ namespace NilPortugues\Api\JsonApi\Http\Message;
 
 class ResourceUpdated extends AbstractResponse
 {
+    /**
+     * @var int
+     */
     protected $httpCode = 200;
 }

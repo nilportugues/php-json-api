@@ -11,15 +11,42 @@
 
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
+use NilPortugues\Api\JsonApi\Http\Error;
+use NilPortugues\Api\JsonApi\Http\ErrorBag;
 use NilPortugues\Api\JsonApi\Http\Message\BadRequest;
 
 class BadRequestTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $response = new BadRequest('Internal Server Error', 400);
+        $errorBag = new ErrorBag([
+            new Error('Json Error', 'JSON parse error - Expecting property name at line 1 column 2.'),
+        ]);
+
+        $response = new BadRequest($errorBag);
 
         $this->assertEquals(400, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+        $this->assertEquals($this->getJsonError(), json_decode($response->getBody(), true));
+    }
+
+    /**
+     * @return string
+     */
+    private function getJsonError()
+    {
+        $json = <<<JSON
+{
+    "errors": [
+        {
+            "status" : 400,
+            "title": "Json Error",
+            "detail": "JSON parse error - Expecting property name at line 1 column 2."
+        }
+    ]
+}
+JSON;
+
+        return json_decode($json, true);
     }
 }

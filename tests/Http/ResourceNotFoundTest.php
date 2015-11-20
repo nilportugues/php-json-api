@@ -11,16 +11,41 @@
 
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
+use NilPortugues\Api\JsonApi\Http\Error;
+use NilPortugues\Api\JsonApi\Http\ErrorBag;
 use NilPortugues\Api\JsonApi\Http\Message\ResourceNotFound;
 
 class ResourceNotFoundTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = \json_encode([]);
-        $response = new ResourceNotFound($json);
+        $errorBag = new ErrorBag([
+            new Error('User not found', 'User resource with id 1 was not found.'),
+        ]);
+        $response = new ResourceNotFound($errorBag);
 
         $this->assertEquals(404, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+        $this->assertEquals($this->getJsonError(), json_decode($response->getBody(), true));
+    }
+
+    /**
+     * @return string
+     */
+    private function getJsonError()
+    {
+        $json = <<<JSON
+{
+    "errors": [
+        {
+            "status" : 404,
+            "title": "User not found",
+            "detail": "User resource with id 1 was not found."
+        }
+    ]
+}
+JSON;
+
+        return json_decode($json, true);
     }
 }

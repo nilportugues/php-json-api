@@ -11,44 +11,42 @@
 
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
+use NilPortugues\Api\JsonApi\Http\ErrorBag;
+
 /**
  * Class BadRequest.
  */
 class BadRequest extends AbstractResponse
 {
+    /**
+     * @var int
+     */
     protected $httpCode = 400;
 
     /**
-     * Error as defined in http://jsonapi.org/format/#error-objects;.
+     * ErrorBag as defined in http://jsonapi.org/format/#error-objects;.
      *
-     * @link http://jsonapi.org/format/#error-objects
+     * @link     http://jsonapi.org/format/#error-objects
      *
-     * @param string $message
-     * @param int    $code
-     * @param null   $data
+     * @param ErrorBag $errors
      */
-    public function __construct($message, $code = 400, $data = null)
+    public function __construct(ErrorBag $errors = null)
     {
-        $body = \json_encode(
-            [
-                'errors' => [
-                    'id' => '',
-                    'links' => [
-                        'about' => '',
-                    ],
-                    'status' => '',
-                    'code' => '',
-                    'title' => '',
-                    'detail' => '',
-                    'source' => [
-                        'pointer' => '',
-                        'parameter' => '',
-                    ],
-                    'meta' => '',
-                ],
-            ]
-        );
+        $body = $this->getDefaultError();
+
+        if (null !== $errors) {
+            $errors->setHttpCode($this->httpCode);
+            $body = json_encode($errors);
+        }
 
         $this->response = parent::instance($body, $this->httpCode, $this->headers);
+    }
+
+    /**
+     * @return string
+     */
+    private function getDefaultError()
+    {
+        return json_encode(['errors' => [['status' => $this->httpCode, 'code' => 'Bad Request']]]);
     }
 }

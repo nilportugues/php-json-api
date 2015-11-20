@@ -11,16 +11,41 @@
 
 namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
 
+use NilPortugues\Api\JsonApi\Http\Error;
+use NilPortugues\Api\JsonApi\Http\ErrorBag;
 use NilPortugues\Api\JsonApi\Http\Message\ResourceConflicted;
 
 class ResourceConflictedTest extends \PHPUnit_Framework_TestCase
 {
     public function testResponse()
     {
-        $json = \json_encode([]);
-        $response = new ResourceConflicted($json);
+        $errorBag = new ErrorBag([
+            new Error('Conflicted modification', 'There seems to be an inconsistency in your resource.'),
+        ]);
+        $response = new ResourceConflicted($errorBag);
 
         $this->assertEquals(409, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
+        $this->assertEquals($this->getJsonError(), json_decode($response->getBody(), true));
+    }
+
+    /**
+     * @return string
+     */
+    private function getJsonError()
+    {
+        $json = <<<JSON
+{
+    "errors": [
+        {
+            "status" : 409,
+            "title": "Conflicted modification",
+            "detail": "There seems to be an inconsistency in your resource."
+        }
+    ]
+}
+JSON;
+
+        return json_decode($json, true);
     }
 }
