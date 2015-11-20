@@ -70,6 +70,25 @@ final class DataAttributesHelper
     ];
 
     /**
+     * Changes all array keys to under_score format using recursion.
+     *
+     * @param array $array
+     */
+    protected static function recursiveSetKeysToUnderScore(array &$array)
+    {
+        $newArray = [];
+        foreach ($array as $key => &$value) {
+            $underscoreKey = RecursiveFormatterHelper::camelCaseToUnderscore($key);
+            $newArray[$underscoreKey] = $value;
+
+            if (\is_array($value)) {
+                self::recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
+            }
+        }
+        $array = $newArray;
+    }
+
+    /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $array
      *
@@ -89,7 +108,9 @@ final class DataAttributesHelper
             $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
             if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY]) && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])) {
-                $attributes[$keyName] = $value;
+                $copy = $value;
+                self::recursiveSetKeysToUnderScore($copy);
+                $attributes[$keyName] = $copy;
                 continue;
             }
 
