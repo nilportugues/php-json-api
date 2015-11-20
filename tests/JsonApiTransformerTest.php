@@ -23,6 +23,7 @@ use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\User;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\CommentId;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\PostId;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\UserId;
+use NilPortugues\Tests\Api\JsonApi\Dummy\SimpleObject\Comment as SimpleComment;
 use NilPortugues\Tests\Api\JsonApi\Dummy\SimpleObject\Post as SimplePost;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
@@ -779,6 +780,54 @@ JSON;
         $this->assertEquals(
             \json_decode($expected, true),
             \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+        );
+    }
+
+    public function testItWillSerializeObjectsNotAddedInMappings()
+    {
+        $stdClass = new \stdClass();
+        $stdClass->userName = 'Joe';
+        $stdClass->commentBody = 'Hello World';
+
+        $comment = new SimpleComment(1, $stdClass);
+        $mapping = new Mapping(SimpleComment::class, '/comment/{id}', ['id']);
+
+        $mapper = new Mapper();
+        $mapper->setClassMap([$mapping->getClassName() => $mapping]);
+
+        $jsonApiSerializer = new JsonApiTransformer($mapper);
+
+        $expected = <<<JSON
+{
+   "data":{
+      "type":"comment",
+      "id":"1",
+      "attributes":{
+         "created_at":{
+            "date":"2015-11-20 21:43:31.000000",
+            "timezone_type":3,
+            "timezone":"Europe/Madrid"
+         },
+         "comment":{
+            "user_name":"Joe",
+            "comment_body":"Hello World"
+         }
+      },
+      "links":{
+         "self":{
+            "href":"/comment/1"
+         }
+      }
+   },
+   "jsonapi":{
+      "version":"1.0"
+   }
+}
+JSON;
+
+        $this->assertEquals(
+            \json_decode($expected, true),
+            \json_decode((new Serializer($jsonApiSerializer))->serialize($comment), true)
         );
     }
 }

@@ -2,14 +2,13 @@
 /**
  * Author: Nil Portugués Calderó <contact@nilportugues.com>
  * Date: 11/20/15
- * Time: 9:01 PM
+ * Time: 9:01 PM.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 namespace NilPortugues\Tests\Api\JsonApi\Http;
-
 
 use InvalidArgumentException;
 use NilPortugues\Api\JsonApi\Http\Error;
@@ -38,7 +37,7 @@ JSON;
     {
         $error = new Error('title', 'message');
         $error->setCode('code');
-        $error->setId("post.user.error");
+        $error->setId('post.user.error');
         $error->setStatus(403);
         $error->setAboutLink('http://api.example.com/documentation/errors.html');
         $error->setMeta(['time' => '0.001 ms']);
@@ -81,13 +80,11 @@ JSON;
         $error->setAboutLink('aaaa');
     }
 
-
     public function testItWillThrowExceptionIfTitleIsEmpty()
     {
         $this->setExpectedException(InvalidArgumentException::class);
         new Error('', 'message');
     }
-
 
     public function testItWillThrowExceptionIfMessageIsEmpty()
     {
@@ -95,4 +92,3 @@ JSON;
         new Error('title', '');
     }
 }
- 
