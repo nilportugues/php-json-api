@@ -17,19 +17,4 @@ class ResourceAccepted extends AbstractResponse
      * @var int
      */
     protected $httpCode = 202;
-
-    /**
-     *
-     */
-    public function __construct()
-    {
-        $this->response = self::instance('', $this->httpCode, $this->headers);
-    }
-
-    /**
-     */
-    public function getBody()
-    {
-        return;
-    }
 }

@@ -87,10 +87,6 @@ class Error implements \JsonSerializable
      */
     public function setStatus($status)
     {
-        if (empty($status)) {
-            return;
-        }
-
         $validStatus = [
             '100',
             '101',

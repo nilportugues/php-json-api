@@ -36,7 +36,7 @@ class BadRequest extends AbstractResponse
 
         if (null !== $errors) {
             $errors->setHttpCode($this->httpCode);
-            $body = json_encode($errors);
+            $body = json_encode($errors, JSON_UNESCAPED_SLASHES);
         }
 
         $this->response = parent::instance($body, $this->httpCode, $this->headers);
