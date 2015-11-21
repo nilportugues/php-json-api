@@ -117,6 +117,8 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
 
     /**
      * @param $key
+     *
+     * @return null|mixed
      */
     private function get($key)
     {
