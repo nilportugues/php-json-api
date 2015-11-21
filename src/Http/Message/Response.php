@@ -20,4 +20,36 @@ class Response extends AbstractResponse
      * @var int
      */
     protected $httpCode = 200;
+
+    /**
+     * @var array
+     */
+    private $links = [
+        'next' => 'next',
+        'last' => 'last',
+        'first' => 'first',
+        'previous' => 'prev',
+    ];
+
+    /**
+     * @param string $json
+     */
+    public function __construct($json)
+    {
+        $pagination = json_decode($json, true);
+        if (!empty($pagination['links'])) {
+            $headerLinks = [];
+            foreach ($this->links as $linkName => $relName) {
+                if (!empty($pagination['links'][$linkName]['href'])) {
+                    $headerLinks[] = sprintf('<%s>; rel="%s"', $pagination['links'][$linkName]['href'], $relName);
+                }
+            }
+
+            if (!empty($headerLinks)) {
+                $this->headers['Link'] = implode(', ', $headerLinks);
+            }
+        }
+
+        parent::__construct($json);
+    }
 }
