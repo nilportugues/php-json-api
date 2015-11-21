@@ -11,9 +11,7 @@
 
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
-use NilPortugues\Api\JsonApi\Http\ErrorBag;
-
-class ResourceConflicted extends AbstractResponse
+class ResourceConflicted extends AbstractErrorResponse
 {
     /**
      * @var int
@@ -21,29 +19,7 @@ class ResourceConflicted extends AbstractResponse
     protected $httpCode = 409;
 
     /**
-     * ErrorBag as defined in http://jsonapi.org/format/#error-objects;.
-     *
-     * @link     http://jsonapi.org/format/#error-objects
-     *
-     * @param ErrorBag $errors
+     * @var string
      */
-    public function __construct(ErrorBag $errors = null)
-    {
-        $body = $this->getDefaultError();
-
-        if (null !== $errors) {
-            $errors->setHttpCode($this->httpCode);
-            $body = json_encode($errors, JSON_UNESCAPED_SLASHES);
-        }
-
-        $this->response = parent::instance($body, $this->httpCode, $this->headers);
-    }
-
-    /**
-     * @return string
-     */
-    private function getDefaultError()
-    {
-        return json_encode(['errors' => [['status' => $this->httpCode, 'code' => 'Conflict']]]);
-    }
+    protected $errorCode = 'Conflict';
 }
