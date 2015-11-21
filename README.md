@@ -164,17 +164,17 @@ $mapper = new Mapper($mappings);
 Calling the transformer will output a **valid JSON API response** using the correct formatting:
 
 ```php
+use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Http\Message\Response;
-use NilPortugues\Serializer\DeepCopySerializer;
 
 $transformer = new JsonApiTransformer($mapper);
 
 //Output transformation
-$serializer = new DeepCopySerializer($transformer);
-$serializer->setSelfUrl('http://example.com/posts/9');
-$serializer->setNextUrl('http://example.com/posts/10');
-$serializer->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
+$serializer = new JsonApiSerializer($transformer);
+$serializer->getTransformer()->setSelfUrl('http://example.com/posts/9');
+$serializer->getTransformer()->setNextUrl('http://example.com/posts/10');
+$serializer->getTransformer()->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
 $output = $serializer->serialize($post);
 
@@ -324,7 +324,9 @@ Content-type: application/vnd.api+json
 
 #### Request objects
 
-JSON API comes with a helper Request class, `NilPortugues\Api\JsonApi\Http\Message\Request(ServerRequestInterface $request)`, implementing the PSR-7 Request Interface. Using this request object will provide you access to all the interactions expected in a JSON API:
+JSON API comes with its Request class, framework agnostic, implementing the PSR-7 Request Interface.
+
+Using this request object will provide you access to all the interactions expected in a JSON API:
 
 ##### JSON API Query Parameters:
 
