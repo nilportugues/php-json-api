@@ -208,6 +208,8 @@ final class Request extends \Zend\Diactoros\Request
     {
         $fields = (array) $this->getQueryParam('fields', null);
 
+        $fields = array_filter($fields);
+
         foreach ($fields as &$filter) {
             $filter = \explode(',', $filter);
             $filter = \array_map('trim', $filter);
