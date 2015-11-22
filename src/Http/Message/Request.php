@@ -44,7 +44,13 @@ final class Request extends \Zend\Diactoros\Request
      */
     public function getIncludedRelationships()
     {
-        $relationshipNames = \explode(',', $this->getQueryParam('include', ''));
+        $include = $this->getQueryParam('include', []);
+
+        if (!is_string($include)) {
+            return [];
+        }
+
+        $relationshipNames = \explode(',', $include);
         $relationships = [];
 
         foreach ($relationshipNames as $relationship) {
