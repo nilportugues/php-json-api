@@ -59,7 +59,7 @@ final class Request extends \Zend\Diactoros\Request
             }
         }
 
-        return $relationships;
+        return array_filter($relationships);
     }
 
     /**
