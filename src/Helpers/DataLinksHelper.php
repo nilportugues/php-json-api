@@ -421,10 +421,12 @@ final class DataLinksHelper
         RecursiveDeleteHelper::deleteKeys($idValues, [Serializer::CLASS_IDENTIFIER_KEY]);
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($idValues);
 
-        foreach ($idValues as $key => $value) {
-            if (is_array($value)) {
-                unset($idProperties[$key]);
-                unset($idValues[$key]);
+         if (is_array($idValues)) {
+            foreach ($idValues as $key => $value) {
+                if (is_array($value)) {
+                    unset($idProperties[$key]);
+                    unset($idValues[$key]);
+                }
             }
         }
     }
