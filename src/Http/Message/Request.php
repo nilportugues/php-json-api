@@ -76,7 +76,7 @@ final class Request extends \Zend\Diactoros\Request
         $sort = $this->getQueryParam('sort');
         $fields = null;
 
-        if (!empty($sort)) {
+        if (!empty($sort) && is_string($sort)) {
             $fields = \explode(',', $sort);
             if (!empty($fields)) {
                 foreach ($fields as &$field) {
@@ -99,7 +99,7 @@ final class Request extends \Zend\Diactoros\Request
 
         $direction = null;
 
-        if (!empty($sort)) {
+        if (!empty($sort) && is_string($sort)) {
             $direction = [];
 
             $fields = \explode(',', $sort);
