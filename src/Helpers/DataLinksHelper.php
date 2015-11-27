@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -421,7 +420,7 @@ final class DataLinksHelper
         RecursiveDeleteHelper::deleteKeys($idValues, [Serializer::CLASS_IDENTIFIER_KEY]);
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($idValues);
 
-        if(is_array($idValues)) {
+        if (is_array($idValues)) {
             foreach ($idValues as $key => $value) {
                 if (is_array($value)) {
                     unset($idProperties[$key]);
@@ -429,6 +428,5 @@ final class DataLinksHelper
                 }
             }
         }
-
     }
 }

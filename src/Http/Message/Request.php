@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi\Http\Message;
 
 use Psr\Http\Message\ServerRequestInterface;
@@ -210,7 +209,7 @@ final class Request extends \Zend\Diactoros\Request
         $fields = (array) $this->getQueryParam('fields', null);
 
         $fields = array_filter($fields);
-        
+
         foreach ($fields as &$filter) {
             $filter = \explode(',', $filter);
             $filter = \array_map('trim', $filter);
