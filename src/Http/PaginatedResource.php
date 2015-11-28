@@ -94,7 +94,7 @@ class PaginatedResource implements JsonSerializable
         $data = (array) json_decode($data, true);
 
         if (false === array_key_exists('data', $data)) {
-            throw new \InvalidArgumentException("Provided JSON has no 'data' property defined");
+            throw new \InvalidArgumentException('Provided JSON has no `data` member defined');
         }
 
         $this->data = $data['data'];
