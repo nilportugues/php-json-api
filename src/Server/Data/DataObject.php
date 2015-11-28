@@ -23,7 +23,7 @@ class DataObject
      * @param string            $className
      * @param ErrorBag          $errorBag
      */
-    public function assert($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
+    public static function assert($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
     {
         DataObjectAssertions::assert($data, $serializer, $className, $errorBag);
     }
