@@ -11,6 +11,7 @@ namespace NilPortugues\Api\JsonApi\Server\Data;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Server\Errors\MissingAttributeError;
 
 /**
  * Class DataObject.
@@ -23,9 +24,48 @@ class DataObject
      * @param string            $className
      * @param ErrorBag          $errorBag
      */
-    public static function assert($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
+    public static function assertInput($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
     {
         DataObjectAssertions::assert($data, $serializer, $className, $errorBag);
+    }
+
+    public static function assertGet()
+    {
+
+    }
+
+    /**
+     * @param array             $data
+     * @param JsonApiSerializer $serializer
+     * @param string            $className
+     * @param ErrorBag          $errorBag
+     *
+     * @throws DataObjectException
+     */
+    public static function assertPost($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
+    {
+        DataObjectAssertions::assert($data, $serializer, $className, $errorBag);
+
+        $missing = DataObject::missingCreationAttributes($data, $serializer);
+        if (false === empty($missing)) {
+            foreach($missing as $attribute) {
+                $errorBag[] = new MissingAttributeError($attribute);
+            }
+            throw new DataObjectException();
+        }
+    }
+
+    /**
+     * @param array             $data
+     * @param JsonApiSerializer $serializer
+     * @param string            $className
+     * @param ErrorBag          $errorBag
+     *
+     * @throws DataObjectException
+     */
+    public static function assertPut($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
+    {
+        self::assertPost($data, $serializer, $className, $errorBag);
     }
 
     /**
@@ -34,7 +74,7 @@ class DataObject
      *
      * @return array
      */
-    public static function missingCreationAttributes(array $data, JsonApiSerializer $serializer)
+    private static function missingCreationAttributes(array $data, JsonApiSerializer $serializer)
     {
         $inputAttributes = array_keys($data['attributes']);
 
@@ -58,7 +98,7 @@ class DataObject
      *
      * @return array
      */
-    public static function undoAliasedAttributes(array $data, JsonApiSerializer $serializer)
+    public static function getAttributes(array $data, JsonApiSerializer $serializer)
     {
         $mapping = $serializer->getTransformer()->getMappingByAlias($data['type']);
         $aliases = $mapping->getAliasedProperties();

@@ -16,9 +16,9 @@ use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 
 /**
- * Class RequestValidation.
+ * Class RequestTrait.
  */
-trait RequestValidation
+trait RequestTrait
 {
     /**
      * @var Error[]
