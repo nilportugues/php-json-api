@@ -51,7 +51,7 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
      */
     public function offsetExists($offset)
     {
-        return isset($this->errors[$offset]) || array_key_exists($offset, $this->errors);
+        return array_key_exists($offset, $this->errors);
     }
 
     /**
@@ -67,11 +67,7 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
      */
     public function offsetSet($offset, $value)
     {
-        if (null === $offset) {
-            $offset = (0 === count($this->errors)) ? 0 : key($this->errors) + 1;
-        }
-
-        $this->errors[$offset] = $value;
+        $this->errors[count($this->errors)+1] = $value;
     }
 
     /**
@@ -103,7 +99,7 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
             }
         }
 
-        return ['errors' => $this->errors];
+        return ['errors' => array_values($this->errors)];
     }
 
     /**
@@ -129,6 +125,6 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
      */
     public function toArray()
     {
-        return $this->errors;
+        return array_values($this->errors);
     }
 }

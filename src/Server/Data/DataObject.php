@@ -23,27 +23,16 @@ class DataObject
      * @param JsonApiSerializer $serializer
      * @param string            $className
      * @param ErrorBag          $errorBag
-     */
-    public static function assertInput($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
-    {
-        DataAssertions::assert($data, $serializer, $className, $errorBag);
-    }
-
-    public static function assertGet()
-    {
-    }
-
-    /**
-     * @param array             $data
-     * @param JsonApiSerializer $serializer
-     * @param string            $className
-     * @param ErrorBag          $errorBag
      *
      * @throws DataException
      */
     public static function assertPost($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
     {
-        DataAssertions::assert($data, $serializer, $className, $errorBag);
+        try {
+            DataAssertions::assert($data, $serializer, $className, $errorBag);
+        } catch(DataException $e) {
+
+        }
 
         $missing = self::missingCreationAttributes($data, $serializer);
         if (false === empty($missing)) {
@@ -65,6 +54,17 @@ class DataObject
     public static function assertPut($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
     {
         self::assertPost($data, $serializer, $className, $errorBag);
+    }
+
+    /**
+     * @param array             $data
+     * @param JsonApiSerializer $serializer
+     * @param string            $className
+     * @param ErrorBag          $errorBag
+     */
+    public static function assertPatch($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
+    {
+        DataAssertions::assert($data, $serializer, $className, $errorBag);
     }
 
     /**
