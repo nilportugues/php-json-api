@@ -18,9 +18,9 @@ use NilPortugues\Api\JsonApi\Server\Errors\MissingDataError;
 use NilPortugues\Api\JsonApi\Server\Errors\MissingTypeError;
 
 /**
- * Class DataObjectAssertions.
+ * Class DataAssertions.
  */
-class DataObjectAssertions
+class DataAssertions
 {
     /**
      * @param array             $data
@@ -41,13 +41,13 @@ class DataObjectAssertions
      * @param          $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataObjectException
+     * @throws DataException
      */
     private static function assertItIsArray($data, ErrorBag $errorBag)
     {
         if (empty($data) || !is_array($data)) {
             $errorBag[] = new MissingDataError();
-            throw new DataObjectException();
+            throw new DataException();
         }
     }
 
@@ -55,13 +55,13 @@ class DataObjectAssertions
      * @param array    $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataObjectException
+     * @throws DataException
      */
     private static function assertItHasTypeMember(array $data, ErrorBag $errorBag)
     {
         if (empty($data['type']) || !is_string($data['type'])) {
             $errorBag[] = new MissingTypeError();
-            throw new DataObjectException();
+            throw new DataException();
         }
     }
 
@@ -71,7 +71,7 @@ class DataObjectAssertions
      * @param                   $className
      * @param ErrorBag          $errorBag
      *
-     * @throws DataObjectException
+     * @throws DataException
      */
     private static function assertItTypeMemberIsExpectedValue(
         array $data,
@@ -83,7 +83,7 @@ class DataObjectAssertions
 
         if (null === $mapping || $mapping->getClassName() !== $className) {
             $errorBag[] = new InvalidTypeError($data['type']);
-            throw new DataObjectException();
+            throw new DataException();
         }
     }
 
@@ -91,13 +91,13 @@ class DataObjectAssertions
      * @param          $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataObjectException
+     * @throws DataException
      */
     private static function assertItHasAttributeMember($data, ErrorBag $errorBag)
     {
         if (empty($data['attributes']) || !is_array($data['attributes'])) {
             $errorBag[] = new MissingAttributesError();
-            throw new DataObjectException();
+            throw new DataException();
         }
     }
 
@@ -106,7 +106,7 @@ class DataObjectAssertions
      * @param JsonApiSerializer $serializer
      * @param ErrorBag          $errorBag
      *
-     * @throws DataObjectException
+     * @throws DataException
      */
     private static function assertAttributesExists(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
     {
@@ -131,7 +131,7 @@ class DataObjectAssertions
         }
 
         if ($hasErrors) {
-            throw new DataObjectException();
+            throw new DataException();
         }
     }
 }

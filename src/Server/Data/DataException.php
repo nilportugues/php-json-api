@@ -10,8 +10,8 @@
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
 /**
- * Class DataObjectException.
+ * Class DataException.
  */
-class DataObjectException extends \InvalidArgumentException
+class DataException extends \InvalidArgumentException
 {
 }

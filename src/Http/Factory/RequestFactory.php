@@ -9,7 +9,7 @@
  */
 namespace NilPortugues\Api\JsonApi\Http\Factory;
 
-use NilPortugues\Api\JsonApi\Http\Message\Request;
+use NilPortugues\Api\JsonApi\Http\Request\Request;
 
 /**
  * Class RequestFactory.

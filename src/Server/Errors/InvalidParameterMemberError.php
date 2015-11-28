@@ -12,20 +12,21 @@ namespace NilPortugues\Api\JsonApi\Server\Errors;
 /**
  * Class InvalidParameterError.
  */
-class InvalidParameterError extends Error
+class InvalidParameterMemberError extends Error
 {
     /**
      * @param string $paramName
-     * @param string $field
+     * @param string $fieldKey
+     * @param string $fieldName
      */
-    public function __construct($paramName, $field)
+    public function __construct($paramName, $fieldKey, $fieldName)
     {
         parent::__construct(
             'Invalid Parameter',
-            sprintf('Parameter `%s` not supported.', $paramName),
+            sprintf('Parameter member `%s` not supported.', $paramName),
             'bad_request'
         );
 
-        $this->setSource('parameter', $field);
+        $this->setSource('parameter', sprintf('%s[%s]', $fieldName, $fieldKey));
     }
 }
