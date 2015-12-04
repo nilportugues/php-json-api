@@ -24,11 +24,4 @@ class ResourceDeleted extends AbstractResponse
     {
         $this->response = self::instance('', $this->httpCode, $this->headers);
     }
-
-    /**
-     */
-    public function getBody()
-    {
-        return;
-    }
 }

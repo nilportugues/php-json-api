@@ -19,6 +19,7 @@ class ErrorBagTest extends \PHPUnit_Framework_TestCase
         $errorBag = new ErrorBag();
         $error = new Error('Error', 'Error Detail');
         $errorBag[] = $error;
+
         $this->assertTrue(empty($errorBag['a']));
         $this->assertFalse(empty($errorBag[0]));
         unset($errorBag[0]);

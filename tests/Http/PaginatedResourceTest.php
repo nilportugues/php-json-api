@@ -174,6 +174,7 @@ COLLECTION;
             "href": "http://localhost:9000/api/v1/employees?page[number]=2&page[size]=10"
         }
     },
+    "included" : [],
     "meta": {
         "page": {
             "total": 50,

@@ -18,7 +18,7 @@ class ResourceDeletedTest extends \PHPUnit_Framework_TestCase
     {
         $response = new ResourceDeleted();
 
-        $this->assertSame(null, $response->getBody());
+        $this->assertSame('', (string) $response->getBody());
         $this->assertEquals(204, $response->getStatusCode());
         $this->assertEquals(['application/vnd.api+json'], $response->getHeader('Content-type'));
     }
