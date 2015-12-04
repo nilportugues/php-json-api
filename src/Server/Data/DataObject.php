@@ -30,8 +30,7 @@ class DataObject
     {
         try {
             DataAssertions::assert($data, $serializer, $className, $errorBag);
-        } catch(DataException $e) {
-
+        } catch (DataException $e) {
         }
 
         $missing = self::missingCreationAttributes($data, $serializer);

@@ -46,7 +46,11 @@ class PaginatedResource implements JsonSerializable
     /**
      * @var string
      */
-    private $data;
+    private $data = [];
+    /**
+     * @var array
+     */
+    private $include = [];
     /**
      * @var array
      */
@@ -98,6 +102,10 @@ class PaginatedResource implements JsonSerializable
         }
 
         $this->data = $data['data'];
+
+        if (!empty($data['included'])) {
+            $this->include = $data['included'];
+        }
     }
 
     /**
@@ -171,24 +179,31 @@ class PaginatedResource implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        return array_filter([
-            'data' => array_filter($this->data),
-            'links' => array_filter($this->links),
-            'meta' => array_filter(
-                array_merge([
-                    'page' => array_filter([
-                        'total' => $this->totalPages,
-                        'number' => $this->currentPage,
-                        'size' => $this->pageSize,
-                        'limit' => $this->offsetLimit,
-                        'offset' => $this->offset,
-                        'cursor' => $this->cursor,
-                    ]),
-                    ],
-                    $this->meta
-                )
-            ),
-            'jsonapi' => ['version' => '1.0'],
-        ]);
+        $callable = function ($v) {
+            return $v !== null;
+        };
+
+        $data = array_filter([
+                'data' => array_filter($this->data, $callable),
+                'included' => array_filter($this->include),
+                'links' => array_filter($this->links),
+                'meta' => array_filter(
+                    array_merge([
+                            'page' => array_filter([
+                                    'total' => $this->totalPages,
+                                    'number' => $this->currentPage,
+                                    'size' => $this->pageSize,
+                                    'limit' => $this->offsetLimit,
+                                    'offset' => $this->offset,
+                                    'cursor' => $this->cursor,
+                                ], $callable),
+                        ],
+                        $this->meta
+                    )
+                ),
+                'jsonapi' => ['version' => '1.0'],
+            ], $callable);
+
+        return $data;
     }
 }

@@ -67,7 +67,7 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
      */
     public function offsetSet($offset, $value)
     {
-        $this->errors[count($this->errors)+1] = $value;
+        $this->errors[] = $value;
     }
 
     /**

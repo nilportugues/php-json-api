@@ -30,7 +30,6 @@ class QueryObject
     {
         $apiRequest = RequestFactory::create();
         self::validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields', $errorBag);
-        self::validateQueryParamsTypes($serializer, $apiRequest->getIncludedRelationships(), 'Include', $errorBag);
 
         if ($errorBag->count() > 0) {
             throw new QueryException();
