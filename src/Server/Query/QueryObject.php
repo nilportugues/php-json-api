@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Server\Query;
 
 use NilPortugues\Api\JsonApi\Http\Factory\RequestFactory;
@@ -30,6 +31,7 @@ class QueryObject
     {
         $apiRequest = RequestFactory::create();
         self::validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields', $errorBag);
+        self::validateIncludeParams($serializer, $apiRequest->getIncludedRelationships(), 'include', $errorBag);
 
         if ($errorBag->count() > 0) {
             throw new QueryException();
@@ -71,6 +73,36 @@ class QueryObject
             if (false === empty($validateFields)) {
                 foreach ($validateFields as $field) {
                     $errorBag[] = new InvalidParameterError($field, strtolower($paramName));
+                }
+            }
+        }
+    }
+
+    /**
+     * @param JsonApiSerializer $serializer
+     * @param array             $includes
+     * @param string            $paramName
+     * @param ErrorBag          $errorBag
+     */
+    private static function validateIncludeParams(
+        JsonApiSerializer $serializer,
+        array $includes,
+        $paramName,
+        ErrorBag $errorBag
+    ) {
+        $transformer = $serializer->getTransformer();
+
+        foreach ($includes as $resource => $data) {
+            if (null == $transformer->getMappingByAlias($resource)) {
+                $errorBag[] = new InvalidParameterError($resource, strtolower($paramName));
+                continue;
+            }
+
+            if (is_array($data)) {
+                foreach ($data as $subResource) {
+                    if (null == $transformer->getMappingByAlias($subResource)) {
+                        $errorBag[] = new InvalidParameterError($subResource, strtolower($paramName));
+                    }
                 }
             }
         }

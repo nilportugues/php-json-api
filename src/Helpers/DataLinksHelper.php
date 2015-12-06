@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -118,7 +119,6 @@ final class DataLinksHelper
                         }
 
                         if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
-
                             $propertyNameKey = DataAttributesHelper::transformToValidMemberName($propertyName);
                             $propertyNameKey = self::camelCaseToUnderscore($propertyNameKey);
 
