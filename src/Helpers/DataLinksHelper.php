@@ -108,14 +108,21 @@ final class DataLinksHelper
                                 if (!empty($selfLink)) {
                                     $href = \str_replace($idProperties, $idValues, $selfLink);
                                     if ($selfLink != $href) {
-                                        $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $href;
+                                        $propertyNameKey = DataAttributesHelper::transformToValidMemberName($propertyName);
+                                        $propertyNameKey = self::camelCaseToUnderscore($propertyNameKey);
+
+                                        $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyNameKey][JsonApiTransformer::LINKS_KEY][JsonApiTransformer::SELF_LINK][JsonApiTransformer::LINKS_HREF] = $href;
                                     }
                                 }
                             }
                         }
 
                         if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
-                            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
+
+                            $propertyNameKey = DataAttributesHelper::transformToValidMemberName($propertyName);
+                            $propertyNameKey = self::camelCaseToUnderscore($propertyNameKey);
+
+                            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyNameKey][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
                         }
                     }
                 }

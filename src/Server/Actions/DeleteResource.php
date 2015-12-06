@@ -15,7 +15,6 @@ use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
-use NilPortugues\Serializer\Serializer;
 
 /**
  * Class DeleteResource.
@@ -36,7 +35,7 @@ class DeleteResource
     private $serializer;
 
     /**
-     * @param Serializer $serializer
+     * @param JsonApiSerializer $serializer
      */
     public function __construct(JsonApiSerializer $serializer)
     {

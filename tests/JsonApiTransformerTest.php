@@ -604,6 +604,7 @@ JSON;
         $post = $this->createSimplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setProperties(['postId', 'title', 'body', 'authorId', 'comments']);
         $postMapping->setFilterKeys(['body']);
 
         $mapper = new Mapper();
@@ -662,6 +663,7 @@ JSON;
         ];
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setProperties(['postId', 'title', 'body', 'authorId', 'comments']);
         $postMapping->setFilterKeys(['body', 'title']);
 
         $mapper = new Mapper();

@@ -132,7 +132,7 @@ class ListResource
     }
 
     /**
-     * Build the URL using Laravel's route facade method.
+     * Build the URL.
      *
      * @param Request $request
      * @param string  $route
