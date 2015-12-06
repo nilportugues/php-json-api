@@ -11,6 +11,7 @@
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
+use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidAttributeError;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidTypeError;
@@ -60,7 +61,7 @@ class DataAssertions
      */
     private static function assertItHasTypeMember(array $data, ErrorBag $errorBag)
     {
-        if (empty($data['type']) || !is_string($data['type'])) {
+        if (empty($data[JsonApiTransformer::TYPE_KEY]) || !is_string($data[JsonApiTransformer::TYPE_KEY])) {
             $errorBag[] = new MissingTypeError();
             throw new DataException();
         }
@@ -80,10 +81,10 @@ class DataAssertions
         $className,
         ErrorBag $errorBag
     ) {
-        $mapping = $serializer->getTransformer()->getMappingByAlias($data['type']);
+        $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
         if (null === $mapping || $mapping->getClassName() !== $className) {
-            $errorBag[] = new InvalidTypeError($data['type']);
+            $errorBag[] = new InvalidTypeError($data[JsonApiTransformer::TYPE_KEY]);
             throw new DataException();
         }
     }
@@ -96,7 +97,7 @@ class DataAssertions
      */
     private static function assertItHasAttributeMember($data, ErrorBag $errorBag)
     {
-        if (empty($data['attributes']) || !is_array($data['attributes'])) {
+        if (empty($data[JsonApiTransformer::ATTRIBUTES_KEY]) || !is_array($data[JsonApiTransformer::ATTRIBUTES_KEY])) {
             $errorBag[] = new MissingAttributesError();
             throw new DataException();
         }
@@ -111,9 +112,9 @@ class DataAssertions
      */
     private static function assertAttributesExists(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
     {
-        $inputAttributes = array_keys($data['attributes']);
+        $inputAttributes = array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY]);
 
-        $mapping = $serializer->getTransformer()->getMappingByAlias($data['type']);
+        $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
         $properties = str_replace(
             array_keys($mapping->getAliasedProperties()),
@@ -121,13 +122,13 @@ class DataAssertions
             $mapping->getProperties()
         );
         $properties = array_diff($properties, $mapping->getIdProperties());
-        $properties = array_diff($properties, $mapping->getHiddenProperties());
+        $properties = array_merge($properties, $mapping->getHiddenProperties());
 
         $hasErrors = false;
         foreach ($inputAttributes as $property) {
             if (false === in_array($property, $properties)) {
                 $hasErrors = true;
-                $errorBag[] = new InvalidAttributeError($property, $data['type']);
+                $errorBag[] = new InvalidAttributeError($property, $data[JsonApiTransformer::TYPE_KEY]);
             }
         }
 

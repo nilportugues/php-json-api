@@ -52,10 +52,8 @@ class JsonApiSerializer extends DeepCopySerializer
         $this->filterOutResourceFields($request);
         $this->filterOutIncludedResources($request);
 
-
         return parent::serialize($value);
     }
-
 
     /**
      * @param Request $request

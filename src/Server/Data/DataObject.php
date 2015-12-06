@@ -11,14 +11,30 @@
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
+use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Server\Errors\InvalidAttributeError;
+use NilPortugues\Api\JsonApi\Server\Errors\InvalidTypeError;
 use NilPortugues\Api\JsonApi\Server\Errors\MissingAttributeError;
+use NilPortugues\Api\JsonApi\Server\Errors\MissingDataError;
+use NilPortugues\Api\JsonApi\Server\Errors\MissingTypeError;
 
 /**
  * Class DataObject.
  */
 class DataObject
 {
+    /**
+     * @param array             $data
+     * @param JsonApiSerializer $serializer
+     * @param string            $className
+     * @param ErrorBag          $errorBag
+     */
+    public static function assertPatch($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
+    {
+        DataAssertions::assert($data, $serializer, $className, $errorBag);
+    }
+
     /**
      * @param array             $data
      * @param JsonApiSerializer $serializer
@@ -34,12 +50,16 @@ class DataObject
         } catch (DataException $e) {
         }
 
+        try {
+            self::assertRelationshipData($data, $serializer, $errorBag);
+        } catch (DataException $e) {
+        }
+
         $missing = self::missingCreationAttributes($data, $serializer);
         if (false === empty($missing)) {
             foreach ($missing as $attribute) {
                 $errorBag[] = new MissingAttributeError($attribute);
             }
-            throw new DataException();
         }
     }
 
@@ -59,25 +79,14 @@ class DataObject
     /**
      * @param array             $data
      * @param JsonApiSerializer $serializer
-     * @param string            $className
-     * @param ErrorBag          $errorBag
-     */
-    public static function assertPatch($data, JsonApiSerializer $serializer, $className, ErrorBag $errorBag)
-    {
-        DataAssertions::assert($data, $serializer, $className, $errorBag);
-    }
-
-    /**
-     * @param array             $data
-     * @param JsonApiSerializer $serializer
      *
      * @return array
      */
-    private static function missingCreationAttributes(array $data, JsonApiSerializer $serializer)
+    private static function missingCreationAttributes(array $data, $serializer)
     {
-        $inputAttributes = array_keys($data['attributes']);
+        $inputAttributes = array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY]);
 
-        $mapping = $serializer->getTransformer()->getMappingByAlias($data['type']);
+        $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
         $properties = str_replace(
             array_keys($mapping->getAliasedProperties()),
@@ -99,10 +108,93 @@ class DataObject
      */
     public static function getAttributes(array $data, JsonApiSerializer $serializer)
     {
-        $mapping = $serializer->getTransformer()->getMappingByAlias($data['type']);
+        $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
         $aliases = $mapping->getAliasedProperties();
-        $keys = str_replace(array_values($aliases), array_keys($aliases), array_keys($data['attributes']));
+        $keys = str_replace(
+            array_values($aliases),
+            array_keys($aliases),
+            array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY])
+        );
 
-        return array_combine($keys, array_values($data['attributes']));
+        return array_combine($keys, array_values($data[JsonApiTransformer::ATTRIBUTES_KEY]));
+    }
+
+    /**
+     * @param array             $data
+     * @param JsonApiSerializer $serializer
+     * @param ErrorBag          $errorBag
+     *
+     * @throws DataException
+     */
+    private static function assertRelationshipData(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
+    {
+        if (!empty($data[JsonApiTransformer::RELATIONSHIPS_KEY])) {
+            foreach ($data[JsonApiTransformer::RELATIONSHIPS_KEY] as $relationshipData) {
+                if (empty($relationshipData[JsonApiTransformer::DATA_KEY]) || !is_array(
+                        $relationshipData[JsonApiTransformer::DATA_KEY]
+                    )
+                ) {
+                    $errorBag[] = new MissingDataError();
+                    break;
+                }
+
+                $firstKey = key($relationshipData[JsonApiTransformer::DATA_KEY]);
+                if (is_numeric($firstKey)) {
+                    foreach ($relationshipData[JsonApiTransformer::DATA_KEY] as $inArrayRelationshipData) {
+                        self::relationshipDataAssert($inArrayRelationshipData, $serializer, $errorBag);
+                    }
+                    break;
+                }
+
+                self::relationshipDataAssert($relationshipData[JsonApiTransformer::DATA_KEY], $serializer, $errorBag);
+            }
+        }
+    }
+
+    /**
+     * @param array             $relationshipData
+     * @param JsonApiSerializer $serializer
+     * @param ErrorBag          $errorBag
+     */
+    private static function relationshipDataAssert($relationshipData, JsonApiSerializer $serializer, ErrorBag $errorBag)
+    {
+        //Has type member.
+        if (empty($relationshipData[JsonApiTransformer::TYPE_KEY]) || !is_string(
+                $relationshipData[JsonApiTransformer::TYPE_KEY]
+            )
+        ) {
+            $errorBag[] = new MissingTypeError();
+
+            return;
+        }
+
+        //Provided type value is supported.
+        if (null === $serializer->getTransformer()->getMappingByAlias(
+                $relationshipData[JsonApiTransformer::TYPE_KEY]
+            )
+        ) {
+            $errorBag[] = new InvalidTypeError($relationshipData[JsonApiTransformer::TYPE_KEY]);
+
+            return;
+        }
+
+        //Validate if attributes passed in make sense.
+        if (!empty($relationshipData[JsonApiTransformer::ATTRIBUTES_KEY])) {
+            $mapping = $serializer->getTransformer()->getMappingByAlias(
+                $relationshipData[JsonApiTransformer::TYPE_KEY]
+            );
+
+            $properties = str_replace(
+                array_keys($mapping->getAliasedProperties()),
+                array_values($mapping->getAliasedProperties()),
+                $mapping->getProperties()
+            );
+
+            foreach (array_keys($relationshipData[JsonApiTransformer::ATTRIBUTES_KEY]) as $property) {
+                if (false === in_array($property, $properties, true)) {
+                    $errorBag[] = new InvalidAttributeError($property, $relationshipData[JsonApiTransformer::TYPE_KEY]);
+                }
+            }
+        }
     }
 }
