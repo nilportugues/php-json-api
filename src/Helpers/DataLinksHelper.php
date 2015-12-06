@@ -122,7 +122,24 @@ final class DataLinksHelper
                             $propertyNameKey = DataAttributesHelper::transformToValidMemberName($propertyName);
                             $propertyNameKey = self::camelCaseToUnderscore($propertyNameKey);
 
-                            $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyNameKey][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
+                            if (!empty($d[Serializer::CLASS_IDENTIFIER_KEY])) {
+                                $type = $d[Serializer::CLASS_IDENTIFIER_KEY];
+                                $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
+
+                                //Removes relationships related to the current resource if filtering include resources has been set.
+                                if ($mappings[$parentType]->isFilteringIncludedResources()) {
+                                    foreach ($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] as $position => $includedResource) {
+                                        if (false === in_array($type, $mappings[$parentType]->getIncludedResources(), true)) {
+                                            unset($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][$position]);
+                                        }
+                                    }
+                                }
+
+                                $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = array_filter($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName]);
+                                if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
+                                    $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyNameKey][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
+                                }
+                            }
                         }
                     }
                 }

@@ -100,32 +100,13 @@ class JsonApiTransformer extends Transformer
             ),
         ];
 
-        DataIncludedHelper::setResponseDataIncluded($this->mappings, $this->removeTypeAndId($value), $data);
+        DataIncludedHelper::setResponseDataIncluded($this->mappings, $value, $data);
 
         $this->setResponseLinks($value, $data);
         $this->setResponseMeta($data);
         $this->setResponseVersion($data);
 
         return $data;
-    }
-
-    /**
-     * @param array $copy
-     *
-     * @return array
-     */
-    private function removeTypeAndId(array $copy)
-    {
-        $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
-
-        if (\is_scalar($type)) {
-            foreach ($this->mappings[$type]->getIdProperties() as $propertyName) {
-                unset($copy[$propertyName]);
-            }
-            unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
-        }
-
-        return $copy;
     }
 
     /**

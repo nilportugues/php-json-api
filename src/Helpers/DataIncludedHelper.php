@@ -20,10 +20,13 @@ final class DataIncludedHelper
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $array
      * @param array                               $data
+     * @param null                                $parentType
      */
-    public static function setResponseDataIncluded(array &$mappings, array $array, array &$data)
+    public static function setResponseDataIncluded(array &$mappings, array $array, array &$data, $parentType = null)
     {
-        foreach ($array as $value) {
+        $parentType = (null === $parentType) ? $array[Serializer::CLASS_IDENTIFIER_KEY] : $parentType;
+
+        foreach (self::removeTypeAndId($mappings, $array) as $value) {
             if (\is_array($value)) {
                 if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
                     $attributes = [];
@@ -38,12 +41,48 @@ final class DataIncludedHelper
                 if (\is_array($value)) {
                     foreach ($value as $inArrayValue) {
                         if (\is_array($inArrayValue)) {
-                            self::setResponseDataIncluded($mappings, $inArrayValue, $data);
+
+                            //Remove those resources that do not to appear in the getIncludedResources array.
+                            foreach ($inArrayValue as $position => $includableValue) {
+                                if ($mappings[$parentType]->isFilteringIncludedResources()
+                                    && false === in_array(
+                                        $includableValue[Serializer::CLASS_IDENTIFIER_KEY],
+                                        $mappings[$parentType]->getIncludedResources(),
+                                        true
+                                    )
+                                ) {
+                                    unset($inArrayValue[$position]);
+                                }
+                            }
+
+                            self::setResponseDataIncluded($mappings, $inArrayValue, $data, $parentType);
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param array                               $copy
+     *
+     * @return array
+     */
+    private static function removeTypeAndId(array &$mappings, array $copy)
+    {
+        if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
+            $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
+
+            if (\is_scalar($type)) {
+                foreach ($mappings[$type]->getIdProperties() as $propertyName) {
+                    unset($copy[$propertyName]);
+                }
+                unset($copy[Serializer::CLASS_IDENTIFIER_KEY]);
+            }
+        }
+
+        return $copy;
     }
 
     /**
@@ -155,7 +194,10 @@ final class DataIncludedHelper
                 $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
 
                 if (\is_array($attribute) && \array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
-                    $data[$propertyName][JsonApiTransformer::DATA_KEY] = PropertyHelper::setResponseDataTypeAndId($mappings, $attribute);
+                    $data[$propertyName][JsonApiTransformer::DATA_KEY] = PropertyHelper::setResponseDataTypeAndId(
+                        $mappings,
+                        $attribute
+                    );
 
                     continue;
                 }

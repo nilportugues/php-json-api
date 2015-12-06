@@ -61,7 +61,7 @@ final class Request extends \Zend\Diactoros\Request
             if (null === $attribute) {
                 $relationships[$type] = $type;
             } else {
-                if (is_string($relationships[$type])) {
+                if (!empty($relationships[$type]) && is_string($relationships[$type])) {
                     $relationships[$type] = [];
                 }
                 $relationships[$type][] = $attribute;
