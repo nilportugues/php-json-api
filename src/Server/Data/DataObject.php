@@ -61,6 +61,11 @@ class DataObject
                 $errorBag[] = new MissingAttributeError($attribute);
             }
         }
+
+
+        if ($errorBag->count() >0) {
+            throw new DataException();
+        }
     }
 
     /**
