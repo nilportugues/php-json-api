@@ -69,7 +69,7 @@ class PutResource
                 return $this->resourceNotFound(new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)]));
             }
             $values = DataObject::getAttributes($data, $this->serializer);
-            $update($model, $values);
+            $update($model, $values, $this->errorBag);
 
             $response = $this->resourceUpdated($this->serializer->serialize($model));
         } catch (Exception $e) {

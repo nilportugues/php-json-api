@@ -62,8 +62,7 @@ class DataObject
             }
         }
 
-
-        if ($errorBag->count() >0) {
+        if ($errorBag->count() > 0) {
             throw new DataException();
         }
     }

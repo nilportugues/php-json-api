@@ -55,17 +55,15 @@ class CreateResource
      */
     public function get(array $data, $className, callable $callable)
     {
-        $errorBag = new ErrorBag();
-
         try {
-            DataObject::assertPost($data, $this->serializer, $className, $errorBag);
+            DataObject::assertPost($data, $this->serializer, $className, $this->errorBag);
 
             $values = DataObject::getAttributes($data, $this->serializer);
-            $model = $callable($data, $values);
+            $model = $callable($data, $values, $this->errorBag);
 
             $response = $this->resourceCreated($this->serializer->serialize($model));
         } catch (Exception $e) {
-            $response = $this->getErrorResponse($e, $errorBag);
+            $response = $this->getErrorResponse($e, $this->errorBag);
         }
 
         return $response;

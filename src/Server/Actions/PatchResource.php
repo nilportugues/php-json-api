@@ -69,7 +69,7 @@ class PatchResource
             }
 
             $values = DataObject::getAttributes($data, $this->serializer);
-            $update($model, $values);
+            $update($model, $values, $this->errorBag);
 
             $response = $this->resourceUpdated($this->serializer->serialize($model));
         } catch (Exception $e) {
