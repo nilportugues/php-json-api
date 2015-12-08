@@ -15,6 +15,7 @@ use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
+use NilPortugues\Api\JsonApi\Server\Errors\InvalidSortError;
 
 /**
  * Class QueryObject.
@@ -24,14 +25,18 @@ class QueryObject
     /**
      * @param JsonApiSerializer $serializer
      * @param ErrorBag          $errorBag
+     * @param string            $className
      *
      * @throws QueryException
      */
-    public static function assert(JsonApiSerializer $serializer, ErrorBag $errorBag)
+    public static function assert(JsonApiSerializer $serializer, ErrorBag $errorBag, $className = '')
     {
         $apiRequest = RequestFactory::create();
         self::validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields', $errorBag);
         self::validateIncludeParams($serializer, $apiRequest->getIncludedRelationships(), 'include', $errorBag);
+        if (!empty($className)) {
+            self::validateSortParams($serializer, $className, array_keys($apiRequest->getSortDirection()), $errorBag);
+        }
 
         if ($errorBag->count() > 0) {
             throw new QueryException();
@@ -103,6 +108,28 @@ class QueryObject
                     if (null == $transformer->getMappingByAlias($subResource)) {
                         $errorBag[] = new InvalidParameterError($subResource, strtolower($paramName));
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param JsonApiSerializer $serializer
+     * @param string            $className
+     * @param array             $keys
+     * @param ErrorBag          $errorBag
+     */
+    private static function validateSortParams(JsonApiSerializer $serializer, $className, array $keys, ErrorBag $errorBag)
+    {
+        if (!empty($keys)) {
+            if ($mapping = $serializer->getTransformer()->getMappingByClassName($className)) {
+                $aliased = (array) $mapping->getAliasedProperties();
+                $sortsFields = str_replace(array_values($aliased), array_keys($aliased), $keys);
+
+                $invalidProperties = array_diff($sortsFields, $mapping->getProperties());
+
+                foreach ($invalidProperties as $extraField) {
+                    $errorBag[] = new InvalidSortError($extraField);
                 }
             }
         }

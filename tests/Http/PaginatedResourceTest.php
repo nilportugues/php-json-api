@@ -179,7 +179,7 @@ COLLECTION;
     "meta": {
         "page": {
             "total": 50,
-            "pages": 5,
+            "last": 5,
             "number": 2,
             "size": 10,
             "limit" : 25,

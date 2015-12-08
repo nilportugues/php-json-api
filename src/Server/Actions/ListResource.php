@@ -63,13 +63,14 @@ class ListResource
      * @param callable $totalAmountCallable
      * @param callable $resultsCallable
      * @param string   $route
+     * @param string   $className
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function get(callable $totalAmountCallable, callable $resultsCallable, $route)
+    public function get(callable $totalAmountCallable, callable $resultsCallable, $route, $className)
     {
         try {
-            QueryObject::assert($this->serializer, $this->errorBag);
+            QueryObject::assert($this->serializer, $this->errorBag, $className);
             $totalAmount = $totalAmountCallable();
 
             if ($totalAmount > 0 && $this->pageNumber > ceil($totalAmount / $this->pageSize)) {

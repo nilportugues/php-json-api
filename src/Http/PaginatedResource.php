@@ -205,7 +205,7 @@ class PaginatedResource implements JsonSerializable
                     array_merge([
                             'page' => array_filter([
                                     'total' => $this->total,
-                                    'pages' => $this->pages,
+                                    'last' => $this->pages,
                                     'number' => $this->currentPage,
                                     'size' => $this->pageSize,
                                     'limit' => $this->offsetLimit,
