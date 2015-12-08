@@ -1,4 +1,4 @@
- JSON API Transformer
+ JSON API Transformer & Server Helpers
 =========================================
 
 [![Build Status](https://travis-ci.org/nilportugues/jsonapi-transformer.svg)](https://travis-ci.org/nilportugues/jsonapi-transformer)
@@ -6,9 +6,16 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nilportugues/json-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nilportugues/json-api/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e39e4c0e-a402-495b-a763-6e0482e2083d/mini.png)](https://insight.sensiolabs.com/projects/e39e4c0e-a402-495b-a763-6e0482e2083d) [![Latest Stable Version](https://poser.pugx.org/nilportugues/json-api/v/stable)](https://packagist.org/packages/nilportugues/json-api) [![Total Downloads](https://poser.pugx.org/nilportugues/json-api/downloads)](https://packagist.org/packages/nilportugues/json-api) [![License](https://poser.pugx.org/nilportugues/json-api/license)](https://packagist.org/packages/nilportugues/json-api) 
 
 
+ - [Installation](#installation)
+ - [Transfomer Classes](#transfomer-classes)
+ - [Server Classes](#server-classes)
+    - [JSON API Request object](#json-api-request-object)
+    - [Request Object](#request-object)
+    - [JSON API Response objects](#json-api-response-objects)
+    - [Action Objects](#action-objects)
+    
 
-
-## Installation
+# Installation
 
 Use [Composer](https://getcomposer.org) to install the package:
 
@@ -16,7 +23,9 @@ Use [Composer](https://getcomposer.org) to install the package:
 $ composer require nilportugues/json-api
 ```
 
-## Usage
+
+# Transfomer Classes
+
 Given a PHP Object, and a series of mappings, the **JSON API Transformer** will represent the given data following the `http://jsonapi.org` specification.
 
 For instance, given the following piece of code, defining a Blog Post and some comments:
@@ -44,165 +53,411 @@ $post = new Post(
 );
 ```
 
-And a Mapping array for all the involved classes:
+And a Mapping series of classes implementing `JsonApiMapping` interface.
 
 ```php
-use NilPortugues\Api\Mapping\Mapper;
+<?php
+namespace AcmeProject\Infrastructure\Api\Mappings;
 
-$mappings = [
-    [
-        'class' => Post::class,
-        'alias' => 'Message',
-        'aliased_properties' => [
+use NilPortugues\Api\Mappings\JsonApiMapping;
+
+class PostMapping  implements JsonApiMapping
+{
+    /**
+     * {@inhertidoc}
+     */
+    public function getClass() 
+    {
+        return \Post::class;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return 'Message';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAliasedProperties() {
+        return [
             'author' => 'author',
             'title' => 'headline',
             'content' => 'body',
-        ],
-        'hide_properties' => [
-
-        ],
-        'id_properties' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getHideProperties(){
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdProperties()
+        return [ 
             'postId',
-        ],
-        'urls' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrls()
+    {
+        return [
             'self' => 'http://example.com/posts/{postId}',
             'comments' => 'http://example.com/posts/{postId}/comments'
-        ],
-        // (Optional)
-        'relationships' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationships()
+    {
+        return [
             'author' => [ //this key must match with the property or alias of the same name in Post class.
                 'related' => 'http://example.com/posts/{postId}/author',
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
-        ],
-    ],
-    [
-        'class' => PostId::class,
-        'alias' => '',
-        'aliased_properties' => [],
-        'hide_properties' => [],
-        'id_properties' => [
+        ];
+    }
+}
+```
+
+```php
+<?php
+namespace AcmeProject\Infrastructure\Api\Mappings;
+
+use NilPortugues\Api\Mappings\JsonApiMapping;
+
+class PostIdMapping implements JsonApiMapping
+{
+    /**
+     * {@inhertidoc}
+     */
+    public function getClass() 
+    {
+        return \PostId::class;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return '';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAliasedProperties() {
+        return [],    
+    }
+    /**
+     * {@inheritdoc}
+     */    
+    public function getHideProperties(){
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdProperties()
+        return [
             'postId',
-        ],
-        'urls' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrls()
+    {
+        return [
             'self' => 'http://example.com/posts/{postId}',
-         ],
-         'relationships' => [
-              'comment' => [ //this key must match with the property or alias of the same name in PostId class.
-                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
-              ],
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationships()
+    {
+        return [
+            'comment' => [ //this key must match with the property or alias of the same name in PostId class.
+                'self' => 'http://example.com/posts/{postId}/relationships/comments',
+                ],
             ],
-        ],
-    ],
-    [
-        'class' => User::class,
-        'alias' => '',
-        'aliased_properties' => [],
-        'hide_properties' => [],
-        'id_properties' => [
+        ];
+    }
+}
+```
+
+```php
+<?php
+namespace AcmeProject\Infrastructure\Api\Mappings;
+
+use NilPortugues\Api\Mappings\JsonApiMapping;
+
+class UserMapping implements JsonApiMapping
+{
+    /**
+     * {@inhertidoc}
+     */
+    public function getClass() 
+    {
+        return \User::class;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return '';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAliasedProperties() {
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getHideProperties(){
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdProperties()
+        return [
             'userId',
-        ],
-        'urls' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrls()
+    {
+        return [
             'self' => 'http://example.com/users/{userId}',
             'friends' => 'http://example.com/users/{userId}/friends',
             'comments' => 'http://example.com/users/{userId}/comments',
-        ],
-    ],
-    [
-        'class' => UserId::class,
-        'alias' => '',
-        'aliased_properties' => [],
-        'hide_properties' => [],
-        'id_properties' => [
-            'userId',
-        ],
-        'urls' => [
+        ];
+    }
+}
+```
+
+```php
+<?php
+namespace AcmeProject\Infrastructure\Api\Mappings;
+
+use NilPortugues\Api\Mappings\JsonApiMapping;
+
+class UserIdMapping implements JsonApiMapping
+{
+    /**
+     * {@inhertidoc}
+     */
+    public function getClass() 
+    {
+        return \UserId::class;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return '';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAliasedProperties() {
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getHideProperties(){
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdProperties()
+        return [ 'userId',];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrls()
+    {
+        return [
             'self' => 'http://example.com/users/{userId}',
             'friends' => 'http://example.com/users/{userId}/friends',
             'comments' => 'http://example.com/users/{userId}/comments',
-        ],
-    ],
-    [
-        'class' => Comment::class,
-        'alias' => '',
-        'aliased_properties' => [],
-        'hide_properties' => [],
-        'id_properties' => [
-            'commentId',
-        ],
-        'urls' => [
+        ];
+    }
+}
+```
+
+
+```php
+<?php
+namespace AcmeProject\Infrastructure\Api\Mappings;
+
+use NilPortugues\Api\Mappings\JsonApiMapping;
+
+class CommendMapping implements JsonApiMapping
+{
+    /**
+     * {@inhertidoc}
+     */
+    public function getClass() 
+    {
+        return \Comment::class;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return '';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAliasedProperties() {
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getHideProperties(){
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdProperties()
+        return [ 'commentId',];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrls()
+    {
+        return [
             'self' => 'http://example.com/comments/{commentId}',
-        ],
-        'relationships' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationships()
+    {
+        return [
             'post' => [ //this key must match with the property or alias of the same name in Commend class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
-        ],
-    ],
-    [
-        'class' => CommentId::class,
-        'alias' => '',
-        'aliased_properties' => [],
-        'hide_properties' => [],
-        'id_properties' => [
-            'commentId',
-        ],
-        'urls' => [
+        ];
+    }
+}
+```
+
+```php
+<?php
+namespace AcmeProject\Infrastructure\Api\Mappings;
+
+use NilPortugues\Api\Mappings\JsonApiMapping;
+
+class CommentId implements JsonApiMapping
+{
+    /**
+     * {@inhertidoc}
+     */
+    public function getClass() 
+    {
+        return \CommentId::class;
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAlias()
+    {
+        return '';
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getAliasedProperties() {
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getHideProperties(){
+        return [];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdProperties() {
+        return [ 'commentId', ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrls()
+    {
+        return [
             'self' => 'http://example.com/comments/{commentId}',
-        ],
-        'relationships' => [
+        ];
+    }
+    /**
+     * {@inheritdoc}
+     */
+    public function getRelationships()
+    {
+        return [
             'post' => [ //this key must match with the property or alias of the same name in CommendId class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
-        ],
-    ],
-];
-
-$mapper = new Mapper($mappings);
+        ];
+    }
+}
 ```
+
 
 Calling the transformer will output a **valid JSON API response** using the correct formatting:
 
 ```php
+<?php
+
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Http\Message\Response;
+use NilPortugues\Api\Mapping\Mapper;
+
+$classConfig = [
+    \AcmeProject\Infrastructure\Api\Mappings\PostMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\PostIdMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\UserMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\UserIdMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\CommendMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\CommentId::class,
+];
+
+$mapper = new Mapper($mappings);
 
 $transformer = new JsonApiTransformer($mapper);
-
-//Output transformation
 $serializer = new JsonApiSerializer($transformer);
-$serializer->getTransformer()->setSelfUrl('http://example.com/posts/9');
-$serializer->getTransformer()->setNextUrl('http://example.com/posts/10');
-$serializer->getTransformer()->addMeta('author',[['name' => 'Nil Portugués Calderó', 'email' => 'contact@nilportugues.com']]);
 
-$output = $serializer->serialize($post);
-
-//PSR7 Response with headers and content.
-$response = new Response($output);
-
-header(
-    sprintf(
-        'HTTP/%s %s %s',
-        $response->getProtocolVersion(),
-        $response->getStatusCode(),
-        $response->getReasonPhrase()
-    )
-);
-foreach($response->getHeaders() as $header => $values) {
-    header(sprintf("%s:%s\n", $header, implode(', ', $values)));
-}
-
-echo $response->getBody();
+echo $serializer->serialize($post);
 ```
 
-**Output:**
-
-```
-HTTP/1.1 200 OK
-Cache-Control: private, max-age=0, must-revalidate
-Content-type: application/vnd.api+json
-```
+**Output (formatted):**
 
 ```json
 {
@@ -300,39 +555,27 @@ Content-type: application/vnd.api+json
             }
         }
     ],
-    "links": {
-        "self": {
-            "href": "http://example.com/posts/9"
-        },
-        "next": {
-            "href": "http://example.com/posts/10"
-        }
-    },
-    "meta": {
-        "author": [
-            {
-                "name": "Nil Portugués Calderó",
-                "email": "contact@nilportugues.com"
-            }
-        ]
-    },
     "jsonapi": {
         "version": "1.0"
     }
 }
 ```
 
-#### Request objects
+---
+
+# Server Classes
+
+## JSON API Request object
 
 JSON API comes with its Request class, framework agnostic, implementing the PSR-7 Request Interface.
 
 Using this request object will provide you access to all the interactions expected in a JSON API:
 
-##### JSON API Query Parameters:
+#### Defined Query Parameters:
 
 - **&fields[resource]=field1,field2** will only show the specified fields for a given resource.
-- **&include[resource]**  show the relationship for a given resource even if it is filtered out by fields parameter.
-- **&include[resource.field1]** show the relationship field even if it is filtered out by fields parameter.
+- **&include=resource** show the relationship for a given resource.
+- **&include=resource.resource2** show the relationship field for those depending on resource2.
 - **&sort=field1,-field2** sort by field2 as DESC and field1 as ASC.
 - **&sort=-field1,field2** sort by field1 as DESC and field2 as ASC.
 - **&page[number]** will return the current page elements in a *page-based* pagination strategy.
@@ -342,47 +585,71 @@ Using this request object will provide you access to all the interactions expect
 - **&page[cursor]** will return the cursor value  in a *cursor-based* pagination strategy.
 - **&filter** will return data passed in the filter param.
 
-##### NilPortugues\Api\JsonApi\Http\Message\Request
+## Request Object
 
 Given the query parameters listed above, Request implements helper methods that parse and return data already prepared.
 
 ```php
-namespace NilPortugues\Api\JsonApi\Http\Message;
+namespace \NilPortugues\Api\JsonApi\Http\Request;
 
-final class Request
+class Request
 {
-    public function __construct(ServerRequestInterface $request) { ... }
-    public function getQueryParam($name, $default = null) { ... }
-    public function getIncludedRelationships($baseRelationshipPath) { ... }
-    public function getSortFields() { ... }
-    public function getAttribute($name, $default = null) { ... }
-    public function getSortDirection() { ... }
-    public function getPageNumber() { ... }
-    public function getPageLimit() { ... }
-    public function getPageOffset() { ... }
-    public function getPageSize() { ... }
-    public function getPageCursor() { ... }
-    public function getFilters() { ... }
-    public function getFields() { ... }
+  public function __construct(ServerRequestInterface $request = null) { ... }
+  public function getQueryParam($name, $default = null) { ... }
+  public function getIncludedRelationships() { ... }
+  public function getSortFields() { ... }
+  public function getSortDirection() { ... }
+  public function getPageNumber($default = 1) { ... }
+  public function getPageLimit() { ... }
+  public function getPageOffset() { ... }
+  public function getPageSize($default = 10) { ... }
+  public function getPageCursor() { ... }
+  public function getFilters() { ... }
+  public function getFields() { ... }
 }
 ```
 
-#### Response objects
+## JSON API Response objects
 
-The following PSR-7 Response objects providing the right headers and HTTP status codes are available:
+Because the JSON API specification lists a set of behaviours, specific Response objects are provided for successful and error cases.
 
-- `NilPortugues\Api\JsonApi\Http\Message\Response($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceAccepted($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceCreated($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceDeleted($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceNotFound($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceConflicted($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceProcessing($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\ResourceUpdated($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\BadRequest($json)`
-- `NilPortugues\Api\JsonApi\Http\Message\UnsupportedAction($json)`
+**Success**
+
+- `NilPortugues\Api\JsonApi\Http\Response\Response`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceUpdated`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceAccepted`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceCreated`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceDeleted`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceProcessing`
+
+**Error**
+
+- `NilPortugues\Api\JsonApi\Http\Response\BadRequest`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceConflicted`
+- `NilPortugues\Api\JsonApi\Http\Response\ResourceNotFound`
+- `NilPortugues\Api\JsonApi\Http\Response\TooManyRequests`
+- `NilPortugues\Api\JsonApi\Http\Response\UnprocessableEntity`
+- `NilPortugues\Api\JsonApi\Http\Response\UnsupportedAction`
 
 
+## Action Objects
+
+Having Request and Response objects and Transformers, it just makes sense to have a set of classes that tie them all together into something more powerful: **Actions**.
+
+Provided actions are: 
+
+- `NilPortugues\Api\JsonApi\Server\Actions\CreateResource`
+- `NilPortugues\Api\JsonApi\Server\Actions\DeleteResource`
+- `NilPortugues\Api\JsonApi\Server\Actions\GetResource`
+- `NilPortugues\Api\JsonApi\Server\Actions\ListResource`
+- `NilPortugues\Api\JsonApi\Server\Actions\PatchResource`
+- `NilPortugues\Api\JsonApi\Server\Actions\PutResource`
+
+All actions share a `get` method to run the Resource. 
+
+These `get` methods will expect in all cases one or more `callables`. This has been done to avoid coupling with any library or interface and being able to extend it.
+
+---
 
 ## Quality
 
