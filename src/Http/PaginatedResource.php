@@ -20,7 +20,11 @@ class PaginatedResource implements JsonSerializable
     /**
      * @var int
      */
-    private $totalPages;
+    private $total;
+    /**
+     * @var int
+     */
+    private $pages;
     /**
      * @var int
      */
@@ -65,15 +69,16 @@ class PaginatedResource implements JsonSerializable
      * @param string $elements
      * @param int    $currentPage
      * @param int    $pageSize
-     * @param int    $totalPages
+     * @param null   $total
      * @param array  $links
      */
-    public function __construct($elements, $currentPage = null, $pageSize = null, $totalPages = null, array $links = [])
+    public function __construct($elements, $currentPage = null, $pageSize = null, $total = null, array $links = [])
     {
         $this->setData($elements);
         $this->setPageSize($pageSize);
         $this->setCurrentPage($currentPage);
-        $this->setTotalPages($totalPages);
+        $this->setTotal($total);
+        $this->setTotalPages($total, $pageSize);
         $this->setLinks($links);
     }
 
@@ -158,13 +163,21 @@ class PaginatedResource implements JsonSerializable
     {
         $this->pageSize = (int) $pageSize;
     }
+    /**
+     * @param $total
+     */
+    private function setTotal($total)
+    {
+        $this->total = (int) $total;
+    }
 
     /**
-     * @param $totalPages
+     * @param $total
+     * @param $pageSize
      */
-    private function setTotalPages($totalPages)
+    private function setTotalPages($total, $pageSize)
     {
-        $this->totalPages = (int) $totalPages;
+        $this->pages = (int) ceil($total / $pageSize);
     }
 
     /**
@@ -191,7 +204,8 @@ class PaginatedResource implements JsonSerializable
                 'meta' => array_filter(
                     array_merge([
                             'page' => array_filter([
-                                    'total' => $this->totalPages,
+                                    'total' => $this->total,
+                                    'pages' => $this->pages,
                                     'number' => $this->currentPage,
                                     'size' => $this->pageSize,
                                     'limit' => $this->offsetLimit,
