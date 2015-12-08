@@ -35,7 +35,8 @@ class QueryObject
         self::validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields', $errorBag);
         self::validateIncludeParams($serializer, $apiRequest->getIncludedRelationships(), 'include', $errorBag);
         if (!empty($className)) {
-            self::validateSortParams($serializer, $className, array_keys($apiRequest->getSortDirection()), $errorBag);
+            $sort = array_keys((array) $apiRequest->getSortDirection());
+            self::validateSortParams($serializer, $className, $sort, $errorBag);
         }
 
         if ($errorBag->count() > 0) {

@@ -94,13 +94,13 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @return array|null
+     * @return array
      */
     public function getSortDirection()
     {
         $sort = $this->getQueryParam('sort');
 
-        $direction = null;
+        $direction = [];
 
         if (!empty($sort) && is_string($sort)) {
             $direction = [];
