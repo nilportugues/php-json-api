@@ -10,7 +10,9 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Query;
 
-use NilPortugues\Api\JsonApi\Http\Factory\RequestFactory;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
@@ -24,18 +26,26 @@ class QueryObject
 {
     /**
      * @param JsonApiSerializer $serializer
+     * @param Fields            $fields
+     * @param Included          $included
+     * @param Sorting           $sort
      * @param ErrorBag          $errorBag
      * @param string            $className
      *
      * @throws QueryException
      */
-    public static function assert(JsonApiSerializer $serializer, ErrorBag $errorBag, $className = '')
-    {
-        $apiRequest = RequestFactory::create();
-        self::validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields', $errorBag);
-        self::validateIncludeParams($serializer, $apiRequest->getIncludedRelationships(), 'include', $errorBag);
+    public static function assert(
+        JsonApiSerializer $serializer,
+        Fields $fields,
+        Included $included,
+        Sorting $sort,
+        ErrorBag $errorBag,
+        $className = ''
+    ) {
+        self::validateQueryParamsTypes($serializer, $fields, 'Fields', $errorBag);
+        self::validateIncludeParams($serializer, $included, 'include', $errorBag);
         if (!empty($className)) {
-            $sort = array_keys((array) $apiRequest->getSortDirection());
+            $sort = array_keys($sort->sorting());
             self::validateSortParams($serializer, $className, $sort, $errorBag);
         }
 
@@ -46,39 +56,39 @@ class QueryObject
 
     /**
      * @param JsonApiSerializer $serializer
-     * @param array             $fields
+     * @param Fields            $fields
      * @param                   $paramName
      * @param ErrorBag          $errorBag
      */
     private static function validateQueryParamsTypes(
         JsonApiSerializer $serializer,
-        array $fields,
+        Fields $fields,
         $paramName,
         ErrorBag $errorBag
     ) {
-        if (!empty($fields)) {
+        if (false === $fields->isEmpty()) {
             $transformer = $serializer->getTransformer();
-            $validateFields = array_keys($fields);
+            $validateFields = $fields->types();
 
-            foreach ($validateFields as $key => $field) {
-                $mapping = $transformer->getMappingByAlias($field);
+            foreach ($validateFields as $key => $type) {
+                $mapping = $transformer->getMappingByAlias($type);
                 if (null !== $mapping) {
-                    $properties = array_merge(
+                    $members = array_merge(
                         array_combine($mapping->getProperties(), $mapping->getProperties()),
                         $mapping->getAliasedProperties()
                     );
 
-                    $invalidProperties = array_diff($fields[$field], $properties);
-                    foreach ($invalidProperties as $extraField) {
-                        $errorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower($paramName));
+                    $invalidMembers = array_diff($fields->members($type), $members);
+                    foreach ($invalidMembers as $extraField) {
+                        $errorBag[] = new InvalidParameterMemberError($extraField, $type, strtolower($paramName));
                     }
                     unset($validateFields[$key]);
                 }
             }
 
             if (false === empty($validateFields)) {
-                foreach ($validateFields as $field) {
-                    $errorBag[] = new InvalidParameterError($field, strtolower($paramName));
+                foreach ($validateFields as $type) {
+                    $errorBag[] = new InvalidParameterError($type, strtolower($paramName));
                 }
             }
         }
@@ -86,19 +96,19 @@ class QueryObject
 
     /**
      * @param JsonApiSerializer $serializer
-     * @param array             $includes
+     * @param Included          $included
      * @param string            $paramName
      * @param ErrorBag          $errorBag
      */
     private static function validateIncludeParams(
         JsonApiSerializer $serializer,
-        array $includes,
+        Included $included,
         $paramName,
         ErrorBag $errorBag
     ) {
         $transformer = $serializer->getTransformer();
 
-        foreach ($includes as $resource => $data) {
+        foreach ($included->get() as $resource => $data) {
             if (null == $transformer->getMappingByAlias($resource)) {
                 $errorBag[] = new InvalidParameterError($resource, strtolower($paramName));
                 continue;
@@ -117,15 +127,19 @@ class QueryObject
     /**
      * @param JsonApiSerializer $serializer
      * @param string            $className
-     * @param array             $keys
+     * @param Sorting           $sorting
      * @param ErrorBag          $errorBag
      */
-    private static function validateSortParams(JsonApiSerializer $serializer, $className, array $keys, ErrorBag $errorBag)
-    {
-        if (!empty($keys)) {
+    private static function validateSortParams(
+        JsonApiSerializer $serializer,
+        $className,
+        Sorting $sorting,
+        ErrorBag $errorBag
+    ) {
+        if (false === $sorting->isEmpty()) {
             if ($mapping = $serializer->getTransformer()->getMappingByClassName($className)) {
                 $aliased = (array) $mapping->getAliasedProperties();
-                $sortsFields = str_replace(array_values($aliased), array_keys($aliased), $keys);
+                $sortsFields = str_replace(array_values($aliased), array_keys($aliased), $sorting->fields());
 
                 $invalidProperties = array_diff($sortsFields, $mapping->getProperties());
 

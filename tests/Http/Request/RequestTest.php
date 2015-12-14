@@ -46,12 +46,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPageNumber()
     {
-        $this->assertEquals(1, $this->request->getPageNumber());
-    }
-
-    public function testGetQueryParam()
-    {
-        $this->assertEquals('-age,gender', $this->request->getQueryParam('sort'));
+        $this->assertEquals(1, $this->request->getPage()->number());
     }
 
     public function testGetIncludedRelationships()
@@ -61,42 +56,42 @@ class RequestTest extends \PHPUnit_Framework_TestCase
             'comments' => 'comments',
         ];
 
-        $this->assertEquals($expected, $this->request->getIncludedRelationships());
+        $this->assertEquals($expected, $this->request->getIncludedRelationships()->get());
     }
 
     public function testGetSortFields()
     {
-        $this->assertEquals(['age', 'gender'], $this->request->getSortFields());
+        $this->assertEquals(['age', 'gender'], $this->request->getSort()->fields());
     }
 
     public function testGetSortDirection()
     {
-        $this->assertEquals(['age' => 'descending', 'gender' => 'ascending'], $this->request->getSortDirection());
+        $this->assertEquals(['age' => 'descending', 'gender' => 'ascending'], $this->request->getSort()->sorting());
     }
 
     public function testGetPageLimit()
     {
-        $this->assertEquals(100, $this->request->getPageLimit());
+        $this->assertEquals(100, $this->request->getPage()->limit());
     }
 
     public function testGetPageOffset()
     {
-        $this->assertEquals('50a', $this->request->getPageOffset());
+        $this->assertEquals('50a', $this->request->getPage()->offset());
     }
 
     public function testGetPageSize()
     {
-        $this->assertEquals(20, $this->request->getPageSize());
+        $this->assertEquals(20, $this->request->getPage()->size());
     }
 
     public function testGetPageCursor()
     {
-        $this->assertEquals('abc', $this->request->getPageCursor());
+        $this->assertEquals('abc', $this->request->getPage()->cursor());
     }
 
     public function testGetFields()
     {
-        $this->assertSame(['user' => ['user_name', 'email']], $this->request->getFields());
+        $this->assertEquals(['user' => ['user_name', 'email']], $this->request->getFields()->get());
     }
 
     public function testGetFilter()

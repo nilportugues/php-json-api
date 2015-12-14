@@ -12,7 +12,10 @@ namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
 use NilPortugues\Api\JsonApi\Http\PaginatedResource;
-use NilPortugues\Api\JsonApi\Http\Request\Request;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Page;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
@@ -34,14 +37,27 @@ class ListResource
      * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
      */
     private $errorBag;
+
     /**
-     * @var int
+     * @var Page
      */
-    private $pageNumber;
+    private $page;
     /**
-     * @var int
+     * @var Fields
      */
-    private $pageSize;
+    private $fields;
+    /**
+     * @var Sorting
+     */
+    private $sorting;
+    /**
+     * @var Included
+     */
+    private $included;
+    /**
+     * @var array
+     */
+    private $filters;
 
     /**
      * @var JsonApiSerializer
@@ -50,13 +66,27 @@ class ListResource
 
     /**
      * @param JsonApiSerializer $serializer
+     * @param Page              $page
+     * @param Fields            $fields
+     * @param Sorting           $sorting
+     * @param Included          $included
+     * @param array             $filters
      */
-    public function __construct(JsonApiSerializer $serializer)
-    {
+    public function __construct(
+        JsonApiSerializer $serializer,
+        Page $page,
+        Fields $fields,
+        Sorting $sorting,
+        Included $included,
+        $filters
+    ) {
         $this->serializer = $serializer;
         $this->errorBag = new ErrorBag();
-        $this->pageNumber = $this->apiRequest()->getPageNumber();
-        $this->pageSize = $this->apiRequest()->getPageSize();
+        $this->page = $page;
+        $this->fields = $fields;
+        $this->sorting = $sorting;
+        $this->included = $included;
+        $this->filters = $filters;
     }
 
     /**
@@ -70,28 +100,39 @@ class ListResource
     public function get(callable $totalAmountCallable, callable $resultsCallable, $route, $className)
     {
         try {
-            QueryObject::assert($this->serializer, $this->errorBag, $className);
+            QueryObject::assert(
+                $this->serializer,
+                $this->fields,
+                $this->included,
+                $this->sorting,
+                $this->errorBag,
+                $className
+            );
             $totalAmount = $totalAmountCallable();
 
-            if ($totalAmount > 0 && $this->pageNumber > ceil($totalAmount / $this->pageSize)) {
+            if ($totalAmount > 0 && $this->page->number() > ceil($totalAmount / $this->page->size())) {
                 return $this->resourceNotFound(
-                    new ErrorBag([new OufOfBoundsError($this->pageNumber, $this->pageSize)])
+                    new ErrorBag([new OufOfBoundsError($this->page->number(), $this->page->size())])
                 );
             }
 
             $links = $this->pagePaginationLinks(
                 $route,
-                $this->pageNumber,
-                $this->pageSize,
-                $totalAmount
+                $this->page->number(),
+                $this->page->size(),
+                $totalAmount,
+                $this->fields,
+                $this->sorting,
+                $this->included,
+                $this->filters
             );
 
             $results = $resultsCallable();
 
             $paginatedResource = new PaginatedResource(
                 $this->serializer->serialize($results),
-                $this->pageNumber,
-                $this->pageSize,
+                $this->page->number(),
+                $this->page->size(),
                 $totalAmount,
                 $links
             );
@@ -105,29 +146,51 @@ class ListResource
     }
 
     /**
-     * @param string $route
-     * @param int    $pageNumber
-     * @param int    $pageSize
-     * @param int    $totalPages
+     * @param string   $route
+     * @param int      $pageNumber
+     * @param int      $pageSize
+     * @param int      $totalPages
+     * @param Fields   $fields
+     * @param Sorting  $sorting
+     * @param Included $included
+     * @param array    $filters
      *
      * @return array
      */
-    protected function pagePaginationLinks($route, $pageNumber, $pageSize, $totalPages)
-    {
+    protected function pagePaginationLinks(
+        $route,
+        $pageNumber,
+        $pageSize,
+        $totalPages,
+        Fields $fields,
+        Sorting $sorting,
+        Included $included,
+        $filters
+    ) {
         $next = $pageNumber + 1;
         $previous = $pageNumber - 1;
         $last = ceil($totalPages / $pageSize);
 
-        $links = array_filter([
+        $links = array_filter(
+            [
                 'self' => $pageNumber,
                 'first' => 1,
                 'next' => ($next <= $last) ? $next : null,
                 'previous' => ($previous > 1) ? $previous : null,
                 'last' => $last,
-            ]);
+            ]
+        );
 
         foreach ($links as &$numberedLink) {
-            $numberedLink = $this->pagePaginatedRoute($this->apiRequest(), $route, $numberedLink, $pageSize);
+            $numberedLink = $this->pagePaginatedRoute(
+                $route,
+                $numberedLink,
+                $pageSize,
+                $fields,
+                $sorting,
+                $included,
+                $filters
+            );
         }
 
         return $links;
@@ -136,16 +199,27 @@ class ListResource
     /**
      * Build the URL.
      *
-     * @param Request $request
-     * @param string  $route
-     * @param int     $pageNumber
-     * @param int     $pageSize
+     * @param string   $route
+     * @param int      $pageNumber
+     * @param int      $pageSize
+     * @param Fields   $fields
+     * @param Sorting  $sorting
+     * @param Included $included
+     * @param array    $filters
      *
      * @return string
      */
-    private function pagePaginatedRoute(Request $request, $route, $pageNumber, $pageSize)
-    {
-        $queryParams = urldecode(http_build_query(
+    private function pagePaginatedRoute(
+        $route,
+        $pageNumber,
+        $pageSize,
+        Fields $fields,
+        Sorting $sorting,
+        Included $included,
+        $filters
+    ) {
+        $queryParams = urldecode(
+            http_build_query(
                 [
                     'page' => array_filter(
                         [
@@ -153,12 +227,13 @@ class ListResource
                             'size' => $pageSize,
                         ]
                     ),
-                    'fields' => $request->getQueryParam('fields'),
-                    'filter' => $request->getQueryParam('filter'),
-                    'sort' => $request->getQueryParam('sort'),
-                    'include' => $request->getQueryParam('include'),
+                    'fields' => $fields->get(),
+                    'filter' => $filters,
+                    'sort' => $sorting->get(),
+                    'include' => $included->get(),
                 ]
-            ));
+            )
+        );
 
         if ($route[strlen($route) - 1] === '?' || $route[strlen($route) - 1] === '&') {
             return sprintf('%s%s', $route, $queryParams);

@@ -10,8 +10,8 @@
 
 namespace NilPortugues\Api\JsonApi;
 
-use NilPortugues\Api\JsonApi\Http\Factory\RequestFactory;
-use NilPortugues\Api\JsonApi\Http\Request\Request;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Serializer\DeepCopySerializer;
 
 /**
@@ -41,27 +41,32 @@ class JsonApiSerializer extends DeepCopySerializer
     }
 
     /**
-     * @param mixed $value
+     * @param mixed                            $value
+     * @param Http\Request\Parameters\Fields   $fields
+     * @param Http\Request\Parameters\Included $included
      *
      * @return string
      */
-    public function serialize($value)
+    public function serialize($value, Fields $fields = null, Included $included = null)
     {
-        $request = RequestFactory::create();
+        if ($fields) {
+            $this->filterOutResourceFields($fields);
+        }
 
-        $this->filterOutResourceFields($request);
-        $this->filterOutIncludedResources($request);
+        if ($included) {
+            $this->filterOutIncludedResources($included);
+        }
 
         return parent::serialize($value);
     }
 
     /**
-     * @param Request $request
+     * @param Http\Request\Parameters\Included $included
      */
-    private function filterOutIncludedResources(Request $request)
+    private function filterOutIncludedResources(Included $included)
     {
-        if ($include = $request->getIncludedRelationships()) {
-            foreach ($include as $resource => $includeData) {
+        if (false === $included->isEmpty()) {
+            foreach ($included->get() as $resource => $includeData) {
                 foreach ($this->serializationStrategy->getMappings() as $mapping) {
                     $mapping->filteringIncludedResources(true);
                     if (is_array($includeData)) {
@@ -82,12 +87,12 @@ class JsonApiSerializer extends DeepCopySerializer
     }
 
     /**
-     * @param Request $request
+     * @param Http\Request\Parameters\Fields $fields
      */
-    private function filterOutResourceFields(Request $request)
+    private function filterOutResourceFields(Fields $fields)
     {
-        if ($filters = $request->getFields()) {
-            foreach ($filters as $type => $properties) {
+        if (false === $fields->isEmpty()) {
+            foreach ($fields->get() as $type => $properties) {
                 foreach ($this->serializationStrategy->getMappings() as $mapping) {
                     if ($mapping->getClassAlias() === $type) {
                         $mapping->setFilterKeys($properties);

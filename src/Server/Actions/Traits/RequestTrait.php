@@ -10,10 +10,10 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Actions\Traits;
 
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
-use NilPortugues\Api\JsonApi\Http\Factory\RequestFactory;
-use NilPortugues\Api\JsonApi\Http\Request\Request;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
 
@@ -37,36 +37,29 @@ trait RequestTrait
 
     /**
      * @param JsonApiSerializer $serializer
+     * @param Fields            $fields
+     * @param Included          $included
      *
      * @return bool
      */
-    protected function hasValidQueryParams($serializer)
+    protected function hasValidQueryParams($serializer, Fields $fields, Included $included)
     {
-        $apiRequest = $this->apiRequest();
-        $this->validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields');
-        $this->validateQueryParamsTypes($serializer, $apiRequest->getIncludedRelationships(), 'Include');
+        $this->validateQueryParamsTypes($serializer, $fields, 'Fields');
+        $this->validateQueryParamsTypes($serializer, $included, 'Include');
 
         return empty($this->queryParamErrorBag);
     }
 
     /**
-     * @return Request
-     */
-    protected function apiRequest()
-    {
-        return RequestFactory::create();
-    }
-
-    /**
      * @param JsonApiSerializer $serializer
-     * @param array             $fields
+     * @param Fields            $fields
      * @param                   $paramName
      */
-    private function validateQueryParamsTypes($serializer, array $fields, $paramName)
+    private function validateQueryParamsTypes($serializer, Fields $fields, $paramName)
     {
-        if (!empty($fields)) {
+        if (false === $fields->isEmpty()) {
             $transformer = $serializer->getTransformer();
-            $validateFields = array_keys($fields);
+            $validateFields = $fields->types();
 
             foreach ($validateFields as $key => $field) {
                 $mapping = $transformer->getMappingByAlias($field);
@@ -76,9 +69,11 @@ trait RequestTrait
                         $mapping->getAliasedProperties()
                     );
 
-                    $invalidProperties = array_diff($fields[$field], $properties);
+                    $invalidProperties = array_diff($fields->members($field), $properties);
                     foreach ($invalidProperties as $extraField) {
-                        $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower($paramName));
+                        $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower(
+                            $paramName
+                        ));
                     }
                     unset($validateFields[$key]);
                 }

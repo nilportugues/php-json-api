@@ -11,6 +11,9 @@
 namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
@@ -38,28 +41,45 @@ class GetResource
     private $serializer;
 
     /**
-     * @param JsonApiSerializer $serializer
+     * @var Fields
      */
-    public function __construct(JsonApiSerializer $serializer)
-    {
+    private $fields;
+
+    /**
+     * @var Included
+     */
+    private $included;
+
+    /**
+     * @param JsonApiSerializer $serializer
+     * @param Fields            $fields
+     * @param Included          $included
+     */
+    public function __construct(
+        JsonApiSerializer $serializer,
+        Fields $fields,
+        Included $included
+    ) {
         $this->serializer = $serializer;
         $this->errorBag = new ErrorBag();
+        $this->fields = $fields;
+        $this->included = $included;
     }
 
     /**
-     * @param          $id
-     * @param          $className
-     * @param callable $callable
+     * @param string|int $id
+     * @param string     $className
+     * @param callable   $callable
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function get($id, $className, callable $callable)
     {
         try {
-            QueryObject::assert($this->serializer, $this->errorBag);
+            QueryObject::assert($this->serializer, $this->fields, $this->included, new Sorting(), $this->errorBag, $className);
             $data = $callable();
 
-            $response = $this->response($this->serializer->serialize($data, $this->apiRequest()));
+            $response = $this->response($this->serializer->serialize($data, $this->fields, $this->included));
         } catch (Exception $e) {
             $response = $this->getErrorResponse($id, $className, $e);
         }
@@ -68,9 +88,9 @@ class GetResource
     }
 
     /**
-     * @param           $id
-     * @param           $className
-     * @param Exception $e
+     * @param string|int $id
+     * @param string     $className
+     * @param Exception  $e
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
