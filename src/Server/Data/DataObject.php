@@ -92,6 +92,10 @@ class DataObject
 
         $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
+        if (null === $mapping) {
+            return [];
+        }
+
         $properties = str_replace(
             array_keys($mapping->getAliasedProperties()),
             array_values($mapping->getAliasedProperties()),
