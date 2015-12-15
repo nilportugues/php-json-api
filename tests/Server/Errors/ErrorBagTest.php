@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Api\JsonApi\Http;
+namespace NilPortugues\Tests\Api\JsonApi\Server\Errors;
 
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
