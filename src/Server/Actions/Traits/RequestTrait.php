@@ -16,6 +16,7 @@ use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
+use NilPortugues\Api\Mapping\Mapping;
 
 /**
  * Class RequestTrait.
@@ -44,8 +45,8 @@ trait RequestTrait
      */
     protected function hasValidQueryParams($serializer, Fields $fields, Included $included)
     {
-        $this->validateQueryParamsTypes($serializer, $fields, 'Fields');
-        $this->validateQueryParamsTypes($serializer, $included, 'Include');
+        $this->validateFieldsQueryParams($serializer, $fields, 'Fields');
+        $this->validateIncludeQueryParamsTypes($serializer, $included, 'Include');
 
         return empty($this->queryParamErrorBag);
     }
@@ -53,37 +54,89 @@ trait RequestTrait
     /**
      * @param JsonApiSerializer $serializer
      * @param Fields            $fields
-     * @param                   $paramName
+     * @param string            $paramName
      */
-    private function validateQueryParamsTypes($serializer, Fields $fields, $paramName)
+    private function validateFieldsQueryParams($serializer, Fields $fields, $paramName)
     {
         if (false === $fields->isEmpty()) {
-            $transformer = $serializer->getTransformer();
             $validateFields = $fields->types();
 
             foreach ($validateFields as $key => $field) {
-                $mapping = $transformer->getMappingByAlias($field);
+                $mapping = $serializer->getTransformer()->getMappingByAlias($field);
                 if (null !== $mapping) {
-                    $properties = array_merge(
-                        array_combine($mapping->getProperties(), $mapping->getProperties()),
-                        $mapping->getAliasedProperties()
-                    );
-
+                    $properties        = $this->getPropertiesFromMapping($mapping);
                     $invalidProperties = array_diff($fields->members($field), $properties);
-                    foreach ($invalidProperties as $extraField) {
-                        $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower(
-                            $paramName
-                        ));
-                    }
+                    $this->addInvalidParameterMemberErrorsToErrorBag($invalidProperties, $paramName, $field);
                     unset($validateFields[$key]);
                 }
             }
 
-            if (false === empty($validateFields)) {
-                foreach ($validateFields as $field) {
-                    $this->queryParamErrorBag[] = new InvalidParameterError($field, strtolower($paramName));
+            $this->addInvalidParameterErrorsToErrorBag($paramName, $validateFields);
+        }
+    }
+
+    /**
+     * @param Mapping $mapping
+     *
+     * @return array
+     */
+    private function getPropertiesFromMapping(Mapping $mapping)
+    {
+        $properties = array_merge(
+            array_combine($mapping->getProperties(), $mapping->getProperties()),
+            $mapping->getAliasedProperties()
+        );
+        return $properties;
+    }
+
+    /**
+     * @param array  $invalidProperties
+     * @param string $paramName
+     * @param string $field
+     */
+    private function addInvalidParameterMemberErrorsToErrorBag(array $invalidProperties, $paramName, $field)
+    {
+        foreach ($invalidProperties as $extraField) {
+            $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower(
+                $paramName
+            ));
+        }
+    }
+
+    /**
+     * @param string $paramName
+     * @param array  $validateFields
+     */
+    private function addInvalidParameterErrorsToErrorBag($paramName, array &$validateFields)
+    {
+        if (false === empty($validateFields)) {
+            foreach ($validateFields as $field) {
+                $this->queryParamErrorBag[] = new InvalidParameterError($field, strtolower($paramName));
+            }
+        }
+    }
+
+    /**
+     * @param JsonApiSerializer $serializer
+     * @param Included          $included
+     * @param string            $paramName
+     */
+    private function validateIncludeQueryParamsTypes($serializer, Included $included, $paramName)
+    {
+        if (false === $included->isEmpty()) {
+            $validateFields = array_keys($included->get());
+
+            foreach ($validateFields as $key => $field) {
+                $mapping = $serializer->getTransformer()->getMappingByAlias($field);
+                if (null !== $mapping) {
+                    $properties        = $this->getPropertiesFromMapping($mapping);
+                    $invalidProperties = array_diff($included->get()[$field], $properties);
+                    $this->addInvalidParameterMemberErrorsToErrorBag($invalidProperties, $paramName, $field);
+                    unset($validateFields[$key]);
                 }
             }
+
+            $this->addInvalidParameterErrorsToErrorBag($paramName, $validateFields);
         }
     }
 }

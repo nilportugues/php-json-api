@@ -177,6 +177,11 @@ class PaginatedResource implements JsonSerializable
      */
     private function setTotalPages($total, $pageSize)
     {
+        if (0 == $pageSize) {
+            $this->pages = 0;
+            return;
+        }
+
         $this->pages = (int) ceil($total / $pageSize);
     }
 

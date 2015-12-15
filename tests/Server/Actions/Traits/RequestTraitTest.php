@@ -10,9 +10,61 @@
 
 namespace NilPortugues\Tests\Api\JsonApi\Server\Actions\Traits;
 
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\JsonApiSerializer;
+use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
+use NilPortugues\Api\Mapping\Mapper;
 
 class RequestTraitTest extends \PHPUnit_Framework_TestCase
 {
     use RequestTrait;
+
+    /**
+     * @var JsonApiSerializer
+     */
+    private $serializer;
+    /**
+     * @var Fields
+     */
+    private $fields;
+    /**
+     * @var Included
+     */
+    private $included;
+
+    /**
+     *
+     */
+    public function setUp()
+    {
+        $this->included = new Included();
+        $this->included->add('order.employee');
+
+        $this->fields = new Fields();
+        $this->fields->addField('employee', 'name');
+
+        //@todo add Mappings
+        $mappings = [];
+        $this->serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper($mappings)));
+    }
+
+    /**
+     *
+     */
+    public function testItCanGetQueryParamErrors()
+    {
+        $this->assertEmpty($this->getQueryParamsErrors());
+    }
+
+    /**
+     *
+     */
+    public function testItHasValidQueryParams()
+    {
+        $isValid = $this->hasValidQueryParams($this->serializer, $this->fields, $this->included);
+
+        $this->assertFalse($isValid);
+    }
 }
