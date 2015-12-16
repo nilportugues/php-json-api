@@ -18,14 +18,14 @@ use NilPortugues\Serializer\Serializer;
 /**
  * Class DataAttributesHelper.
  */
-final class DataAttributesHelper
+class DataAttributesHelper
 {
     /**
      * @link http://jsonapi.org/format/#document-member-names-reserved-characters
      *
      * @var array
      */
-    private static $forbiddenMemberNameCharacters = [
+    protected static $forbiddenMemberNameCharacters = [
         '+',
         ',',
         '.',
@@ -63,7 +63,7 @@ final class DataAttributesHelper
      *
      * @var array
      */
-    private static $forbiddenAsFirstOrLastCharacter = [
+    protected static $forbiddenAsFirstOrLastCharacter = [
         '-',
         '_',
         ' ',
@@ -149,7 +149,7 @@ final class DataAttributesHelper
      *
      * @return bool
      */
-    private static function isScalarValue($value)
+    protected static function isScalarValue($value)
     {
         return \is_array($value)
         && \array_key_exists(Serializer::SCALAR_TYPE, $value)
@@ -162,7 +162,7 @@ final class DataAttributesHelper
      *
      * @return bool
      */
-    private static function containsClassIdentifierKey(array $input, $foundIdentifierKey = false)
+    protected static function containsClassIdentifierKey(array $input, $foundIdentifierKey = false)
     {
         if (!is_array($input)) {
             return $foundIdentifierKey || false;

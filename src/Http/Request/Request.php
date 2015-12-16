@@ -11,6 +11,10 @@
 
 namespace NilPortugues\Api\JsonApi\Http\Request;
 
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Page;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\DiactorosFactory;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -18,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 /**
  * Class AbstractRequest.
  */
-final class Request extends \Zend\Diactoros\Request
+class Request extends \Zend\Diactoros\Request
 {
     /**
      * @param ServerRequestInterface $request
@@ -34,165 +38,66 @@ final class Request extends \Zend\Diactoros\Request
      *
      * @return array|string
      */
-    public function getQueryParam($name, $default = null)
+    protected function getQueryParam($name, $default = null)
     {
         return isset($this->request->getQueryParams()[$name]) ? $this->request->getQueryParams()[$name] : $default;
     }
 
     /**
-     * @return array
+     * @return Included
      */
     public function getIncludedRelationships()
     {
         $include = $this->getQueryParam('include', []);
+        $included = new Included();
 
-        if (!is_string($include)) {
-            return [];
-        }
-
-        $relationshipNames = \explode(',', $include);
-        $relationships = [];
-
-        foreach ($relationshipNames as $relationship) {
-            $data = \explode('.', $relationship);
-            $type = $data[0];
-            $attribute = (!empty($data[1])) ? $data[1] : null;
-
-            if (null === $attribute) {
-                $relationships[$type] = $type;
-            } else {
-                if (!empty($relationships[$type]) && is_string($relationships[$type])) {
-                    $relationships[$type] = [];
-                }
-                $relationships[$type][] = $attribute;
+        if (is_string($include)) {
+            $includeNames = \explode(',', $include);
+            foreach ($includeNames as $relationship) {
+                $included->add($relationship);
             }
         }
 
-        return array_filter($relationships);
+        return $included;
     }
 
     /**
-     * @return array|null
+     * @return \NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting
      */
-    public function getSortFields()
+    public function getSort()
     {
         $sort = $this->getQueryParam('sort');
-        $fields = null;
+        $sorting = new Sorting();
 
         if (!empty($sort) && is_string($sort)) {
-            $fields = \explode(',', $sort);
-            if (!empty($fields)) {
-                foreach ($fields as &$field) {
-                    if ('-' === $field[0]) {
-                        $field = \ltrim($field, '-');
-                    }
+            $members = \explode(',', $sort);
+            if (!empty($members)) {
+                foreach ($members as $field) {
+                    $key = ltrim($field, '-');
+                    $sorting->addField($key, ('-' === $field[0]) ? 'descending' : 'ascending');
                 }
             }
         }
 
-        return $fields;
+        return $sorting;
     }
 
     /**
-     * @return array
+     * @return \NilPortugues\Api\JsonApi\Http\Request\Parameters\Page
      */
-    public function getSortDirection()
+    public function getPage()
     {
-        $sort = $this->getQueryParam('sort');
+        $queryParam = $this->getQueryParam('page');
 
-        $direction = [];
+        $page = new Page(
+            (!empty($queryParam['number'])) ? $queryParam['number'] : 1,
+            (!empty($queryParam['cursor'])) ? $queryParam['cursor'] : null,
+            (!empty($queryParam['limit'])) ? $queryParam['limit'] : null,
+            (!empty($queryParam['offset'])) ? $queryParam['offset'] : null,
+            (!empty($queryParam['size'])) ? $queryParam['size'] : null
+        );
 
-        if (!empty($sort) && is_string($sort)) {
-            $direction = [];
-
-            $fields = \explode(',', $sort);
-            if (!empty($fields)) {
-                foreach ($fields as $field) {
-                    $direction[ltrim($field, '-')] = ('-' === $field[0]) ? 'descending' : 'ascending';
-                }
-            }
-        }
-
-        return $direction;
-    }
-
-    /**
-     * @param int $default
-     *
-     * @return int
-     */
-    public function getPageNumber($default = 1)
-    {
-        $page = $this->getQueryParam('page');
-        $number = $default;
-
-        if (!empty($page['number'])) {
-            $number = (int) $page['number'];
-        }
-
-        return $number;
-    }
-
-    /**
-     * @return int
-     */
-    public function getPageLimit()
-    {
-        $page = $this->getQueryParam('page');
-        $limit = null;
-
-        if (!empty($page['limit'])) {
-            $limit = (int) $page['limit'];
-        }
-
-        return $limit;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getPageOffset()
-    {
-        $page = $this->getQueryParam('page');
-
-        $offset = null;
-        if (!empty($page['offset'])) {
-            $offset = (string) $page['offset'];
-        }
-
-        return $offset;
-    }
-
-    /**
-     * @param int $default
-     *
-     * @return int
-     */
-    public function getPageSize($default = 10)
-    {
-        $page = $this->getQueryParam('page');
-        $size = $default;
-
-        if (!empty($page['size'])) {
-            $size = (int) $page['size'];
-        }
-
-        return $size;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getPageCursor()
-    {
-        $page = $this->getQueryParam('page');
-        $cursor = null;
-
-        if (!empty($page['cursor'])) {
-            $cursor = (string) $page['cursor'];
-        }
-
-        return $cursor;
+        return $page;
     }
 
     /**
@@ -206,19 +111,23 @@ final class Request extends \Zend\Diactoros\Request
     }
 
     /**
-     * @return array
+     * @return \NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields
      */
     public function getFields()
     {
         $fields = (array) $this->getQueryParam('fields', null);
-
         $fields = array_filter($fields);
 
-        foreach ($fields as &$filter) {
-            $filter = \explode(',', $filter);
-            $filter = \array_map('trim', $filter);
+        $object = new Fields();
+        foreach ($fields as $type => &$members) {
+            $members = \explode(',', $members);
+            $members = \array_map('trim', $members);
+
+            foreach ($members as $member) {
+                $object->addField($type, $member);
+            }
         }
 
-        return $fields;
+        return $object;
     }
 }

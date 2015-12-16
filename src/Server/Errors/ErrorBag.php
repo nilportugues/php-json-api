@@ -24,12 +24,12 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
     /**
      * @var array
      */
-    private $errors = [];
+    protected $errors = [];
 
     /**
      * @var
      */
-    private $httpCode;
+    protected $httpCode;
 
     /**
      * @param array $errors
@@ -116,7 +116,7 @@ class ErrorBag implements JsonSerializable, ArrayAccess, Countable, IteratorAggr
      *
      * @return null|mixed
      */
-    private function get($key)
+    protected function get($key)
     {
         return isset($this->errors[$key]) ? $this->errors[$key] : null;
     }

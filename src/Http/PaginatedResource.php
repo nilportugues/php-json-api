@@ -20,50 +20,50 @@ class PaginatedResource implements JsonSerializable
     /**
      * @var int
      */
-    private $total;
+    protected $total;
     /**
      * @var int
      */
-    private $pages;
+    protected $pages;
     /**
      * @var int
      */
-    private $currentPage;
+    protected $currentPage;
     /**
      * @var int
      */
-    private $pageSize;
+    protected $pageSize;
     /**
      * @var string
      */
-    private $offsetLimit;
+    protected $offsetLimit;
 
     /**
      * @var string
      */
-    private $offset;
+    protected $offset;
 
     /**
      * @var string
      */
-    private $cursor;
+    protected $cursor;
 
     /**
      * @var string
      */
-    private $data = [];
+    protected $data = [];
     /**
      * @var array
      */
-    private $include = [];
+    protected $include = [];
     /**
      * @var array
      */
-    private $links = [];
+    protected $links = [];
     /**
      * @var array
      */
-    private $meta = [];
+    protected $meta = [];
 
     /**
      * @param string $elements
@@ -99,7 +99,7 @@ class PaginatedResource implements JsonSerializable
      *
      * @return $this
      */
-    private function setData($data)
+    protected function setData($data)
     {
         $data = (array) json_decode($data, true);
 
@@ -151,7 +151,7 @@ class PaginatedResource implements JsonSerializable
     /**
      * @param $currentPage
      */
-    private function setCurrentPage($currentPage)
+    protected function setCurrentPage($currentPage)
     {
         $this->currentPage = (int) $currentPage;
     }
@@ -159,14 +159,14 @@ class PaginatedResource implements JsonSerializable
     /**
      * @param $pageSize
      */
-    private function setPageSize($pageSize)
+    protected function setPageSize($pageSize)
     {
         $this->pageSize = (int) $pageSize;
     }
     /**
      * @param $total
      */
-    private function setTotal($total)
+    protected function setTotal($total)
     {
         $this->total = (int) $total;
     }
@@ -175,8 +175,14 @@ class PaginatedResource implements JsonSerializable
      * @param $total
      * @param $pageSize
      */
-    private function setTotalPages($total, $pageSize)
+    protected function setTotalPages($total, $pageSize)
     {
+        if (0 == $pageSize) {
+            $this->pages = 0;
+
+            return;
+        }
+
         $this->pages = (int) ceil($total / $pageSize);
     }
 

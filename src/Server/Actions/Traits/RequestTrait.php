@@ -10,12 +10,13 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Actions\Traits;
 
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
-use NilPortugues\Api\JsonApi\Http\Factory\RequestFactory;
-use NilPortugues\Api\JsonApi\Http\Request\Request;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
+use NilPortugues\Api\Mapping\Mapping;
 
 /**
  * Class RequestTrait.
@@ -25,7 +26,7 @@ trait RequestTrait
     /**
      * @var Error[]
      */
-    private $queryParamErrorBag = [];
+    protected $queryParamErrorBag = [];
 
     /**
      * @return Error[]
@@ -37,58 +38,106 @@ trait RequestTrait
 
     /**
      * @param JsonApiSerializer $serializer
+     * @param Fields            $fields
+     * @param Included          $included
      *
      * @return bool
      */
-    protected function hasValidQueryParams($serializer)
+    protected function hasValidQueryParams($serializer, Fields $fields, Included $included)
     {
-        $apiRequest = $this->apiRequest();
-        $this->validateQueryParamsTypes($serializer, $apiRequest->getFields(), 'Fields');
-        $this->validateQueryParamsTypes($serializer, $apiRequest->getIncludedRelationships(), 'Include');
+        $this->validateFieldsQueryParams($serializer, $fields, 'Fields');
+        $this->validateIncludeQueryParamsTypes($serializer, $included, 'Include');
 
         return empty($this->queryParamErrorBag);
     }
 
     /**
-     * @return Request
-     */
-    protected function apiRequest()
-    {
-        return RequestFactory::create();
-    }
-
-    /**
      * @param JsonApiSerializer $serializer
-     * @param array             $fields
-     * @param                   $paramName
+     * @param Fields            $fields
+     * @param string            $paramName
      */
-    private function validateQueryParamsTypes($serializer, array $fields, $paramName)
+    protected function validateFieldsQueryParams($serializer, Fields $fields, $paramName)
     {
-        if (!empty($fields)) {
-            $transformer = $serializer->getTransformer();
-            $validateFields = array_keys($fields);
+        if (false === $fields->isEmpty()) {
+            $validateFields = $fields->types();
 
             foreach ($validateFields as $key => $field) {
-                $mapping = $transformer->getMappingByAlias($field);
+                $mapping = $serializer->getTransformer()->getMappingByAlias($field);
                 if (null !== $mapping) {
-                    $properties = array_merge(
-                        array_combine($mapping->getProperties(), $mapping->getProperties()),
-                        $mapping->getAliasedProperties()
-                    );
-
-                    $invalidProperties = array_diff($fields[$field], $properties);
-                    foreach ($invalidProperties as $extraField) {
-                        $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower($paramName));
-                    }
+                    $properties = $this->getPropertiesFromMapping($mapping);
+                    $invalidProperties = array_diff($fields->members($field), $properties);
+                    $this->addInvalidParameterMemberErrorsToErrorBag($invalidProperties, $paramName, $field);
                     unset($validateFields[$key]);
                 }
             }
 
-            if (false === empty($validateFields)) {
-                foreach ($validateFields as $field) {
-                    $this->queryParamErrorBag[] = new InvalidParameterError($field, strtolower($paramName));
+            $this->addInvalidParameterErrorsToErrorBag($paramName, $validateFields);
+        }
+    }
+
+    /**
+     * @param Mapping $mapping
+     *
+     * @return array
+     */
+    protected function getPropertiesFromMapping(Mapping $mapping)
+    {
+        $properties = array_merge(
+            array_combine($mapping->getProperties(), $mapping->getProperties()),
+            $mapping->getAliasedProperties()
+        );
+
+        return $properties;
+    }
+
+    /**
+     * @param array  $invalidProperties
+     * @param string $paramName
+     * @param string $field
+     */
+    protected function addInvalidParameterMemberErrorsToErrorBag(array $invalidProperties, $paramName, $field)
+    {
+        foreach ($invalidProperties as $extraField) {
+            $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower(
+                $paramName
+            ));
+        }
+    }
+
+    /**
+     * @param string $paramName
+     * @param array  $validateFields
+     */
+    protected function addInvalidParameterErrorsToErrorBag($paramName, array &$validateFields)
+    {
+        if (false === empty($validateFields)) {
+            foreach ($validateFields as $field) {
+                $this->queryParamErrorBag[] = new InvalidParameterError($field, strtolower($paramName));
+            }
+        }
+    }
+
+    /**
+     * @param JsonApiSerializer $serializer
+     * @param Included          $included
+     * @param string            $paramName
+     */
+    protected function validateIncludeQueryParamsTypes($serializer, Included $included, $paramName)
+    {
+        if (false === $included->isEmpty()) {
+            $validateFields = array_keys($included->get());
+
+            foreach ($validateFields as $key => $field) {
+                $mapping = $serializer->getTransformer()->getMappingByAlias($field);
+                if (null !== $mapping) {
+                    $properties = $this->getPropertiesFromMapping($mapping);
+                    $invalidProperties = array_diff($included->get()[$field], $properties);
+                    $this->addInvalidParameterMemberErrorsToErrorBag($invalidProperties, $paramName, $field);
+                    unset($validateFields[$key]);
                 }
             }
+
+            $this->addInvalidParameterErrorsToErrorBag($paramName, $validateFields);
         }
     }
 }

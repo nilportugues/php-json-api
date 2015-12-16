@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Api\JsonApi\Http;
+namespace NilPortugues\Tests\Api\JsonApi\Server\Errors;
 
 use InvalidArgumentException;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
@@ -78,6 +78,13 @@ JSON;
         $this->setExpectedException(InvalidArgumentException::class);
         $error = new Error('title', 'message');
         $error->setAboutLink('aaaa');
+    }
+
+    public function testSetSourceWillThrowExceptionInvalidKeyIsProvided()
+    {
+        $this->setExpectedException(InvalidArgumentException::class);
+        $error = new Error('title', 'message');
+        $error->setSource('aaaa', 'b');
     }
 
     public function testItWillThrowExceptionIfTitleIsEmpty()

@@ -11,9 +11,13 @@
 namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
+use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
 use NilPortugues\Api\JsonApi\Server\Query\QueryException;
@@ -30,51 +34,72 @@ class GetResource
     /**
      * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
      */
-    private $errorBag;
+    protected $errorBag;
 
     /**
      * @var JsonApiSerializer
      */
-    private $serializer;
+    protected $serializer;
+
+    /**
+     * @var Fields
+     */
+    protected $fields;
+
+    /**
+     * @var Included
+     */
+    protected $included;
 
     /**
      * @param JsonApiSerializer $serializer
+     * @param Fields            $fields
+     * @param Included          $included
      */
-    public function __construct(JsonApiSerializer $serializer)
-    {
+    public function __construct(
+        JsonApiSerializer $serializer,
+        Fields $fields,
+        Included $included
+    ) {
         $this->serializer = $serializer;
         $this->errorBag = new ErrorBag();
+        $this->fields = $fields;
+        $this->included = $included;
     }
 
     /**
-     * @param          $id
-     * @param          $className
-     * @param callable $callable
+     * @param string|int $id
+     * @param string     $className
+     * @param callable   $callable
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function get($id, $className, callable $callable)
     {
         try {
-            QueryObject::assert($this->serializer, $this->errorBag);
+            QueryObject::assert($this->serializer, $this->fields, $this->included, new Sorting(), $this->errorBag, $className);
             $data = $callable();
 
-            $response = $this->response($this->serializer->serialize($data, $this->apiRequest()));
+            if (empty($data)) {
+                $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
+
+                return $this->resourceNotFound(new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)]));
+            }
+
+            $response = $this->response($this->serializer->serialize($data, $this->fields, $this->included));
         } catch (Exception $e) {
-            $response = $this->getErrorResponse($id, $className, $e);
+            $response = $this->getErrorResponse($e);
         }
 
         return $response;
     }
 
     /**
-     * @param           $id
-     * @param           $className
      * @param Exception $e
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function getErrorResponse($id, $className, Exception $e)
+    protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
             case QueryException::class:
@@ -82,10 +107,8 @@ class GetResource
                 break;
 
             default:
-                $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
-
-                $response = $this->resourceNotFound(
-                    new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)])
+                $response = $this->errorResponse(
+                    new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
                 );
         }
 

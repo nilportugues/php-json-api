@@ -58,7 +58,7 @@ class JsonApiTransformer extends Transformer
      *
      * @return array
      */
-    private function serializeObject(array $value)
+    protected function serializeObject(array $value)
     {
         $value = $this->preSerialization($value);
         $data = $this->serialization($value);
@@ -71,7 +71,7 @@ class JsonApiTransformer extends Transformer
      *
      * @return array
      */
-    private function preSerialization(array $value)
+    protected function preSerialization(array $value)
     {
         /** @var \NilPortugues\Api\Mapping\Mapping $mapping */
         foreach ($this->mappings as $class => $mapping) {
@@ -89,7 +89,7 @@ class JsonApiTransformer extends Transformer
      *
      * @return array
      */
-    private function serialization(array &$value)
+    protected function serialization(array &$value)
     {
         $data = [
             self::DATA_KEY => \array_merge(
@@ -145,7 +145,7 @@ class JsonApiTransformer extends Transformer
     /**
      * @param array $response
      */
-    private function setResponseMeta(array &$response)
+    protected function setResponseMeta(array &$response)
     {
         if (!empty($this->meta)) {
             $response[self::META_KEY] = $this->meta;
@@ -155,7 +155,7 @@ class JsonApiTransformer extends Transformer
     /**
      * @param array $response
      */
-    private function setResponseVersion(array &$response)
+    protected function setResponseVersion(array &$response)
     {
         $response[self::JSON_API_KEY][self::VERSION_KEY] = '1.0';
     }
@@ -165,7 +165,7 @@ class JsonApiTransformer extends Transformer
      *
      * @return array
      */
-    private function postSerialization(array $data)
+    protected function postSerialization(array $data)
     {
         $this->formatScalarValues($data);
         RecursiveDeleteHelper::deleteKeys($data, [Serializer::CLASS_IDENTIFIER_KEY]);
@@ -178,7 +178,7 @@ class JsonApiTransformer extends Transformer
      *
      * @link http://jsonapi.org/format/#document-member-names-allowed-characters
      */
-    private function buildValidPropertyAlias($mapping)
+    protected function buildValidPropertyAlias($mapping)
     {
         $aliases = $mapping->getAliasedProperties();
         foreach ($aliases as &$alias) {
@@ -215,10 +215,6 @@ class JsonApiTransformer extends Transformer
         $this->setResponseLinks($value, $data);
         $this->setResponseVersion($data);
 
-        if (empty($data['data'])) {
-            $data = array_merge(['data' => []], $data);
-        }
-
-        return $data;
+        return (empty($data['data'])) ? array_merge(['data' => []], $data) : $data;
     }
 }

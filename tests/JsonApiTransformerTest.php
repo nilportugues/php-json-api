@@ -11,23 +11,27 @@
 
 namespace NilPortugues\Tests\JsonApi;
 
-use DateTime;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
+use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
+use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Api\Mapping\Mapping;
 use NilPortugues\Api\Transformer\TransformerException;
-use NilPortugues\Serializer\Serializer;
-use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Comment;
-use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
-use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\User;
-use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\CommentId;
-use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\PostId;
-use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\UserId;
 use NilPortugues\Tests\Api\JsonApi\Dummy\SimpleObject\Comment as SimpleComment;
 use NilPortugues\Tests\Api\JsonApi\Dummy\SimpleObject\Post as SimplePost;
+use NilPortugues\Tests\Api\JsonApi\HelperFactory;
+use NilPortugues\Tests\Api\JsonApi\HelperMapping;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testGetTransformerReturnsJsonApiTransformer()
+    {
+        $serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
+
+        $this->assertInstanceOf(JsonApiTransformer::class, $serializer->getTransformer());
+    }
+
     /**
      *
      */
@@ -37,7 +41,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
         $mapper->setClassMap([]);
 
         $this->setExpectedException(TransformerException::class);
-        (new Serializer(new JsonApiTransformer($mapper)))->serialize(new \stdClass());
+        (new JsonApiSerializer(new JsonApiTransformer($mapper)))->serialize(new \stdClass());
     }
 
     /**
@@ -45,102 +49,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
      */
     public function testItWillSerializeToJsonApiAComplexObject()
     {
-        $mappings = [
-            [
-                'class' => Post::class,
-                'aliased_properties' => [
-                ],
-                'hide_properties' => [
-
-                ],
-                'id_properties' => [
-                    'postId',
-                ],
-                'urls' => [
-                    // Mandatory
-                    'self' => 'http://example.com/posts/{postId}',
-                    // Optional
-                    'comments' => 'http://example.com/posts/{postId}/comments',
-                ],
-                // (Optional) Used by JSONAPI
-                'relationships' => [
-                    'author' => [
-                        'related' => ['name' => 'http://example.com/posts/{postId}/author'],
-                        'self' => ['name' => 'http://example.com/posts/{postId}/relationships/author'],
-                    ],
-                ],
-            ],
-            [
-                'class' => PostId::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'postId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/posts/{postId}'],
-                    'relationships' => [
-                        Comment::class => ['name' => 'http://example.com/posts/{postId}/relationships/comments'],
-                    ],
-                ],
-            ],
-            [
-                'class' => User::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'userId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/users/{userId}'],
-                    'friends' => ['name' => 'http://example.com/users/{userId}/friends'],
-                    'comments' => ['name' => 'http://example.com/users/{userId}/comments'],
-                ],
-            ],
-            [
-                'class' => UserId::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'userId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/users/{userId}'],
-                    'friends' => ['name' => 'http://example.com/users/{userId}/friends'],
-                    'comments' => ['name' => 'http://example.com/users/{userId}/comments'],
-                ],
-            ],
-            [
-                'class' => Comment::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'commentId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/comments/{commentId}'],
-                ],
-                'relationships' => [
-                ],
-            ],
-            [
-                'class' => CommentId::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'commentId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/comments/{commentId}'],
-                ],
-            ],
-        ];
-
+        $mappings = HelperMapping::complex();
         $mapper = new Mapper($mappings);
 
         $expected = <<<JSON
@@ -273,26 +182,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
    }
 }
 JSON;
-        $post = new Post(
-            new PostId(9),
-            'Hello World',
-            'Your first post',
-            new User(
-                new UserId(1),
-                'Post Author'
-            ),
-            [
-                new Comment(
-                    new CommentId(1000),
-                    'Have no fear, sers, your king is safe.',
-                    new User(new UserId(2), 'Barristan Selmy'),
-                    [
-                        'created_at' => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
-                        'accepted_at' => (new DateTime('2015-07-19T00:00:00+00:00'))->format('c'),
-                    ]
-                ),
-            ]
-        );
+        $post = HelperFactory::complexPost();
 
         $transformer = new JsonApiTransformer($mapper);
         $transformer->setMeta(
@@ -310,7 +200,308 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($transformer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($transformer))->serialize($post), true)
+        );
+    }
+
+    /**
+     *
+     */
+    public function testItWillSerializeToJsonApiAComplexObjectAndFilterIncluded()
+    {
+        $mappings = HelperMapping::complex();
+        $mapper = new Mapper($mappings);
+
+        $expected = <<<JSON
+{
+   "data":{
+      "type":"post",
+      "id":"9",
+      "attributes":{
+         "title":"Hello World",
+         "content":"Your first post"
+      },
+      "links":{
+         "self":{
+            "href":"http://example.com/posts/9"
+         },
+         "comments":{
+            "href":"http://example.com/posts/9/comments"
+         }
+      },
+      "relationships":{
+         "author":{
+            "links":{
+               "self":{
+                  "href":"http://example.com/posts/9/relationships/author"
+               },
+               "related":{
+                  "href":"http://example.com/posts/9/author"
+               }
+            },
+            "data":{
+               "type":"user",
+               "id":"1"
+            }
+         }
+      }
+   },
+   "included":[
+      {
+         "type":"user",
+         "id":"1",
+         "attributes":{
+            "name":"Post Author"
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/users/1"
+            },
+            "friends":{
+               "href":"http://example.com/users/1/friends"
+            },
+            "comments":{
+               "href":"http://example.com/users/1/comments"
+            }
+         }
+      }
+   ],
+   "links":{
+      "self":{
+         "href":"http://example.com/posts/9"
+      },
+      "first":{
+         "href":"http://example.com/posts/1"
+      },
+      "next":{
+         "href":"http://example.com/posts/10"
+      },
+      "comments":{
+         "href":"http://example.com/posts/9/comments"
+      }
+   },
+   "meta":{
+      "author":{
+         "name":"Nil Portugués Calderó",
+         "email":"contact@nilportugues.com"
+      },
+      "is_devel":true
+   },
+   "jsonapi":{
+      "version":"1.0"
+   }
+}
+JSON;
+        $post = HelperFactory::complexPost();
+
+        $transformer = new JsonApiTransformer($mapper);
+        $transformer->setMeta(
+            [
+                'author' => [
+                    'name' => 'Nil Portugués Calderó',
+                    'email' => 'contact@nilportugues.com',
+                ],
+            ]
+        );
+        $transformer->addMeta('is_devel', true);
+        $transformer->setSelfUrl('http://example.com/posts/9');
+        $transformer->setFirstUrl('http://example.com/posts/1');
+        $transformer->setNextUrl('http://example.com/posts/10');
+
+        $included = new Included();
+        $included->add('user.post');
+
+        $this->assertEquals(
+            \json_decode($expected, true),
+            \json_decode((new JsonApiSerializer($transformer))->serialize($post, new Fields(), $included), true)
+        );
+    }
+    /**
+     *
+     */
+    public function testItWillSerializeToJsonApiAComplexObjectAndFilterIncludedSpecificResource()
+    {
+        $mappings = HelperMapping::complex();
+        $mapper = new Mapper($mappings);
+
+        $expected = <<<JSON
+{
+   "data":{
+      "type":"post",
+      "id":"9",
+      "attributes":{
+         "title":"Hello World",
+         "content":"Your first post"
+      },
+      "links":{
+         "self":{
+            "href":"http://example.com/posts/9"
+         },
+         "comments":{
+            "href":"http://example.com/posts/9/comments"
+         }
+      },
+      "relationships":{
+         "author":{
+            "links":{
+               "self":{
+                  "href":"http://example.com/posts/9/relationships/author"
+               },
+               "related":{
+                  "href":"http://example.com/posts/9/author"
+               }
+            },
+            "data":{
+               "type":"user",
+               "id":"1"
+            }
+         }
+      }
+   },
+   "included":[
+      {
+         "type":"user",
+         "id":"1",
+         "attributes":{
+            "name":"Post Author"
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/users/1"
+            },
+            "friends":{
+               "href":"http://example.com/users/1/friends"
+            },
+            "comments":{
+               "href":"http://example.com/users/1/comments"
+            }
+         }
+      }
+   ],
+   "links":{
+      "self":{
+         "href":"http://example.com/posts/9"
+      },
+      "first":{
+         "href":"http://example.com/posts/1"
+      },
+      "next":{
+         "href":"http://example.com/posts/10"
+      },
+      "comments":{
+         "href":"http://example.com/posts/9/comments"
+      }
+   },
+   "meta":{
+      "author":{
+         "name":"Nil Portugués Calderó",
+         "email":"contact@nilportugues.com"
+      },
+      "is_devel":true
+   },
+   "jsonapi":{
+      "version":"1.0"
+   }
+}
+JSON;
+        $post = HelperFactory::complexPost();
+
+        $transformer = new JsonApiTransformer($mapper);
+        $transformer->setMeta(
+            [
+                'author' => [
+                    'name' => 'Nil Portugués Calderó',
+                    'email' => 'contact@nilportugues.com',
+                ],
+            ]
+        );
+        $transformer->addMeta('is_devel', true);
+        $transformer->setSelfUrl('http://example.com/posts/9');
+        $transformer->setFirstUrl('http://example.com/posts/1');
+        $transformer->setNextUrl('http://example.com/posts/10');
+
+        $included = new Included();
+        $included->add('user');
+
+        $this->assertEquals(
+            \json_decode($expected, true),
+            \json_decode((new JsonApiSerializer($transformer))->serialize($post, null, $included), true)
+        );
+    }
+
+    /**
+     *
+     */
+    public function testItWillSerializeToJsonApiAComplexObjectAndFilterFields()
+    {
+        $mappings = HelperMapping::complex();
+        $mapper = new Mapper($mappings);
+
+        $expected = <<<JSON
+{
+   "data":{
+      "type":"post",
+      "id":"9",
+      "attributes":{
+         "title":"Hello World"
+      },
+      "links":{
+         "self":{
+            "href":"http://example.com/posts/9"
+         },
+         "comments":{
+            "href":"http://example.com/posts/9/comments"
+         }
+      }
+   },
+   "links":{
+      "self":{
+         "href":"http://example.com/posts/9"
+      },
+      "first":{
+         "href":"http://example.com/posts/1"
+      },
+      "next":{
+         "href":"http://example.com/posts/10"
+      },
+      "comments":{
+         "href":"http://example.com/posts/9/comments"
+      }
+   },
+   "meta":{
+      "author":{
+         "name":"Nil Portugués Calderó",
+         "email":"contact@nilportugues.com"
+      },
+      "is_devel":true
+   },
+   "jsonapi":{
+      "version":"1.0"
+   }
+}
+JSON;
+        $post = HelperFactory::complexPost();
+
+        $transformer = new JsonApiTransformer($mapper);
+        $transformer->setMeta(
+            [
+                'author' => [
+                    'name' => 'Nil Portugués Calderó',
+                    'email' => 'contact@nilportugues.com',
+                ],
+            ]
+        );
+        $transformer->addMeta('is_devel', true);
+        $transformer->setSelfUrl('http://example.com/posts/9');
+        $transformer->setFirstUrl('http://example.com/posts/1');
+        $transformer->setNextUrl('http://example.com/posts/10');
+
+        $fields = new Fields();
+        $fields->addField('post', 'title');
+
+        $this->assertEquals(
+            \json_decode($expected, true),
+            \json_decode((new JsonApiSerializer($transformer))->serialize($post, $fields), true)
         );
     }
 
@@ -319,14 +510,14 @@ JSON;
      */
     public function testItWillSerializeToJsonApiASimpleObject()
     {
-        $post = $this->createSimplePost();
+        $post = HelperFactory::simplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
 
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -382,7 +573,7 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -391,7 +582,7 @@ JSON;
      */
     public function testItWillRenamePropertiesFromClass()
     {
-        $post = $this->createSimplePost();
+        $post = HelperFactory::simplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setPropertyNameAliases(['title' => 'headline', 'body' => 'post', 'postId' => 'someId']);
@@ -399,7 +590,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -455,7 +646,7 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -464,7 +655,7 @@ JSON;
      */
     public function testItWillHidePropertiesFromClass()
     {
-        $post = $this->createSimplePost();
+        $post = HelperFactory::simplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setHiddenProperties(['title', 'body']);
@@ -472,7 +663,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -526,13 +717,13 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
         );
     }
 
     public function testTypeValueIsChangedByClassAlias()
     {
-        $post = $this->createSimplePost();
+        $post = HelperFactory::simplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setClassAlias('Message');
@@ -540,7 +731,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -596,13 +787,13 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
         );
     }
 
     public function testItIfFilteringOutKeys()
     {
-        $post = $this->createSimplePost();
+        $post = HelperFactory::simplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
         $postMapping->setProperties(['postId', 'title', 'body', 'authorId', 'comments']);
@@ -611,7 +802,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -633,24 +824,8 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
         );
-    }
-
-    /**
-     * @return SimplePost
-     */
-    private function createSimplePost()
-    {
-        $post = new SimplePost(1, 'post title', 'post body', 2);
-
-        for ($i = 1; $i <= 5; ++$i) {
-            $userId = $i * 5;
-            $createdAt = new \DateTime("2015/07/18 12:48:00 + $i days", new \DateTimeZone('Europe/Madrid'));
-            $post->addComment($i * 10, "User {$userId}", "I am writing comment no. {$i}", $createdAt->format('c'));
-        }
-
-        return $post;
     }
 
     /**
@@ -670,7 +845,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -710,7 +885,7 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($postArray), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($postArray), true)
         );
     }
 
@@ -719,7 +894,7 @@ JSON;
      */
     public function testItWillBuildUrlUsingAliasOrTypeNameIfIdFieldNotPresentInUrl()
     {
-        $post = $this->createSimplePost();
+        $post = HelperFactory::simplePost();
 
         $postMapping = new Mapping(SimplePost::class, '/post/{post}', ['postId']);
         $postMapping->setHiddenProperties(['title', 'body']);
@@ -727,7 +902,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -781,7 +956,7 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($post), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
         );
     }
 
@@ -797,7 +972,7 @@ JSON;
         $mapper = new Mapper();
         $mapper->setClassMap([$mapping->getClassName() => $mapping]);
 
-        $jsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
 
         $expected = <<<JSON
 {
@@ -829,7 +1004,7 @@ JSON;
 
         $this->assertEquals(
             \json_decode($expected, true),
-            \json_decode((new Serializer($jsonApiSerializer))->serialize($comment), true)
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($comment), true)
         );
     }
 }

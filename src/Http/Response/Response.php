@@ -24,7 +24,7 @@ class Response extends AbstractResponse
     /**
      * @var array
      */
-    private $links = [
+    protected $links = [
         'next' => 'next',
         'last' => 'last',
         'first' => 'first',

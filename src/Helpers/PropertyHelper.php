@@ -18,7 +18,7 @@ use NilPortugues\Serializer\Serializer;
 /**
  * Class PropertyHelper.
  */
-final class PropertyHelper
+class PropertyHelper
 {
     /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings

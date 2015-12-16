@@ -18,35 +18,35 @@ class Error implements \JsonSerializable
     /**
      * @var string
      */
-    private $id;
+    protected $id;
     /**
      * @var array
      */
-    private $links = [];
+    protected $links = [];
     /**
      * @var int
      */
-    private $status;
+    protected $status;
     /**
      * @var string
      */
-    private $code;
+    protected $code;
     /**
      * @var string
      */
-    private $title;
+    protected $title;
     /**
      * @var string
      */
-    private $detail;
+    protected $detail;
     /**
      * @var array
      */
-    private $source = [];
+    protected $source = [];
     /**
      * @var mixed
      */
-    private $meta;
+    protected $meta;
 
     /**
      * @param string $title
@@ -178,7 +178,7 @@ class Error implements \JsonSerializable
      *
      * @throws \InvalidArgumentException
      */
-    private function setTitle($title)
+    protected function setTitle($title)
     {
         if (0 === strlen(trim($title))) {
             throw new \InvalidArgumentException('Provided title cannot be empty');
@@ -194,7 +194,7 @@ class Error implements \JsonSerializable
      *
      * @throws \InvalidArgumentException
      */
-    private function setDetail($detail)
+    protected function setDetail($detail)
     {
         if (0 === strlen(trim($detail))) {
             throw new \InvalidArgumentException('Provided error message cannot be empty');
