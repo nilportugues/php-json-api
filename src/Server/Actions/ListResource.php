@@ -110,7 +110,7 @@ class ListResource
             );
             $totalAmount = $totalAmountCallable();
 
-            if ($totalAmount > 0 && $this->page->number() > ceil($totalAmount / $this->page->size())) {
+            if ($totalAmount > 0 && $this->page->size()>0 && $this->page->number() > ceil($totalAmount / $this->page->size())) {
                 return $this->resourceNotFound(
                     new ErrorBag([new OufOfBoundsError($this->page->number(), $this->page->size())])
                 );
@@ -169,7 +169,7 @@ class ListResource
     ) {
         $next = $pageNumber + 1;
         $previous = $pageNumber - 1;
-        $last = ceil($totalPages / $pageSize);
+        $last = ($pageSize == 0) ? 0: ceil($totalPages / $pageSize);
 
         $links = array_filter(
             [
