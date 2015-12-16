@@ -34,22 +34,22 @@ class GetResource
     /**
      * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
      */
-    private $errorBag;
+    protected $errorBag;
 
     /**
      * @var JsonApiSerializer
      */
-    private $serializer;
+    protected $serializer;
 
     /**
      * @var Fields
      */
-    private $fields;
+    protected $fields;
 
     /**
      * @var Included
      */
-    private $included;
+    protected $included;
 
     /**
      * @param JsonApiSerializer $serializer
@@ -99,7 +99,7 @@ class GetResource
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function getErrorResponse(Exception $e)
+    protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
             case QueryException::class:

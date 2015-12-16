@@ -18,23 +18,23 @@ class Page
     /**
      * @var string|int|null
      */
-    private $number;
+    protected $number;
     /**
      * @var string|int|null
      */
-    private $cursor;
+    protected $cursor;
     /**
      * @var string|int|null
      */
-    private $limit;
+    protected $limit;
     /**
      * @var string|int|null
      */
-    private $offset;
+    protected $offset;
     /**
      * @var string|int|null
      */
-    private $size;
+    protected $size;
 
     /**
      * @param $number

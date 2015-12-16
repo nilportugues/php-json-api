@@ -15,7 +15,7 @@ class Fields
     /**
      * @var array
      */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * @param string $type

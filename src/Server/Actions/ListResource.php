@@ -36,33 +36,33 @@ class ListResource
     /**
      * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
      */
-    private $errorBag;
+    protected $errorBag;
 
     /**
      * @var Page
      */
-    private $page;
+    protected $page;
     /**
      * @var Fields
      */
-    private $fields;
+    protected $fields;
     /**
      * @var Sorting
      */
-    private $sorting;
+    protected $sorting;
     /**
      * @var Included
      */
-    private $included;
+    protected $included;
     /**
      * @var array
      */
-    private $filters;
+    protected $filters;
 
     /**
      * @var JsonApiSerializer
      */
-    private $serializer;
+    protected $serializer;
 
     /**
      * @param JsonApiSerializer $serializer
@@ -209,7 +209,7 @@ class ListResource
      *
      * @return string
      */
-    private function pagePaginatedRoute(
+    protected function pagePaginatedRoute(
         $route,
         $pageNumber,
         $pageSize,
@@ -235,11 +235,9 @@ class ListResource
             )
         );
 
-        if ($route[strlen($route) - 1] === '?' || $route[strlen($route) - 1] === '&') {
-            return sprintf('%s%s', $route, $queryParams);
-        }
+        $expression = ($route[strlen($route) - 1] === '?' || $route[strlen($route) - 1] === '&') ? '%s%s' : '%s?%s';
 
-        return sprintf('%s?%s', $route, $queryParams);
+        return sprintf($expression, $route, $queryParams);
     }
 
     /**
@@ -247,7 +245,7 @@ class ListResource
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function getErrorResponse(Exception $e)
+    protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
             case QueryException::class:

@@ -595,15 +595,9 @@ namespace \NilPortugues\Api\JsonApi\Http\Request;
 class Request
 {
   public function __construct(ServerRequestInterface $request = null) { ... }
-  public function getQueryParam($name, $default = null) { ... }
   public function getIncludedRelationships() { ... }
-  public function getSortFields() { ... }
-  public function getSortDirection() { ... }
-  public function getPageNumber($default = 1) { ... }
-  public function getPageLimit() { ... }
-  public function getPageOffset() { ... }
-  public function getPageSize($default = 10) { ... }
-  public function getPageCursor() { ... }
+  public function getSort() { ... }
+  public function getPage() { ... }
   public function getFilters() { ... }
   public function getFields() { ... }
 }

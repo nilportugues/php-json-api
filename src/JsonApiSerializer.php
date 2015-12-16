@@ -49,11 +49,11 @@ class JsonApiSerializer extends DeepCopySerializer
      */
     public function serialize($value, Fields $fields = null, Included $included = null)
     {
-        if ($fields) {
+        if (null !== $fields) {
             $this->filterOutResourceFields($fields);
         }
 
-        if ($included) {
+        if (null !== $included) {
             $this->filterOutIncludedResources($included);
         }
 
@@ -63,7 +63,7 @@ class JsonApiSerializer extends DeepCopySerializer
     /**
      * @param Http\Request\Parameters\Included $included
      */
-    private function filterOutIncludedResources(Included $included)
+    protected function filterOutIncludedResources(Included $included)
     {
         if (false === $included->isEmpty()) {
             foreach ($included->get() as $resource => $includeData) {
@@ -89,7 +89,7 @@ class JsonApiSerializer extends DeepCopySerializer
     /**
      * @param Http\Request\Parameters\Fields $fields
      */
-    private function filterOutResourceFields(Fields $fields)
+    protected function filterOutResourceFields(Fields $fields)
     {
         if (false === $fields->isEmpty()) {
             foreach ($fields->get() as $type => $properties) {

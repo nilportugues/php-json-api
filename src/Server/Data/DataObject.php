@@ -47,10 +47,6 @@ class DataObject
     {
         try {
             DataAssertions::assert($data, $serializer, $className, $errorBag);
-        } catch (DataException $e) {
-        }
-
-        try {
             self::assertRelationshipData($data, $serializer, $errorBag);
         } catch (DataException $e) {
         }
@@ -86,24 +82,23 @@ class DataObject
      *
      * @return array
      */
-    private static function missingCreationAttributes(array $data, $serializer)
+    protected static function missingCreationAttributes(array $data, $serializer)
     {
         $inputAttributes = array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY]);
 
         $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
-        if (null === $mapping) {
-            return [];
+        $diff = [];
+        if (null !== $mapping) {
+            $properties = str_replace(
+                array_keys($mapping->getAliasedProperties()),
+                array_values($mapping->getAliasedProperties()),
+                $mapping->getProperties()
+            );
+            $properties = array_diff($properties, $mapping->getIdProperties());
+
+            $diff = (array) array_diff($properties, $inputAttributes);
         }
-
-        $properties = str_replace(
-            array_keys($mapping->getAliasedProperties()),
-            array_values($mapping->getAliasedProperties()),
-            $mapping->getProperties()
-        );
-        $properties = array_diff($properties, $mapping->getIdProperties());
-
-        $diff = (array) array_diff($properties, $inputAttributes);
 
         return $diff;
     }
@@ -134,7 +129,7 @@ class DataObject
      *
      * @throws DataException
      */
-    private static function assertRelationshipData(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
+    protected static function assertRelationshipData(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
     {
         if (!empty($data[JsonApiTransformer::RELATIONSHIPS_KEY])) {
             foreach ($data[JsonApiTransformer::RELATIONSHIPS_KEY] as $relationshipData) {
@@ -164,7 +159,7 @@ class DataObject
      * @param JsonApiSerializer $serializer
      * @param ErrorBag          $errorBag
      */
-    private static function relationshipDataAssert($relationshipData, JsonApiSerializer $serializer, ErrorBag $errorBag)
+    protected static function relationshipDataAssert($relationshipData, JsonApiSerializer $serializer, ErrorBag $errorBag)
     {
         //Has type member.
         if (empty($relationshipData[JsonApiTransformer::TYPE_KEY]) || !is_string(

@@ -45,7 +45,7 @@ class DataAssertions
      *
      * @throws DataException
      */
-    private static function assertItIsArray($data, ErrorBag $errorBag)
+    protected static function assertItIsArray($data, ErrorBag $errorBag)
     {
         if (empty($data) || !is_array($data)) {
             $errorBag[] = new MissingDataError();
@@ -59,7 +59,7 @@ class DataAssertions
      *
      * @throws DataException
      */
-    private static function assertItHasTypeMember(array $data, ErrorBag $errorBag)
+    protected static function assertItHasTypeMember(array $data, ErrorBag $errorBag)
     {
         if (empty($data[JsonApiTransformer::TYPE_KEY]) || !is_string($data[JsonApiTransformer::TYPE_KEY])) {
             $errorBag[] = new MissingTypeError();
@@ -75,7 +75,7 @@ class DataAssertions
      *
      * @throws DataException
      */
-    private static function assertItTypeMemberIsExpectedValue(
+    protected static function assertItTypeMemberIsExpectedValue(
         array $data,
         JsonApiSerializer $serializer,
         $className,
@@ -95,7 +95,7 @@ class DataAssertions
      *
      * @throws DataException
      */
-    private static function assertItHasAttributeMember($data, ErrorBag $errorBag)
+    protected static function assertItHasAttributeMember($data, ErrorBag $errorBag)
     {
         if (empty($data[JsonApiTransformer::ATTRIBUTES_KEY]) || !is_array($data[JsonApiTransformer::ATTRIBUTES_KEY])) {
             $errorBag[] = new MissingAttributesError();
@@ -110,7 +110,7 @@ class DataAssertions
      *
      * @throws DataException
      */
-    private static function assertAttributesExists(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
+    protected static function assertAttributesExists(array $data, JsonApiSerializer $serializer, ErrorBag $errorBag)
     {
         $inputAttributes = array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY]);
 

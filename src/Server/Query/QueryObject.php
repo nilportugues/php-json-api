@@ -40,13 +40,12 @@ class QueryObject
         Included $included,
         Sorting $sort,
         ErrorBag $errorBag,
-        $className = ''
+        $className
     ) {
         self::validateQueryParamsTypes($serializer, $fields, 'Fields', $errorBag);
         self::validateIncludeParams($serializer, $included, 'include', $errorBag);
 
         if (!empty($className) && false === $sort->isEmpty()) {
-            $sort = array_keys($sort->sorting());
             self::validateSortParams($serializer, $className, $sort, $errorBag);
         }
 
@@ -61,7 +60,7 @@ class QueryObject
      * @param                   $paramName
      * @param ErrorBag          $errorBag
      */
-    private static function validateQueryParamsTypes(
+    protected static function validateQueryParamsTypes(
         JsonApiSerializer $serializer,
         Fields $fields,
         $paramName,
@@ -101,7 +100,7 @@ class QueryObject
      * @param string            $paramName
      * @param ErrorBag          $errorBag
      */
-    private static function validateIncludeParams(
+    protected static function validateIncludeParams(
         JsonApiSerializer $serializer,
         Included $included,
         $paramName,
@@ -131,7 +130,7 @@ class QueryObject
      * @param Sorting           $sorting
      * @param ErrorBag          $errorBag
      */
-    private static function validateSortParams(
+    protected static function validateSortParams(
         JsonApiSerializer $serializer,
         $className,
         Sorting $sorting,

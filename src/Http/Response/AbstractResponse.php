@@ -21,6 +21,6 @@ abstract class AbstractResponse extends \NilPortugues\Api\Http\Message\AbstractR
      */
     protected $headers = [
         'Content-type' => 'application/vnd.api+json',
-        'Cache-Control' => 'private, max-age=0, must-revalidate',
+        'Cache-Control' => 'protected, max-age=0, must-revalidate',
     ];
 }

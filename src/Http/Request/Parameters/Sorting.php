@@ -18,7 +18,7 @@ class Sorting
     /**
      * @var array
      */
-    private $sort = [];
+    protected $sort = [];
 
     /**
      * @return string

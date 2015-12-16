@@ -12,7 +12,6 @@ namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
-use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
 use NilPortugues\Api\JsonApi\Server\Data\DataException;
 use NilPortugues\Api\JsonApi\Server\Data\DataObject;
@@ -25,18 +24,17 @@ use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
  */
 class PatchResource
 {
-    use RequestTrait;
     use ResponseTrait;
 
     /**
      * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
      */
-    private $errorBag;
+    protected $errorBag;
 
     /**
      * @var JsonApiSerializer
      */
-    private $serializer;
+    protected $serializer;
 
     /**
      * @param JsonApiSerializer $serializer
@@ -84,7 +82,7 @@ class PatchResource
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function getErrorResponse(Exception $e)
+    protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
             case DataException::class:

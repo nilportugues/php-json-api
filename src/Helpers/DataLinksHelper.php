@@ -19,7 +19,7 @@ use NilPortugues\Serializer\Serializer;
 /**
  * Class DataLinksHelper.
  */
-final class DataLinksHelper
+class DataLinksHelper
 {
     /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
@@ -179,7 +179,7 @@ final class DataLinksHelper
      * @param array                               $data
      * @param array                               $value
      */
-    private static function relationshipLinksSelf(
+    protected static function relationshipLinksSelf(
         array &$mappings,
         array &$parent,
         $propertyName,
@@ -254,7 +254,7 @@ final class DataLinksHelper
      * @param array                               $parent
      * @param array                               $data
      */
-    private static function relationshipLinksRelated($propertyName, array &$mappings, array &$parent, array &$data)
+    protected static function relationshipLinksRelated($propertyName, array &$mappings, array &$parent, array &$data)
     {
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
@@ -294,7 +294,7 @@ final class DataLinksHelper
      *
      * @return mixed
      */
-    private static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
+    protected static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
     {
         self::removeArraysFromKeyValueReplacement($idProperties, $idValues);
 
@@ -331,7 +331,7 @@ final class DataLinksHelper
      *
      * @return mixed
      */
-    private static function secondPassBuildUrl($idPropertyName, $idValues, $url)
+    protected static function secondPassBuildUrl($idPropertyName, $idValues, $url)
     {
         if (is_array($url) && !empty($url['name'])) {
             $url = $url['name'];
@@ -368,7 +368,7 @@ final class DataLinksHelper
      *
      * @return mixed
      */
-    private static function toCamelCase($original, $idValues, $url)
+    protected static function toCamelCase($original, $idValues, $url)
     {
         $className = self::underscoreToCamelCase(self::camelCaseToUnderscore($original));
 
@@ -382,7 +382,7 @@ final class DataLinksHelper
      *
      * @return mixed
      */
-    private static function toLowerFirstCamelCase($original, $idValues, $url)
+    protected static function toLowerFirstCamelCase($original, $idValues, $url)
     {
         $className = self::underscoreToCamelCase(self::camelCaseToUnderscore($original));
         $className[0] = \strtolower($className[0]);
@@ -397,7 +397,7 @@ final class DataLinksHelper
      *
      * @return mixed
      */
-    private static function toUnderScore($original, $idValues, $url)
+    protected static function toUnderScore($original, $idValues, $url)
     {
         $className = self::camelCaseToUnderscore($original);
 
@@ -439,7 +439,7 @@ final class DataLinksHelper
      * @param array $idProperties
      * @param array $idValues
      */
-    private static function removeArraysFromKeyValueReplacement(array &$idProperties, array &$idValues)
+    protected static function removeArraysFromKeyValueReplacement(array &$idProperties, array &$idValues)
     {
         RecursiveDeleteHelper::deleteKeys($idValues, [Serializer::CLASS_IDENTIFIER_KEY]);
         RecursiveFormatterHelper::flattenObjectsWithSingleKeyScalars($idValues);

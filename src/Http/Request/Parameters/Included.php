@@ -18,7 +18,7 @@ class Included
     /**
      * @var array
      */
-    private $included = [];
+    protected $included = [];
 
     /**
      * @param string $relationship

@@ -14,7 +14,7 @@ namespace NilPortugues\Api\JsonApi\Helpers;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Serializer\Serializer;
 
-final class DataIncludedHelper
+class DataIncludedHelper
 {
     /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
@@ -69,7 +69,7 @@ final class DataIncludedHelper
      *
      * @return array
      */
-    private static function removeTypeAndId(array &$mappings, array $copy)
+    protected static function removeTypeAndId(array &$mappings, array $copy)
     {
         if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
@@ -93,7 +93,7 @@ final class DataIncludedHelper
      * @param array                               $relationships
      * @param array                               $attributes
      */
-    private static function addToRelationshipsArray(
+    protected static function addToRelationshipsArray(
         array &$mappings,
         array &$data,
         array &$value,
@@ -134,7 +134,7 @@ final class DataIncludedHelper
      * @param array                               $attributes
      * @param array                               $value
      */
-    private static function addToIncludedArray(array &$mappings, array &$data, array &$attributes, array &$value)
+    protected static function addToIncludedArray(array &$mappings, array &$data, array &$attributes, array &$value)
     {
         if (\count($attributes) > 0) {
             $includedData = PropertyHelper::setResponseDataTypeAndId($mappings, $value);
@@ -183,7 +183,7 @@ final class DataIncludedHelper
      * @param array  $value
      * @param string $type
      */
-    private static function addRelationshipsToIncludedResources(
+    protected static function addRelationshipsToIncludedResources(
         array &$mappings,
         array &$data,
         array &$value,
@@ -210,7 +210,7 @@ final class DataIncludedHelper
      *
      * @return bool
      */
-    private static function hasIdKey(array &$includedData)
+    protected static function hasIdKey(array &$includedData)
     {
         return \array_key_exists(JsonApiTransformer::ID_KEY, $includedData)
         && !empty($includedData[JsonApiTransformer::ID_KEY]);

@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 /**
  * Class AbstractRequest.
  */
-final class Request extends \Zend\Diactoros\Request
+class Request extends \Zend\Diactoros\Request
 {
     /**
      * @param ServerRequestInterface $request
@@ -38,7 +38,7 @@ final class Request extends \Zend\Diactoros\Request
      *
      * @return array|string
      */
-    private function getQueryParam($name, $default = null)
+    protected function getQueryParam($name, $default = null)
     {
         return isset($this->request->getQueryParams()[$name]) ? $this->request->getQueryParams()[$name] : $default;
     }

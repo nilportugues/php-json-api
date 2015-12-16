@@ -20,7 +20,7 @@ class RequestFactory
     /**
      * @var Request
      */
-    private static $request;
+    protected static $request;
 
     /**
      * @return Request

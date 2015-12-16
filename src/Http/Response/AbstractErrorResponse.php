@@ -44,7 +44,7 @@ abstract class AbstractErrorResponse extends AbstractResponse
     /**
      * @return string
      */
-    private function getDefaultError()
+    protected function getDefaultError()
     {
         return json_encode(['errors' => [['status' => $this->httpCode, 'code' => $this->errorCode]]]);
     }

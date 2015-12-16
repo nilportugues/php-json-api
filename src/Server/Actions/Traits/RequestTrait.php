@@ -26,7 +26,7 @@ trait RequestTrait
     /**
      * @var Error[]
      */
-    private $queryParamErrorBag = [];
+    protected $queryParamErrorBag = [];
 
     /**
      * @return Error[]
@@ -56,7 +56,7 @@ trait RequestTrait
      * @param Fields            $fields
      * @param string            $paramName
      */
-    private function validateFieldsQueryParams($serializer, Fields $fields, $paramName)
+    protected function validateFieldsQueryParams($serializer, Fields $fields, $paramName)
     {
         if (false === $fields->isEmpty()) {
             $validateFields = $fields->types();
@@ -80,7 +80,7 @@ trait RequestTrait
      *
      * @return array
      */
-    private function getPropertiesFromMapping(Mapping $mapping)
+    protected function getPropertiesFromMapping(Mapping $mapping)
     {
         $properties = array_merge(
             array_combine($mapping->getProperties(), $mapping->getProperties()),
@@ -95,7 +95,7 @@ trait RequestTrait
      * @param string $paramName
      * @param string $field
      */
-    private function addInvalidParameterMemberErrorsToErrorBag(array $invalidProperties, $paramName, $field)
+    protected function addInvalidParameterMemberErrorsToErrorBag(array $invalidProperties, $paramName, $field)
     {
         foreach ($invalidProperties as $extraField) {
             $this->queryParamErrorBag[] = new InvalidParameterMemberError($extraField, $field, strtolower(
@@ -108,7 +108,7 @@ trait RequestTrait
      * @param string $paramName
      * @param array  $validateFields
      */
-    private function addInvalidParameterErrorsToErrorBag($paramName, array &$validateFields)
+    protected function addInvalidParameterErrorsToErrorBag($paramName, array &$validateFields)
     {
         if (false === empty($validateFields)) {
             foreach ($validateFields as $field) {
@@ -122,7 +122,7 @@ trait RequestTrait
      * @param Included          $included
      * @param string            $paramName
      */
-    private function validateIncludeQueryParamsTypes($serializer, Included $included, $paramName)
+    protected function validateIncludeQueryParamsTypes($serializer, Included $included, $paramName)
     {
         if (false === $included->isEmpty()) {
             $validateFields = array_keys($included->get());
