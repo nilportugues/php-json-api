@@ -95,8 +95,6 @@ class PatchResource
                 $response = $this->errorResponse(
                     new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
                 );
-
-                return $response;
         }
 
         return $response;

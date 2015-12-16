@@ -16,6 +16,7 @@ use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\Mapping\Mapper;
+use NilPortugues\Tests\Api\JsonApi\HelperMapping;
 
 class RequestTraitTest extends \PHPUnit_Framework_TestCase
 {
@@ -40,13 +41,13 @@ class RequestTraitTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->included = new Included();
-        $this->included->add('order.employee');
+        $this->included->add('post.user_comment'); //will cause error
 
         $this->fields = new Fields();
-        $this->fields->addField('employee', 'name');
+        $this->fields->addField('post', 'title');
+        $this->fields->addField('blog', 'post');  //will cause error
 
-        //@todo add Mappings
-        $mappings = [];
+        $mappings = HelperMapping::complex();
         $this->serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper($mappings)));
     }
 

@@ -44,7 +44,8 @@ class QueryObject
     ) {
         self::validateQueryParamsTypes($serializer, $fields, 'Fields', $errorBag);
         self::validateIncludeParams($serializer, $included, 'include', $errorBag);
-        if (!empty($className)) {
+
+        if (!empty($className) && false === $sort->isEmpty()) {
             $sort = array_keys($sort->sorting());
             self::validateSortParams($serializer, $className, $sort, $errorBag);
         }

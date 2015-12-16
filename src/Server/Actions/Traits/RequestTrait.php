@@ -64,7 +64,7 @@ trait RequestTrait
             foreach ($validateFields as $key => $field) {
                 $mapping = $serializer->getTransformer()->getMappingByAlias($field);
                 if (null !== $mapping) {
-                    $properties        = $this->getPropertiesFromMapping($mapping);
+                    $properties = $this->getPropertiesFromMapping($mapping);
                     $invalidProperties = array_diff($fields->members($field), $properties);
                     $this->addInvalidParameterMemberErrorsToErrorBag($invalidProperties, $paramName, $field);
                     unset($validateFields[$key]);
@@ -86,6 +86,7 @@ trait RequestTrait
             array_combine($mapping->getProperties(), $mapping->getProperties()),
             $mapping->getAliasedProperties()
         );
+
         return $properties;
     }
 
@@ -129,7 +130,7 @@ trait RequestTrait
             foreach ($validateFields as $key => $field) {
                 $mapping = $serializer->getTransformer()->getMappingByAlias($field);
                 if (null !== $mapping) {
-                    $properties        = $this->getPropertiesFromMapping($mapping);
+                    $properties = $this->getPropertiesFromMapping($mapping);
                     $invalidProperties = array_diff($included->get()[$field], $properties);
                     $this->addInvalidParameterMemberErrorsToErrorBag($invalidProperties, $paramName, $field);
                     unset($validateFields[$key]);

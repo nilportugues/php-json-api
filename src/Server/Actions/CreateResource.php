@@ -75,7 +75,7 @@ class CreateResource
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function getErrorResponse(\Exception $e, ErrorBag $errorBag)
+    private function getErrorResponse(Exception $e, ErrorBag $errorBag)
     {
         switch (get_class($e)) {
             case DataException::class:
@@ -86,8 +86,6 @@ class CreateResource
                 $response = $this->errorResponse(
                     new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
                 );
-
-                return $response;
         }
 
         return $response;

@@ -179,6 +179,7 @@ class PaginatedResource implements JsonSerializable
     {
         if (0 == $pageSize) {
             $this->pages = 0;
+
             return;
         }
 

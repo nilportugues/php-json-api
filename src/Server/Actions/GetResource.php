@@ -17,6 +17,7 @@ use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
+use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
 use NilPortugues\Api\JsonApi\Server\Query\QueryException;
@@ -79,22 +80,26 @@ class GetResource
             QueryObject::assert($this->serializer, $this->fields, $this->included, new Sorting(), $this->errorBag, $className);
             $data = $callable();
 
+            if (empty($data)) {
+                $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
+
+                return $this->resourceNotFound(new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)]));
+            }
+
             $response = $this->response($this->serializer->serialize($data, $this->fields, $this->included));
         } catch (Exception $e) {
-            $response = $this->getErrorResponse($id, $className, $e);
+            $response = $this->getErrorResponse($e);
         }
 
         return $response;
     }
 
     /**
-     * @param string|int $id
-     * @param string     $className
-     * @param Exception  $e
+     * @param Exception $e
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    private function getErrorResponse($id, $className, Exception $e)
+    private function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
             case QueryException::class:
@@ -102,10 +107,8 @@ class GetResource
                 break;
 
             default:
-                $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
-
-                $response = $this->resourceNotFound(
-                    new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)])
+                $response = $this->errorResponse(
+                    new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
                 );
         }
 
