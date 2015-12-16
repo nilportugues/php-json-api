@@ -53,6 +53,14 @@ class Page
     }
 
     /**
+     * @param $size
+     */
+    public function setSize($size)
+    {
+        $this->size = (int) $size;
+    }
+
+    /**
      * @return int|string
      */
     public function cursor()
