@@ -16,7 +16,7 @@
         "php": ">=5.5.0",
         "nilportugues/api-transformer": "~1.5",
         "symfony/psr-http-message-bridge" : "0.2",
-        "symfony/http-foundation": "^2.7",
+        "symfony/http-foundation": "2.*|3.*",
         "nilportugues/php_backslasher": "^0.2.1"
 
     },
