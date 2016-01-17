@@ -8,15 +8,30 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Actions\Drivers;
+namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Resource\Drivers;
 
-use NilPortugues\Api\JsonApi\Infrastructure\Repositories\Actions\Contracts\ResourceRepositoryDriver;
+use NilPortugues\Api\JsonApi\Infrastructure\Repositories\Resource\Contracts\ResourceRepositoryDriver;
 
 /**
  * Class InMemoryResourceRepository.
  */
 class InMemoryResourceRepository implements ResourceRepositoryDriver
 {
+    /**
+     * @var array
+     */
+    private $data;
+
+    /**
+     * InMemoryResourceRepository constructor.
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = [])
+    {
+        $this->data = $data;
+    }
+
     /**
      * @param $id
      *
@@ -38,18 +53,23 @@ class InMemoryResourceRepository implements ResourceRepositoryDriver
     /**
      * @param array $data
      * @param array $values
-     * @param       $errorBag
      *
      * @return mixed
      */
-    public function persist(array $data, array $values, $errorBag)
+    public function persist(array $data, array $values)
     {
     }
 
+    /**
+     * @return array
+     */
     public function findBy()
     {
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
     }

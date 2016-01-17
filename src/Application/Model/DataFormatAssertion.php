@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Server\Data;
+namespace NilPortugues\Api\JsonApi\Application\Model;
 
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
@@ -18,7 +18,7 @@ use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingAttributesError;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingDataError;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingTypeError;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Exceptions\InputException;
+use NilPortugues\Api\JsonApi\Domain\Model\Exceptions\InputException;
 
 /**
  * Class DataAssertions.
@@ -53,6 +53,10 @@ class DataFormatAssertion
         $this->assertItTypeMemberIsExpectedValue($data, $className, $errorBag);
         $this->assertItHasAttributeMember($data, $errorBag);
         $this->assertAttributesExists($data, $errorBag);
+
+        if (count($errorBag) > 0) {
+            throw new InputException($errorBag);
+        }
     }
 
     /**
@@ -126,27 +130,36 @@ class DataFormatAssertion
     protected function assertAttributesExists(array $data, ErrorBag $errorBag)
     {
         $inputAttributes = array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY]);
-
         $mapping = $this->mappingRepository->findByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
-        $properties = str_replace(
-            array_keys($mapping->getAliasedProperties()),
-            array_values($mapping->getAliasedProperties()),
-            $mapping->getProperties()
-        );
-        $properties = array_diff($properties, $mapping->getIdProperties());
-        $properties = array_merge($properties, $mapping->getHiddenProperties());
-
-        $hasErrors = false;
-        foreach ($inputAttributes as $property) {
-            if (false === in_array($property, $properties)) {
-                $hasErrors = true;
-                $errorBag[] = new InvalidAttributeError($property, $data[JsonApiTransformer::TYPE_KEY]);
+        //Remove those aliased
+        $aliasedKeys = $mapping->getAliasedProperties();
+        foreach ($inputAttributes as $pos => $keyName) {
+            if (true === in_array($keyName, $aliasedKeys)) {
+                unset($inputAttributes[$pos]);
             }
         }
 
-        if ($hasErrors) {
-            throw new InputException($errorBag);
+        $properties = array_diff($mapping->getProperties(), $mapping->getIdProperties());
+        foreach ($inputAttributes as $pos => $keyName) {
+            //Remove those that are using the original names.
+            if (true === in_array($keyName, $properties, true)) {
+                unset($inputAttributes[$pos]);
+            }
+        }
+
+        $properties = array_map(function ($v) { return strtolower($v); }, $properties);
+        //Remove if under_score field  matches an existed property.
+        foreach ($inputAttributes as $pos => $keyName) {
+            $keyName = strtolower(str_replace('_', '', ucwords($keyName, '_')));
+            if (true === in_array($keyName, $properties)) {
+                unset($inputAttributes[$pos]);
+            }
+        }
+
+        //Remaining should be here.
+        foreach ($inputAttributes as $property) {
+            $errorBag[] = new InvalidAttributeError($property, $data[JsonApiTransformer::TYPE_KEY]);
         }
     }
 }

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Server\Exceptions;
+namespace NilPortugues\Api\JsonApi\Domain\Model\Exceptions;
 
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
 

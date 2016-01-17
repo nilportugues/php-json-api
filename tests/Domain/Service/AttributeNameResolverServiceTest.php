@@ -17,9 +17,7 @@ class AttributeNameResolverServiceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $mappings = [
-            EmployeeMapping::mapping(),
-        ];
+        $mappings = [EmployeeMapping::mapping()];
 
         $mapper = new Mapper($mappings);
         $transformer = new JsonApiTransformer($mapper);
@@ -31,7 +29,7 @@ class AttributeNameResolverServiceTest extends \PHPUnit_Framework_TestCase
     public function testItCanResolve()
     {
         $data = [
-            'type' => 'employee',
+            'type' => 'worker',
             'attributes' => [
                 'name' => 'John',
                 'family_name' => 'Doe',
@@ -42,8 +40,6 @@ class AttributeNameResolverServiceTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $output = $this->resolverService->resolve($data);
-
         $expected = [
             'firstName' => 'John',
             'surname' => 'Doe',
@@ -52,6 +48,8 @@ class AttributeNameResolverServiceTest extends \PHPUnit_Framework_TestCase
             'email_address' => 'ceo@example.com',
             'city' => 'Barcelona',
         ];
+
+        $output = $this->resolverService->resolve($data);
 
         $this->assertEquals($expected, $output);
     }

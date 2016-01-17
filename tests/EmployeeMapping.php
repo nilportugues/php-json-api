@@ -18,6 +18,7 @@ class EmployeeMapping
     public static function mapping()
     {
         return [
+            'alias' => 'worker',
             'class' => Employee::class,
             'aliased_properties' => [
                 'firstName' => 'name',

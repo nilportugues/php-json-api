@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Actions;
+namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Resource;
 
-use NilPortugues\Api\JsonApi\Infrastructure\Repositories\Actions\Contracts\ResourceRepositoryDriver;
+use NilPortugues\Api\JsonApi\Infrastructure\Repositories\Resource\Contracts\ResourceRepositoryDriver;
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository as ResourceRepositoryInterface;
 use NilPortugues\Api\JsonApi\Server\Data\ResourceNotFoundException;
 
@@ -74,6 +74,7 @@ class ResourceRepository implements ResourceRepositoryInterface
      */
     public function persist(array $data, array $values)
     {
+        return $this->repository->persist($data, $values);
     }
 
     /**
@@ -81,6 +82,7 @@ class ResourceRepository implements ResourceRepositoryInterface
      */
     public function findBy()
     {
+        return $this->repository->findBy();
     }
 
     /**
@@ -88,5 +90,6 @@ class ResourceRepository implements ResourceRepositoryInterface
      */
     public function count()
     {
+        return $this->repository->count();
     }
 }

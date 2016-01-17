@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Actions\Contracts;
+namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Resource\Contracts;
 
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository;
 
