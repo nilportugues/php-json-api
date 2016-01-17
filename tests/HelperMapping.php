@@ -50,36 +50,7 @@ class HelperMapping
                 ],
             ],
             [
-                'class' => PostId::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'postId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/posts/{postId}'],
-                    'relationships' => [
-                        Comment::class => ['name' => 'http://example.com/posts/{postId}/relationships/comments'],
-                    ],
-                ],
-            ],
-            [
                 'class' => User::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'userId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/users/{userId}'],
-                    'friends' => ['name' => 'http://example.com/users/{userId}/friends'],
-                    'comments' => ['name' => 'http://example.com/users/{userId}/comments'],
-                ],
-            ],
-            [
-                'class' => UserId::class,
                 'alias' => '',
                 'aliased_properties' => [],
                 'hide_properties' => [],
@@ -104,18 +75,6 @@ class HelperMapping
                     'self' => ['name' => 'http://example.com/comments/{commentId}'],
                 ],
                 'relationships' => [
-                ],
-            ],
-            [
-                'class' => CommentId::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'commentId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/comments/{commentId}'],
                 ],
             ],
         ];

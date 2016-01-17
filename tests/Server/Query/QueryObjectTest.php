@@ -17,7 +17,7 @@ use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Query\QueryException;
-use NilPortugues\Api\JsonApi\Server\Query\QueryObject;
+use NilPortugues\Api\JsonApi\Server\Query\GetAssertion;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
 use NilPortugues\Tests\Api\JsonApi\HelperMapping;
@@ -43,7 +43,7 @@ class QueryObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasError = false;
         try {
-            QueryObject::assert($this->serializer, $fields, $included, $sorting, $errorBag, Post::class);
+            GetAssertion::assert($fields, $included, $sorting, $errorBag, Post::class);
         } catch (QueryException $e) {
             $hasError = true;
         }
@@ -60,7 +60,7 @@ class QueryObjectTest extends \PHPUnit_Framework_TestCase
         $hasError = false;
         try {
             $fields->addField('post', 'superpower');
-            QueryObject::assert($this->serializer, $fields, $included, $sorting, $errorBag, Post::class);
+            GetAssertion::assert($fields, $included, $sorting, $errorBag, Post::class);
         } catch (QueryException $e) {
             $hasError = true;
         }
@@ -76,7 +76,7 @@ class QueryObjectTest extends \PHPUnit_Framework_TestCase
         $hasError = false;
         try {
             $fields->addField('superhero', 'power');
-            QueryObject::assert($this->serializer, $fields, $included, $sorting, $errorBag, Post::class);
+            GetAssertion::assert($fields, $included, $sorting, $errorBag, Post::class);
         } catch (QueryException $e) {
             $hasError = true;
         }
@@ -94,7 +94,7 @@ class QueryObjectTest extends \PHPUnit_Framework_TestCase
         try {
             $included->add('superhero');
 
-            QueryObject::assert($this->serializer, $fields, $included, $sorting, $errorBag, Post::class);
+            GetAssertion::assert($fields, $included, $sorting, $errorBag, Post::class);
         } catch (QueryException $e) {
             $hasError = true;
         }
@@ -113,7 +113,7 @@ class QueryObjectTest extends \PHPUnit_Framework_TestCase
             $included->add('post.superhero');
             $included->add('post.comment');
 
-            QueryObject::assert($this->serializer, $fields, $included, $sorting, $errorBag, Post::class);
+            GetAssertion::assert($fields, $included, $sorting, $errorBag, Post::class);
         } catch (QueryException $e) {
             $hasError = true;
         }
@@ -130,7 +130,7 @@ class QueryObjectTest extends \PHPUnit_Framework_TestCase
         $hasError = false;
         try {
             $sorting->addField('superhero', 'ascending');
-            QueryObject::assert($this->serializer, $fields, $included, $sorting, $errorBag, Post::class);
+            GetAssertion::assert($fields, $included, $sorting, $errorBag, Post::class);
         } catch (QueryException $e) {
             $hasError = true;
         }

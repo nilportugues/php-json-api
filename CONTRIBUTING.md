@@ -7,7 +7,7 @@ Here are a few guidelines and rules to follow when you'd like to contribute to t
  
 Please ensure that your code fulfills these standards before any Pull Request (PR) by running the following tools found in the bin/ directory after `composer install`.
 
-``` bash
+```bash
 php bin/php-cs-fixer fix src
 php bin/php-formatter formatter:use:sort src/
 

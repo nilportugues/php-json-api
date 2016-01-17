@@ -13,7 +13,7 @@ namespace NilPortugues\Tests\Api\JsonApi\Server\Data;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Data\DataException;
-use NilPortugues\Api\JsonApi\Server\Data\DataObject;
+use NilPortugues\Api\JsonApi\Server\Data\AttributeNameResolverService;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
@@ -51,7 +51,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasErrors = false;
         try {
-            DataObject::assertPost($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPost($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -77,7 +77,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasErrors = false;
         try {
-            DataObject::assertPost($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPost($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -110,7 +110,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasErrors = false;
         try {
-            DataObject::assertPost($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPost($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -144,7 +144,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasErrors = false;
         try {
-            DataObject::assertPost($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPost($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -177,7 +177,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasErrors = false;
         try {
-            DataObject::assertPost($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPost($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -213,7 +213,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
 
         $hasErrors = false;
         try {
-            DataObject::assertPost($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPost($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -232,7 +232,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
         ];
         $hasErrors = false;
         try {
-            DataObject::assertPatch($data, $this->serializer, Post::class, $errorBag);
+            $this->patchSpecification->assert($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -252,7 +252,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
         ];
         $hasErrors = false;
         try {
-            DataObject::assertPut($data, $this->serializer, Post::class, $errorBag);
+            AttributeNameResolverService::assertPut($data, Post::class, $errorBag);
         } catch (DataException $e) {
             $hasErrors = true;
         }
@@ -270,7 +270,7 @@ class DataObjectTest extends \PHPUnit_Framework_TestCase
                 'comments' => [],
             ],
         ];
-        $attributes = DataObject::getAttributes($data, $this->serializer);
+        $attributes = AttributeNameResolverService::resolve($data);
 
         $this->assertNotEmpty($attributes);
     }

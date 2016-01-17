@@ -12,7 +12,7 @@ namespace NilPortugues\Tests\Api\JsonApi\Server\Data;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Data\DataAssertions;
+use NilPortugues\Api\JsonApi\Server\Data\DataFormatAssertion;
 use NilPortugues\Api\JsonApi\Server\Data\DataException;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidAttributeError;
@@ -47,7 +47,7 @@ class DataAssertionsTest extends \PHPUnit_Framework_TestCase
         $data = [];
 
         try {
-            DataAssertions::assert($data, $this->serializer, Post::class, $this->errorBag);
+            DataFormatAssertion::assert($data, $this->serializer, Post::class, $this->errorBag);
         } catch (DataException $e) {
         }
 
@@ -68,7 +68,7 @@ class DataAssertionsTest extends \PHPUnit_Framework_TestCase
         ];
 
         try {
-            DataAssertions::assert($data, $this->serializer, Post::class, $this->errorBag);
+            DataFormatAssertion::assert($data, $this->serializer, Post::class, $this->errorBag);
         } catch (DataException $e) {
         }
         $this->assertArrayContainsExpectedErrorType(MissingTypeError::class);
@@ -89,7 +89,7 @@ class DataAssertionsTest extends \PHPUnit_Framework_TestCase
         ];
 
         try {
-            DataAssertions::assert($data, $this->serializer, Post::class, $this->errorBag);
+            DataFormatAssertion::assert($data, $this->serializer, Post::class, $this->errorBag);
         } catch (DataException $e) {
         }
         $this->assertArrayContainsExpectedErrorType(InvalidTypeError::class);
@@ -102,7 +102,7 @@ class DataAssertionsTest extends \PHPUnit_Framework_TestCase
         ];
 
         try {
-            DataAssertions::assert($data, $this->serializer, Post::class, $this->errorBag);
+            DataFormatAssertion::assert($data, $this->serializer, Post::class, $this->errorBag);
         } catch (DataException $e) {
         }
         $this->assertArrayContainsExpectedErrorType(MissingAttributesError::class);
@@ -123,7 +123,7 @@ class DataAssertionsTest extends \PHPUnit_Framework_TestCase
         ];
 
         try {
-            DataAssertions::assert($data, $this->serializer, Post::class, $this->errorBag);
+            DataFormatAssertion::assert($data, $this->serializer, Post::class, $this->errorBag);
         } catch (DataException $e) {
         }
         $this->assertArrayContainsExpectedErrorType(InvalidAttributeError::class);

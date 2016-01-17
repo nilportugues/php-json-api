@@ -12,7 +12,7 @@ namespace NilPortugues\Tests\Api\JsonApi\Server\Actions;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Actions\PatchResource;
+use NilPortugues\Api\JsonApi\Server\Actions\PatchResourceHandler;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
@@ -30,7 +30,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
     private $serializer;
 
     /**
-     * @var PatchResource
+     * @var PatchResourceHandler
      */
     private $resource;
 
@@ -55,7 +55,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
-        $this->resource = new PatchResource($this->serializer);
+        $this->resource = new PatchResourceHandler($this->serializer);
 
         $this->data = [
             'type' => 'post',
@@ -84,7 +84,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testItCanGet()
     {
-        $response = $this->resource->get(10, $this->data, Post::class, $this->findOneCallable, $this->updateCallable);
+        $response = $this->resource->__invoke(10, $this->data, Post::class, $this->findOneCallable, $this->updateCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -102,7 +102,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $response = $this->resource->get(10, $data, Post::class, $this->findOneCallable, $this->updateCallable);
+        $response = $this->resource->__invoke(10, $data, Post::class, $this->findOneCallable, $this->updateCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(422, $response->getStatusCode());
@@ -114,7 +114,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
             return;
         };
 
-        $response = $this->resource->get(10, $this->data, Post::class, $findOneCallable, $this->updateCallable);
+        $response = $this->resource->__invoke(10, $this->data, Post::class, $findOneCallable, $this->updateCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(404, $response->getStatusCode());
@@ -126,7 +126,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
             throw new \Exception();
         };
 
-        $response = $this->resource->get(10, $this->data, Post::class, $callable, $this->updateCallable);
+        $response = $this->resource->__invoke(10, $this->data, Post::class, $callable, $this->updateCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());

@@ -14,7 +14,7 @@ use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Actions\GetResource;
+use NilPortugues\Api\JsonApi\Server\Actions\GetOneQueryHandler;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\User;
@@ -31,7 +31,7 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
     private $serializer;
 
     /**
-     * @var GetResource
+     * @var GetOneQueryHandler
      */
     private $resource;
 
@@ -59,7 +59,7 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
         $this->fields = new Fields();
         $this->included = new Included();
 
-        $this->resource = new GetResource($this->serializer, $this->fields, $this->included);
+        $this->resource = new GetOneQueryHandler($this->serializer, $this->fields, $this->included);
 
         $this->findOneCallable = function () {
             $user = new User(new UserId(1), 'Post Author');
@@ -70,7 +70,7 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testItCanGet()
     {
-        $response = $this->resource->get(10, Post::class, $this->findOneCallable);
+        $response = $this->resource->__invoke(10, Post::class, $this->findOneCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -82,7 +82,7 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
             return;
         };
 
-        $response = $this->resource->get(10, Post::class, $findOneCallable);
+        $response = $this->resource->__invoke(10, Post::class, $findOneCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(404, $response->getStatusCode());
@@ -94,7 +94,7 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
             throw new \Exception();
         };
 
-        $response = $this->resource->get(10, Post::class, $findOneCallable);
+        $response = $this->resource->__invoke(10, Post::class, $findOneCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());
@@ -105,9 +105,9 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
         $this->fields = new Fields();
         $this->fields->addField('superhero', 'power');
 
-        $this->resource = new GetResource($this->serializer, $this->fields, $this->included);
+        $this->resource = new GetOneQueryHandler($this->serializer, $this->fields, $this->included);
 
-        $response = $this->resource->get(10, Post::class, $this->findOneCallable);
+        $response = $this->resource->__invoke(10, Post::class, $this->findOneCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());

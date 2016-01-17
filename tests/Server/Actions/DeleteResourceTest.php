@@ -12,7 +12,7 @@ namespace NilPortugues\Tests\Api\JsonApi\Server\Actions;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Actions\DeleteResource;
+use NilPortugues\Api\JsonApi\Server\Actions\DeleteResourceHandler;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\User;
@@ -29,7 +29,7 @@ class DeleteResourceTest extends \PHPUnit_Framework_TestCase
     private $serializer;
 
     /**
-     * @var DeleteResource
+     * @var DeleteResourceHandler
      */
     private $resource;
 
@@ -50,7 +50,7 @@ class DeleteResourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
 
-        $this->resource = new DeleteResource($this->serializer);
+        $this->resource = new DeleteResourceHandler($this->serializer);
 
         $this->findOneCallable = function () {
             $user = new User(new UserId(1), 'Post Author');
@@ -65,7 +65,7 @@ class DeleteResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testItCanGet()
     {
-        $response = $this->resource->get(10, Post::class, $this->findOneCallable, $this->deleteCallable);
+        $response = $this->resource->__invoke(10, Post::class, $this->findOneCallable, $this->deleteCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(204, $response->getStatusCode());
@@ -77,7 +77,7 @@ class DeleteResourceTest extends \PHPUnit_Framework_TestCase
             return;
         };
 
-        $response = $this->resource->get(10, Post::class, $findOneCallable, $this->deleteCallable);
+        $response = $this->resource->__invoke(10, Post::class, $findOneCallable, $this->deleteCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(404, $response->getStatusCode());
@@ -89,7 +89,7 @@ class DeleteResourceTest extends \PHPUnit_Framework_TestCase
             throw new \Exception();
         };
 
-        $response = $this->resource->get(10, Post::class, $findOneCallable, $this->deleteCallable);
+        $response = $this->resource->__invoke(10, Post::class, $findOneCallable, $this->deleteCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());

@@ -12,7 +12,7 @@ namespace NilPortugues\Tests\Api\JsonApi\Server\Actions;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Actions\CreateResource;
+use NilPortugues\Api\JsonApi\Server\Actions\CreateCommandHandler;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
@@ -30,7 +30,7 @@ class CreateResourceTest extends \PHPUnit_Framework_TestCase
     private $serializer;
 
     /**
-     * @var CreateResource
+     * @var CreateCommandHandler
      */
     private $resource;
 
@@ -50,7 +50,7 @@ class CreateResourceTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
-        $this->resource = new CreateResource($this->serializer);
+        $this->resource = new CreateCommandHandler($this->serializer);
 
         $this->data = [
             'type' => 'post',

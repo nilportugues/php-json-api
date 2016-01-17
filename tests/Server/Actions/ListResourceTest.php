@@ -16,7 +16,7 @@ use NilPortugues\Api\JsonApi\Http\Request\Parameters\Page;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Actions\ListResource;
+use NilPortugues\Api\JsonApi\Server\Actions\GetAllQueryHandler;
 use NilPortugues\Api\Mapping\Mapper;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
 use NilPortugues\Tests\Api\JsonApi\HelperFactory;
@@ -30,7 +30,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
      */
     private $serializer;
     /**
-     * @var ListResource
+     * @var GetAllQueryHandler
      */
     private $resource;
     /**
@@ -85,7 +85,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
         $this->sorting = new Sorting();
         $this->included = new Included();
 
-        $this->resource = new ListResource(
+        $this->resource = new GetAllQueryHandler(
             $this->serializer,
             $this->page,
             $this->fields,
@@ -110,7 +110,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testItCanGet()
     {
-        $response = $this->resource->get($this->totalAmountCallable, $this->resultsCallable, $this->routeUri, Post::class);
+        $response = $this->resource->__invoke($this->totalAmountCallable, $this->resultsCallable, $this->routeUri, Post::class);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
@@ -120,7 +120,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->page = new Page(2000, null, null, null, 10);
 
-        $this->resource = new ListResource(
+        $this->resource = new GetAllQueryHandler(
             $this->serializer,
             $this->page,
             $this->fields,
@@ -129,7 +129,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
             $this->filters
         );
 
-        $response = $this->resource->get($this->totalAmountCallable, $this->resultsCallable, $this->routeUri, Post::class);
+        $response = $this->resource->__invoke($this->totalAmountCallable, $this->resultsCallable, $this->routeUri, Post::class);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(404, $response->getStatusCode());
@@ -141,7 +141,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
             throw new \Exception();
         };
 
-        $response = $this->resource->get($this->totalAmountCallable, $resultsCallable, $this->routeUri, Post::class);
+        $response = $this->resource->__invoke($this->totalAmountCallable, $resultsCallable, $this->routeUri, Post::class);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());
@@ -152,7 +152,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
         $this->fields = new Fields();
         $this->fields->addField('superhero', 'power');
 
-        $this->resource = new ListResource(
+        $this->resource = new GetAllQueryHandler(
             $this->serializer,
             $this->page,
             $this->fields,
@@ -161,7 +161,7 @@ class ListResourceTest extends \PHPUnit_Framework_TestCase
             $this->filters
         );
 
-        $response = $this->resource->get($this->totalAmountCallable, $this->resultsCallable, $this->routeUri, Post::class);
+        $response = $this->resource->__invoke($this->totalAmountCallable, $this->resultsCallable, $this->routeUri, Post::class);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());
