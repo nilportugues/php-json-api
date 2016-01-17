@@ -17,6 +17,5 @@ class NotFoundErrorTest extends \PHPUnit_Framework_TestCase
     public function testItWillCreateError()
     {
         $error = new NotFoundError('employee', '1000');
-
     }
 }

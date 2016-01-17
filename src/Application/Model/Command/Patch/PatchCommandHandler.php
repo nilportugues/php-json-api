@@ -20,7 +20,7 @@ class PatchCommandHandler
     /**
      * @var ResourceRepository
      */
-    protected $actionRepository;
+    protected $resourceRepository;
     /**
      * @var MappingRepository
      */
@@ -39,19 +39,19 @@ class PatchCommandHandler
      *
      * @param MappingRepository            $mappingRepository
      * @param PatchAssertion               $assertion
-     * @param ResourceRepository           $actionRepository
+     * @param ResourceRepository           $resourceRepository
      * @param AttributeNameResolverService $resolverService
      */
     public function __construct(
         MappingRepository $mappingRepository,
         PatchAssertion $assertion,
-        ResourceRepository $actionRepository,
+        ResourceRepository $resourceRepository,
         AttributeNameResolverService $resolverService
     ) {
         $this->resolverService = $resolverService;
         $this->mappingRepository = $mappingRepository;
         $this->assertion = $assertion;
-        $this->actionRepository = $actionRepository;
+        $this->resourceRepository = $resourceRepository;
     }
 
     /**
@@ -63,9 +63,9 @@ class PatchCommandHandler
     {
         $this->assertion->assert($resource->data(), $resource->className());
 
-        $model = $this->actionRepository->find($resource->id());
+        $model = $this->resourceRepository->find($resource->id());
         $values = $this->resolverService->resolve($resource->data());
 
-        $this->actionRepository->persist($model, $values);
+        $this->resourceRepository->persist($model, $values);
     }
 }

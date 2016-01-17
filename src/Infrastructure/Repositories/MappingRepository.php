@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Server\Actions;
+namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories;
 
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository as MappingRepositoryInterface;
 use NilPortugues\Api\Transformer\Transformer;

@@ -13,7 +13,7 @@ namespace NilPortugues\Api\JsonApi\Infrastructure\Repositories\Actions\Contracts
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository;
 
 /**
- * Class ActionRepositoryDriver.
+ * Class ResourceRepositoryDriver.
  */
 interface ResourceRepositoryDriver extends ResourceRepository
 {

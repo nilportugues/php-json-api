@@ -35,6 +35,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::VALID_CODE, $error->code());
         $this->assertEquals(self::VALID_TITLE, $error->title());
         $this->assertEquals(self::VALID_MESSAGE, $error->detail());
+        $this->assertEquals([], $error->source());
     }
 
     public function testItCanSetAdditionalData()
@@ -53,7 +54,6 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(self::VALID_TITLE, $error->title());
         $this->assertEquals(self::VALID_MESSAGE, $error->detail());
         $this->assertEquals(['time' => '0.001 ms'], $error->meta());
-
     }
 
     public function testSetStatusWillThrowExceptionIfNotValidHttpCodeIsProvided()
@@ -80,7 +80,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
     public function testItWillThrowExceptionIfTitleIsEmpty()
     {
         $this->setExpectedException(InvalidArgumentException::class);
-        new Error(self::VALID_TITLE, self::VALID_MESSAGE);
+        new Error(self::INVALID_TITLE, self::VALID_MESSAGE);
     }
 
     public function testItWillThrowExceptionIfMessageIsEmpty()

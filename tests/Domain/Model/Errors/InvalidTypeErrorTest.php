@@ -17,6 +17,5 @@ class InvalidTypeErrorTest extends \PHPUnit_Framework_TestCase
     public function testItWillCreateError()
     {
         $error = new InvalidTypeError('superhero');
-
     }
 }

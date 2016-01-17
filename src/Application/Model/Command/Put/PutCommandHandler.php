@@ -20,7 +20,7 @@ class PutCommandHandler
     /**
      * @var ResourceRepository
      */
-    protected $actionRepository;
+    protected $resourceRepository;
     /**
      * @var MappingRepository
      */
@@ -38,19 +38,19 @@ class PutCommandHandler
      * PutResourceHandler constructor.
      *
      * @param MappingRepository            $mappingRepository
-     * @param ResourceRepository           $actionRepository
+     * @param ResourceRepository           $resourceRepository
      * @param PutAssertion                 $assertion
      * @param AttributeNameResolverService $resolverService
      */
     public function __construct(
         MappingRepository $mappingRepository,
-        ResourceRepository $actionRepository,
+        ResourceRepository $resourceRepository,
         PutAssertion $assertion,
         AttributeNameResolverService $resolverService
     ) {
         $this->resolverService = $resolverService;
         $this->mappingRepository = $mappingRepository;
-        $this->actionRepository = $actionRepository;
+        $this->resourceRepository = $resourceRepository;
         $this->assertion = $assertion;
     }
 
@@ -63,9 +63,9 @@ class PutCommandHandler
     {
         $this->assertion->assert($resource->data(), $resource->className());
 
-        $model = $this->actionRepository->find($resource->id());
+        $model = $this->resourceRepository->find($resource->id());
         $values = $this->resolverService->resolve($resource->data());
 
-        $this->actionRepository->persist($model, $values);
+        $this->resourceRepository->persist($model, $values);
     }
 }

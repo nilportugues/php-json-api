@@ -11,7 +11,7 @@
 namespace NilPortugues\Api\JsonApi\Domain\Model\Contracts;
 
 /**
- * Class ActionRepository.
+ * Class ResourceRepository.
  */
 interface ResourceRepository
 {

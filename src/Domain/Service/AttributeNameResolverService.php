@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Server\Data;
+namespace NilPortugues\Api\JsonApi\Domain\Service;
 
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -42,12 +42,18 @@ class AttributeNameResolverService
         $mapping = $this->mappingRepository->findByAlias($data[JsonApiTransformer::TYPE_KEY]);
         $aliases = $mapping->getAliasedProperties();
 
-        $keys = str_replace(
-            array_values($aliases),
-            array_keys($aliases),
-            array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY])
-        );
+        $aliasedKeys = array_values($aliases);
+        $realKeys = array_keys($aliases);
+        $newDataAttributes = [];
 
-        return array_combine($keys, array_values($data[JsonApiTransformer::ATTRIBUTES_KEY]));
+        foreach ($data[JsonApiTransformer::ATTRIBUTES_KEY] as $key => $value) {
+            if (false !== ($pos = array_search($key, $aliasedKeys, true))) {
+                $key = $realKeys[$pos];
+            }
+
+            $newDataAttributes[$key] = $value;
+        }
+
+        return $newDataAttributes;
     }
 }

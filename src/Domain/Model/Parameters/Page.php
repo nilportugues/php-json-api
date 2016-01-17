@@ -49,7 +49,7 @@ class Page
         $this->cursor = $cursor;
         $this->limit = $limit;
         $this->offset = $offset;
-        $this->size = $size;
+        $this->setSize($size);
     }
 
     /**

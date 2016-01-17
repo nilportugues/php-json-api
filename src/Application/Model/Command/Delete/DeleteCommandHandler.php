@@ -18,7 +18,7 @@ class DeleteCommandHandler
     /**
      * @var ResourceRepository
      */
-    protected $actionRepository;
+    protected $resourceRepository;
     /**
      * @var MappingRepository
      */
@@ -28,12 +28,12 @@ class DeleteCommandHandler
      * DeleteResourceHandler constructor.
      *
      * @param MappingRepository  $mappingRepository
-     * @param ResourceRepository $actionRepository
+     * @param ResourceRepository $resourceRepository
      */
-    public function __construct(MappingRepository $mappingRepository, ResourceRepository $actionRepository)
+    public function __construct(MappingRepository $mappingRepository, ResourceRepository $resourceRepository)
     {
         $this->mappingRepository = $mappingRepository;
-        $this->actionRepository = $actionRepository;
+        $this->resourceRepository = $resourceRepository;
     }
 
     /**
@@ -43,8 +43,8 @@ class DeleteCommandHandler
      */
     public function __invoke(DeleteCommand $resource)
     {
-        $this->actionRepository->find($resource->id());
+        $this->resourceRepository->find($resource->id());
 
-        $this->actionRepository->delete($resource->id());
+        $this->resourceRepository->delete($resource->id());
     }
 }

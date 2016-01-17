@@ -17,6 +17,5 @@ class InvalidAttributeErrorTest extends \PHPUnit_Framework_TestCase
     public function testItWillCreateError()
     {
         $error = new InvalidAttributeError('employee', 'superpower');
-
     }
 }

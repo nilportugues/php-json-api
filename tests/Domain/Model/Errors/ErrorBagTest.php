@@ -15,6 +15,13 @@ use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
 
 class ErrorBagTest extends \PHPUnit_Framework_TestCase
 {
+    public function testHttpCode()
+    {
+        $errorBag = new ErrorBag();
+        $errorBag->setHttpCode(400);
+        $this->assertEquals(400, $errorBag->httpCode());
+    }
+
     public function testItHasKey()
     {
         $errorBag = new ErrorBag();
