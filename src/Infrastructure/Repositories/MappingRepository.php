@@ -10,7 +10,7 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Actions;
 
-use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository as MappingRepositoryInterface;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository as MappingRepositoryInterface;
 use NilPortugues\Api\Transformer\Transformer;
 
 /**

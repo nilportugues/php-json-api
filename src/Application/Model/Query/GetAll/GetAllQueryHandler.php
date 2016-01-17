@@ -22,7 +22,7 @@ use NilPortugues\Api\JsonApi\Http\Request\Parameters\Page;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
-use NilPortugues\Api\JsonApi\Server\Exceptions\QueryException;
+use NilPortugues\Api\JsonApi\Server\Exceptions\InputException;
 use NilPortugues\Api\JsonApi\Server\Query\GetAssertion;
 
 class GetAllQueryHandler
@@ -260,7 +260,7 @@ class GetAllQueryHandler
     protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
-            case QueryException::class:
+            case InputException::class:
                 $response = $this->errorResponse($this->errorBag);
                 break;
 

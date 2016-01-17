@@ -18,6 +18,7 @@ use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\NotFoundError;
 use NilPortugues\Api\JsonApi\Http\ErrorBagPresenter;
 use NilPortugues\Api\JsonApi\Server\Data\ResourceNotFoundException;
+use NilPortugues\Api\JsonApi\Server\Exceptions\InputException;
 
 /**
  * Class GetService.
@@ -69,6 +70,12 @@ class GetResourceService
         $presenter = new ErrorBagPresenter();
 
         switch (get_class($e)) {
+            case InputException::class:
+                /* @var InputException $e */
+                $body = $presenter->toJson($e->errorBag());
+
+                $response = new GetOneResponse(400, $body, $e);
+                break;
             case ResourceNotFoundException::class:
                 $notFound = new NotFoundError($className, $id);
                 $body = $presenter->toJson(new ErrorBag([$notFound]));

@@ -10,7 +10,7 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
-use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidAttributeError;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidTypeError;
@@ -18,6 +18,7 @@ use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingAttributesError;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingDataError;
 use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingTypeError;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
+use NilPortugues\Api\JsonApi\Server\Exceptions\InputException;
 
 /**
  * Class DataAssertions.
@@ -58,13 +59,13 @@ class DataFormatAssertion
      * @param          $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataException
+     * @throws InputException
      */
     protected function assertItIsArray($data, ErrorBag $errorBag)
     {
         if (empty($data) || !is_array($data)) {
             $errorBag[] = new MissingDataError();
-            throw new DataException();
+            throw new InputException($errorBag);
         }
     }
 
@@ -72,13 +73,13 @@ class DataFormatAssertion
      * @param array    $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataException
+     * @throws InputException
      */
     protected function assertItHasTypeMember(array $data, ErrorBag $errorBag)
     {
         if (empty($data[JsonApiTransformer::TYPE_KEY]) || !is_string($data[JsonApiTransformer::TYPE_KEY])) {
             $errorBag[] = new MissingTypeError();
-            throw new DataException();
+            throw new InputException($errorBag);
         }
     }
 
@@ -87,7 +88,7 @@ class DataFormatAssertion
      * @param          $className
      * @param ErrorBag $errorBag
      *
-     * @throws DataException
+     * @throws InputException
      */
     protected function assertItTypeMemberIsExpectedValue(
         array $data,
@@ -98,7 +99,7 @@ class DataFormatAssertion
 
         if (null === $mapping || $mapping->getClassName() !== $className) {
             $errorBag[] = new InvalidTypeError($data[JsonApiTransformer::TYPE_KEY]);
-            throw new DataException();
+            throw new InputException($errorBag);
         }
     }
 
@@ -106,13 +107,13 @@ class DataFormatAssertion
      * @param          $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataException
+     * @throws InputException
      */
     protected function assertItHasAttributeMember($data, ErrorBag $errorBag)
     {
         if (empty($data[JsonApiTransformer::ATTRIBUTES_KEY]) || !is_array($data[JsonApiTransformer::ATTRIBUTES_KEY])) {
             $errorBag[] = new MissingAttributesError();
-            throw new DataException();
+            throw new InputException($errorBag);
         }
     }
 
@@ -120,7 +121,7 @@ class DataFormatAssertion
      * @param array    $data
      * @param ErrorBag $errorBag
      *
-     * @throws DataException
+     * @throws InputException
      */
     protected function assertAttributesExists(array $data, ErrorBag $errorBag)
     {
@@ -145,7 +146,7 @@ class DataFormatAssertion
         }
 
         if ($hasErrors) {
-            throw new DataException();
+            throw new InputException($errorBag);
         }
     }
 }

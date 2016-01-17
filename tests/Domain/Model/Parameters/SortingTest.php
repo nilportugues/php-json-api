@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi\Parameters;
+namespace NilPortugues\Tests\Api\JsonApi\Domain\Model\Parameters;
 
-use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
+use NilPortugues\Api\JsonApi\Domain\Model\Parameters\Sorting;
 
 class SortingTest extends \PHPUnit_Framework_TestCase
 {

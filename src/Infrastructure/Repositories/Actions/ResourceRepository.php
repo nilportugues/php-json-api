@@ -56,9 +56,13 @@ class ResourceRepository implements ResourceRepositoryInterface
      * @param $id
      *
      * @return mixed
+     *
+     * @throws ResourceNotFoundException
      */
     public function delete($id)
     {
+        $this->find($id);
+
         return $this->repository->delete($id);
     }
 

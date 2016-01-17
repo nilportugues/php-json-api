@@ -18,7 +18,7 @@ use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidSortError;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
-use NilPortugues\Api\JsonApi\Server\Exceptions\QueryException;
+use NilPortugues\Api\JsonApi\Server\Exceptions\InputException;
 
 class GetAssertion
 {
@@ -44,7 +44,7 @@ class GetAssertion
      * @param ErrorBag $errorBag
      * @param string   $className
      *
-     * @throws QueryException
+     * @throws InputException
      */
     public function assert(Fields $fields, Included $included, Sorting $sort, ErrorBag $errorBag, $className)
     {
@@ -56,7 +56,7 @@ class GetAssertion
         }
 
         if ($errorBag->count() > 0) {
-            throw new QueryException();
+            throw new InputException();
         }
     }
 

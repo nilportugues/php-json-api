@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Http\Request\Parameters;
+namespace NilPortugues\Api\JsonApi\Domain\Model\Parameters;
 
 /**
  * Class Included.
