@@ -10,6 +10,8 @@
 
 namespace NilPortugues\Api\JsonApi\Application\Query\GetAll;
 
+use Exception;
+
 /**
  * Class GetAllResponse.
  */
@@ -23,17 +25,23 @@ class GetAllResponse
      * @var string
      */
     private $body;
+    /**
+     * @var Exception|null
+     */
+    private $exception;
 
     /**
      * GetOneResponse constructor.
      *
-     * @param int    $statusCode
-     * @param string $body
+     * @param int            $statusCode
+     * @param string         $body
+     * @param Exception|null $exception
      */
-    public function __construct($statusCode, $body)
+    public function __construct($statusCode, $body, Exception $exception = null)
     {
         $this->statusCode = $statusCode;
         $this->body = $body;
+        $this->exception = $exception;
     }
 
     /**
@@ -54,5 +62,15 @@ class GetAllResponse
     public function body()
     {
         return $this->body;
+    }
+
+    /**
+     * Returns value for `exception`.
+     *
+     * @return Exception|null
+     */
+    public function exception()
+    {
+        return $this->exception;
     }
 }

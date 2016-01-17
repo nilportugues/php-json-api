@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Domain\Contracts;
+namespace NilPortugues\Api\JsonApi\Domain\Model\Contracts;
 
 /**
  * Class MappingRepository.

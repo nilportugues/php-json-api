@@ -10,25 +10,15 @@
 
 namespace NilPortugues\Api\JsonApi\Application\Command\Patch;
 
-use Exception;
-use NilPortugues\Api\JsonApi\Domain\Contracts\ActionRepository;
-use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository;
-use NilPortugues\Api\JsonApi\JsonApiSerializer;
-use NilPortugues\Api\JsonApi\Server\Data\DataException;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository;
 use NilPortugues\Api\JsonApi\Server\Data\AttributeNameResolverService;
 use NilPortugues\Api\JsonApi\Server\Data\PatchAssertion;
-use NilPortugues\Api\JsonApi\Server\Errors\Error;
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
 
 class PatchCommandHandler
 {
     /**
-     * @var JsonApiSerializer
-     */
-    protected $serializer;
-    /**
-     * @var ActionRepository
+     * @var ResourceRepository
      */
     protected $actionRepository;
     /**
@@ -38,7 +28,7 @@ class PatchCommandHandler
     /**
      * @var PatchAssertion
      */
-    protected $patchAssertion;
+    protected $assertion;
     /**
      * @var AttributeNameResolverService
      */
@@ -48,23 +38,20 @@ class PatchCommandHandler
      * PatchCommandHandler constructor.
      *
      * @param MappingRepository            $mappingRepository
-     * @param PatchAssertion               $patchAssertion
-     * @param ActionRepository             $actionRepository
+     * @param PatchAssertion               $assertion
+     * @param ResourceRepository           $actionRepository
      * @param AttributeNameResolverService $resolverService
-     * @param JsonApiSerializer            $serializer
      */
     public function __construct(
         MappingRepository $mappingRepository,
-        PatchAssertion $patchAssertion,
-        ActionRepository $actionRepository,
-        AttributeNameResolverService $resolverService,
-        JsonApiSerializer $serializer
+        PatchAssertion $assertion,
+        ResourceRepository $actionRepository,
+        AttributeNameResolverService $resolverService
     ) {
         $this->resolverService = $resolverService;
         $this->mappingRepository = $mappingRepository;
-        $this->patchAssertion = $patchAssertion;
+        $this->assertion = $assertion;
         $this->actionRepository = $actionRepository;
-        $this->serializer = $serializer;
     }
 
     /**
@@ -74,56 +61,11 @@ class PatchCommandHandler
      */
     public function __invoke(PatchCommand $resource)
     {
-        $errorBag = new ErrorBag();
+        $this->assertion->assert($resource->data(), $resource->className());
 
-        try {
-            $this->patchAssertion->assert($resource->data(), $resource->className(), $errorBag);
+        $model = $this->actionRepository->find($resource->id());
+        $values = $this->resolverService->resolve($resource->data());
 
-            $model = $this->actionRepository->findBy();
-
-            if (empty($model)) {
-                $mapping = $this->mappingRepository->findByClassName($resource->className());
-
-                return $this->resourceNotFound(
-                    new ErrorBag(
-                        [new NotFoundError($mapping->getClassAlias(), $resource->id())]
-                    )
-                );
-            }
-
-            $this->actionRepository->persist(
-                $model,
-                $this->resolverService->resolve($resource->data()),
-                $errorBag
-            );
-
-            $response = $this->resourceUpdated($this->serializer->serialize($model));
-        } catch (Exception $e) {
-            $response = $this->getErrorResponse($e, $errorBag);
-        }
-
-        return $response;
-    }
-
-    /**
-     * @param Exception $e
-     * @param ErrorBag  $errorBag
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function getErrorResponse(Exception $e, ErrorBag $errorBag)
-    {
-        switch (get_class($e)) {
-            case DataException::class:
-                $response = $this->unprocessableEntity($errorBag);
-                break;
-
-            default:
-                $response = $this->errorResponse(
-                    new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
-                );
-        }
-
-        return $response;
+        $this->actionRepository->persist($model, $values);
     }
 }

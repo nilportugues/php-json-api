@@ -10,12 +10,12 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Actions\Traits;
 
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\Error;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidParameterError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidParameterMemberError;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
-use NilPortugues\Api\JsonApi\Server\Errors\Error;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
 use NilPortugues\Api\Mapping\Mapping;
 
 /**

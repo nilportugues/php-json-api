@@ -10,8 +10,6 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-
 class PatchAssertion
 {
     /**
@@ -30,12 +28,11 @@ class PatchAssertion
     }
 
     /**
-     * @param array    $data
-     * @param string   $className
-     * @param ErrorBag $errorBag
+     * @param array  $data
+     * @param string $className
      */
-    public function assert($data, $className, ErrorBag $errorBag)
+    public function assert($data, $className)
     {
-        $this->inputValidation->assert($data, $className, $errorBag);
+        $this->inputValidation->assert($data, $className);
     }
 }

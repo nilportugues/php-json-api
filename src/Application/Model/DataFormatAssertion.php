@@ -11,13 +11,13 @@
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
 use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidAttributeError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidTypeError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingAttributesError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingDataError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\MissingTypeError;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidAttributeError;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidTypeError;
-use NilPortugues\Api\JsonApi\Server\Errors\MissingAttributesError;
-use NilPortugues\Api\JsonApi\Server\Errors\MissingDataError;
-use NilPortugues\Api\JsonApi\Server\Errors\MissingTypeError;
 
 /**
  * Class DataAssertions.
@@ -40,12 +40,13 @@ class DataFormatAssertion
     }
 
     /**
-     * @param array    $data
-     * @param string   $className
-     * @param ErrorBag $errorBag
+     * @param array  $data
+     * @param string $className
      */
-    public function assert($data, $className, ErrorBag $errorBag)
+    public function assert($data, $className)
     {
+        $errorBag = new ErrorBag();
+
         $this->assertItIsArray($data, $errorBag);
         $this->assertItHasTypeMember($data, $errorBag);
         $this->assertItTypeMemberIsExpectedValue($data, $className, $errorBag);

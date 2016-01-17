@@ -11,16 +11,16 @@
 namespace NilPortugues\Api\JsonApi\Application\Query\GetOne;
 
 use Exception;
-use NilPortugues\Api\JsonApi\Domain\Contracts\ActionRepository;
-use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\Error;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\NotFoundError;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
-use NilPortugues\Api\JsonApi\Server\Errors\Error;
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
 use NilPortugues\Api\JsonApi\Server\Exceptions\QueryException;
 use NilPortugues\Api\JsonApi\Server\Query\GetAssertion;
 
@@ -29,7 +29,7 @@ class GetOneQueryHandler
     use RequestTrait;
 
     /**
-     * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
+     * @var \NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag
      */
     protected $errorBag;
 
@@ -48,7 +48,7 @@ class GetOneQueryHandler
      */
     protected $included;
     /**
-     * @var ActionRepository
+     * @var ResourceRepository
      */
     protected $actionRepository;
     /**
@@ -59,15 +59,15 @@ class GetOneQueryHandler
     /**
      * GetResourceHandler constructor.
      *
-     * @param MappingRepository $mappingRepository
-     * @param ActionRepository  $actionRepository
-     * @param JsonApiSerializer $serializer
-     * @param Fields            $fields
-     * @param Included          $included
+     * @param MappingRepository  $mappingRepository
+     * @param ResourceRepository $actionRepository
+     * @param JsonApiSerializer  $serializer
+     * @param Fields             $fields
+     * @param Included           $included
      */
     public function __construct(
         MappingRepository $mappingRepository,
-        ActionRepository $actionRepository,
+        ResourceRepository $actionRepository,
         JsonApiSerializer $serializer,
         Fields $fields,
         Included $included

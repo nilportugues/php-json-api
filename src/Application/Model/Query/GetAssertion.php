@@ -11,13 +11,13 @@
 namespace NilPortugues\Api\JsonApi\Server\Query;
 
 use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidParameterError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidParameterMemberError;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\InvalidSortError;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
-use NilPortugues\Api\JsonApi\Server\Errors\InvalidSortError;
 use NilPortugues\Api\JsonApi\Server\Exceptions\QueryException;
 
 class GetAssertion

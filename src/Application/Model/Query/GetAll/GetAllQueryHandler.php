@@ -11,7 +11,10 @@
 namespace NilPortugues\Api\JsonApi\Application\Query\GetAll;
 
 use Exception;
-use NilPortugues\Api\JsonApi\Domain\Contracts\ActionRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\Error;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\OufOfBoundsError;
 use NilPortugues\Api\JsonApi\Http\PaginatedResource;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
@@ -19,9 +22,6 @@ use NilPortugues\Api\JsonApi\Http\Request\Parameters\Page;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Sorting;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\RequestTrait;
-use NilPortugues\Api\JsonApi\Server\Errors\Error;
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-use NilPortugues\Api\JsonApi\Server\Errors\OufOfBoundsError;
 use NilPortugues\Api\JsonApi\Server\Exceptions\QueryException;
 use NilPortugues\Api\JsonApi\Server\Query\GetAssertion;
 
@@ -30,7 +30,7 @@ class GetAllQueryHandler
     use RequestTrait;
 
     /**
-     * @var \NilPortugues\Api\JsonApi\Server\Errors\ErrorBag
+     * @var \NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag
      */
     protected $errorBag;
 
@@ -60,23 +60,23 @@ class GetAllQueryHandler
      */
     protected $serializer;
     /**
-     * @var ActionRepository
+     * @var ResourceRepository
      */
     protected $repository;
 
     /**
      * ListResourceHandler constructor.
      *
-     * @param ActionRepository  $repository
-     * @param JsonApiSerializer $serializer
-     * @param Page              $page
-     * @param Fields            $fields
-     * @param Sorting           $sorting
-     * @param Included          $included
-     * @param                   $filters
+     * @param ResourceRepository $repository
+     * @param JsonApiSerializer  $serializer
+     * @param Page               $page
+     * @param Fields             $fields
+     * @param Sorting            $sorting
+     * @param Included           $included
+     * @param                    $filters
      */
     public function __construct(
-        ActionRepository $repository,
+        ResourceRepository $repository,
         JsonApiSerializer $serializer,
         Page $page,
         Fields $fields,

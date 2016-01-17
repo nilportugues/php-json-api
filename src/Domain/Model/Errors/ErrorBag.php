@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Api\JsonApi\Server\Errors;
+namespace NilPortugues\Api\JsonApi\Domain\Model\Errors;
 
 use ArrayAccess;
 use ArrayIterator;

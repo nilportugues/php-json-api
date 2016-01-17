@@ -10,9 +10,32 @@
 
 namespace NilPortugues\Api\JsonApi\Application\Service;
 
+use NilPortugues\Api\JsonApi\Application\Command\Put\PutCommandHandler;
+use NilPortugues\Api\JsonApi\Application\Query\GetOne\GetOneQueryHandler;
+
 /**
  * Class PutService.
  */
 class PutResourceService
 {
+    /**
+     * @var PutCommandHandler
+     */
+    private $commandHandler;
+    /**
+     * @var GetOneQueryHandler
+     */
+    private $queryHandler;
+
+    /**
+     * PutService constructor.
+     *
+     * @param PutCommandHandler  $commandHandler
+     * @param GetOneQueryHandler $queryHandler
+     */
+    public function __construct(PutCommandHandler $commandHandler, GetOneQueryHandler $queryHandler)
+    {
+        $this->commandHandler = $commandHandler;
+        $this->queryHandler = $queryHandler;
+    }
 }

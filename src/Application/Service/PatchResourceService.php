@@ -10,11 +10,16 @@
 
 namespace NilPortugues\Api\JsonApi\Application\Service;
 
+use Exception;
 use NilPortugues\Api\JsonApi\Application\Command\Patch\PatchCommand;
 use NilPortugues\Api\JsonApi\Application\Command\Patch\PatchCommandHandler;
 use NilPortugues\Api\JsonApi\Application\Query\GetOne\GetOneQuery;
 use NilPortugues\Api\JsonApi\Application\Query\GetOne\GetOneQueryHandler;
 use NilPortugues\Api\JsonApi\Application\Query\GetOne\GetOneResponse;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\NotFoundError;
+use NilPortugues\Api\JsonApi\Http\ErrorBagPresenter;
+use NilPortugues\Api\JsonApi\Server\Data\ResourceNotFoundException;
 
 /**
  * Class PatchService.
@@ -33,13 +38,13 @@ class PatchResourceService
     /**
      * PatchService constructor.
      *
-     * @param PatchCommandHandler $patchCommandHandler
-     * @param GetOneQueryHandler  $getOneQueryHandler
+     * @param PatchCommandHandler $commandHandler
+     * @param GetOneQueryHandler  $queryHandler
      */
-    public function __construct(PatchCommandHandler $patchCommandHandler, GetOneQueryHandler $getOneQueryHandler)
+    public function __construct(PatchCommandHandler $commandHandler, GetOneQueryHandler $queryHandler)
     {
-        $this->commandHandler = $patchCommandHandler;
-        $this->queryHandler = $getOneQueryHandler;
+        $this->commandHandler = $commandHandler;
+        $this->queryHandler = $queryHandler;
     }
 
     /**
@@ -51,13 +56,43 @@ class PatchResourceService
      */
     public function __invoke($id, $className, $data)
     {
-        $command = new PatchCommand($id, $className, $data);
-        $commandHandler = $this->commandHandler;
-        $commandHandler($command);
+        try {
+            $commandHandler = $this->commandHandler;
+            $commandHandler(new PatchCommand($id, $className, $data));
 
-        $query = new GetOneQuery($id, $className);
-        $queryHandler = $this->queryHandler;
+            $queryHandler = $this->queryHandler;
+            $response = $queryHandler(new GetOneQuery($id, $className));
 
-        return $queryHandler($query);
+        } catch (\Exception $e) {
+            $response = $this->exceptionToResponse($id, $className, $e);
+        }
+
+        return $response;
+    }
+
+    /**
+     * @param string|int $id
+     * @param string     $className
+     * @param Exception  $e
+     *
+     * @return GetOneResponse
+     */
+    private function exceptionToResponse($id, $className, Exception $e)
+    {
+        $presenter = new ErrorBagPresenter();
+
+        switch (get_class($e)) {
+            case ResourceNotFoundException::class:
+                $notFound = new NotFoundError($className, $id);
+                $body = $presenter->toJson(new ErrorBag([$notFound]));
+
+                $response = new GetOneResponse(404, $body, $e);
+                break;
+
+            default:
+                $response = new GetOneResponse(500, '', $e);
+        }
+
+        return $response;
     }
 }

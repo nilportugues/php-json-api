@@ -10,7 +10,7 @@
 
 namespace NilPortugues\Api\JsonApi\Http\Response;
 
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
 
 /**
  * Class AbstractErrorResponse.

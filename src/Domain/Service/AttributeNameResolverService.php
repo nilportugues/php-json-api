@@ -10,7 +10,7 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
-use NilPortugues\Api\JsonApi\Domain\Contracts\MappingRepository;
+use NilPortugues\Api\JsonApi\Domain\Model\Contracts\MappingRepository;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 
 class AttributeNameResolverService

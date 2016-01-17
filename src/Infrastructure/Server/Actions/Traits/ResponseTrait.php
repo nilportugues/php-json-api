@@ -10,6 +10,7 @@
 
 namespace NilPortugues\Api\JsonApi\Server\Actions\Traits;
 
+use NilPortugues\Api\JsonApi\Domain\Model\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Http\PaginatedResource;
 use NilPortugues\Api\JsonApi\Http\Response\BadRequest;
 use NilPortugues\Api\JsonApi\Http\Response\ResourceConflicted;
@@ -21,7 +22,6 @@ use NilPortugues\Api\JsonApi\Http\Response\ResourceUpdated;
 use NilPortugues\Api\JsonApi\Http\Response\Response;
 use NilPortugues\Api\JsonApi\Http\Response\UnprocessableEntity;
 use NilPortugues\Api\JsonApi\Http\Response\UnsupportedAction;
-use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 
