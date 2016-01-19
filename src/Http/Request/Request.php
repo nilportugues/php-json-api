@@ -94,7 +94,7 @@ class Request extends \Zend\Diactoros\Request
             (!empty($queryParam['cursor'])) ? $queryParam['cursor'] : null,
             (!empty($queryParam['limit'])) ? $queryParam['limit'] : null,
             (!empty($queryParam['offset'])) ? $queryParam['offset'] : null,
-            (!empty($queryParam['size'])) ? $queryParam['size'] : 10
+            (!empty($queryParam['size'])) ? $queryParam['size'] : null
         );
 
         return $page;
