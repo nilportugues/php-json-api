@@ -67,14 +67,13 @@ class ResourceRepository implements ResourceRepositoryInterface
     }
 
     /**
-     * @param array $data
      * @param array $values
      *
      * @return mixed
      */
-    public function persist(array $data, array $values)
+    public function persist(array $values)
     {
-        return $this->repository->persist($data, $values);
+        return $this->repository->persist($values);
     }
 
     /**

@@ -11,8 +11,8 @@
 namespace NilPortugues\Api\JsonApi\Application\Command\Post;
 
 use NilPortugues\Api\JsonApi\Domain\Model\Contracts\ResourceRepository;
+use NilPortugues\Api\JsonApi\Domain\Service\AttributeNameResolverService;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
-use NilPortugues\Api\JsonApi\Server\Data\AttributeNameResolverService;
 use NilPortugues\Api\JsonApi\Server\Data\PostAssertion;
 
 class PostCommandHandler
@@ -64,6 +64,6 @@ class PostCommandHandler
         $this->assertion->assert($createResource->data(), $createResource->className());
 
         $values = $this->resolverService->resolve($createResource->data());
-        $this->repository->persist($createResource->data(), $values);
+        $this->repository->persist($values);
     }
 }

@@ -30,12 +30,11 @@ interface ResourceRepository
     public function delete($id);
 
     /**
-     * @param array $data
      * @param array $values
      *
      * @return mixed
      */
-    public function persist(array $data, array $values);
+    public function persist(array $values);
 
     /**
      * @return mixed
