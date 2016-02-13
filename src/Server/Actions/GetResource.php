@@ -22,6 +22,11 @@ use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
 use NilPortugues\Api\JsonApi\Server\Query\QueryException;
 use NilPortugues\Api\JsonApi\Server\Query\QueryObject;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\PageRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\ReadRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\Repository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\WriteRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Fields as EntityFields;
 
 /**
  * Class GetResource.
@@ -50,17 +55,25 @@ class GetResource
      * @var Included
      */
     protected $included;
+    /**
+     * @var Repository|ReadRepository|WriteRepository|PageRepository
+     */
+    protected $repository;
 
     /**
+     * GetResource constructor.
+     * @param Repository $repository
      * @param JsonApiSerializer $serializer
-     * @param Fields            $fields
-     * @param Included          $included
+     * @param Fields $fields
+     * @param Included $included
      */
     public function __construct(
+        Repository $repository,
         JsonApiSerializer $serializer,
         Fields $fields,
         Included $included
     ) {
+        $this->repository = $repository;
         $this->serializer = $serializer;
         $this->errorBag = new ErrorBag();
         $this->fields = $fields;
@@ -70,19 +83,19 @@ class GetResource
     /**
      * @param string|int $id
      * @param string     $className
-     * @param callable   $callable
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function get($id, $className, callable $callable)
+    public function get($id, $className)
     {
         try {
             QueryObject::assert($this->serializer, $this->fields, $this->included, new Sorting(), $this->errorBag, $className);
-            $data = $callable();
 
-            if (empty($data)) {
+            $fields = new EntityFields($this->fields->get());
+            $data = $this->repository->find(new EntityId($id), $fields);
+
+            if (null == $data) {
                 $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
-
                 return $this->resourceNotFound(new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)]));
             }
 

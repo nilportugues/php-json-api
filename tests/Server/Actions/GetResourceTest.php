@@ -16,15 +16,21 @@ use NilPortugues\Api\JsonApi\JsonApiSerializer;
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Server\Actions\GetResource;
 use NilPortugues\Api\Mapping\Mapper;
+use NilPortugues\Foundation\Infrastructure\Model\Repository\InMemory\InMemoryRepository;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\Post;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\User;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\PostId;
 use NilPortugues\Tests\Api\JsonApi\Dummy\ComplexObject\ValueObject\UserId;
+use NilPortugues\Tests\Api\JsonApi\HelperFactory;
 use NilPortugues\Tests\Api\JsonApi\HelperMapping;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetResourceTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var InMemoryRepository
+     */
+    protected $repository;
     /**
      * @var JsonApiSerializer
      */
@@ -55,49 +61,39 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
+        $this->serializer = new JsonApiSerializer(
+            new JsonApiTransformer(
+                new Mapper(HelperMapping::complex())
+            )
+        );
+
         $this->fields = new Fields();
         $this->included = new Included();
 
-        $this->resource = new GetResource($this->serializer, $this->fields, $this->included);
+        $this->repository = new InMemoryRepository(
+            [9 => HelperFactory::complexPost()]
+        );
 
-        $this->findOneCallable = function () {
-            $user = new User(new UserId(1), 'Post Author');
-
-            return new Post(new PostId(10), 'Old title', 'Old content', $user, []);
-        };
+        $this->resource = new GetResource(
+            $this->repository,
+            $this->serializer,
+            $this->fields,
+            $this->included
+        );
     }
 
     public function testItCanGet()
     {
-        $response = $this->resource->get(10, Post::class, $this->findOneCallable);
-
+        $response = $this->resource->get(9, Post::class);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testItCanGetWillReturnNotFoundErrorResponse()
     {
-        $findOneCallable = function () {
-            return;
-        };
-
-        $response = $this->resource->get(10, Post::class, $findOneCallable);
-
+        $response = $this->resource->get(100, Post::class);
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(404, $response->getStatusCode());
-    }
-
-    public function testItCanGetWillReturnErrorResponse()
-    {
-        $findOneCallable = function () {
-            throw new \Exception();
-        };
-
-        $response = $this->resource->get(10, Post::class, $findOneCallable);
-
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(400, $response->getStatusCode());
     }
 
     public function testItCanGetWillReturnErrorResponseBecauseOfInvalidParams()
@@ -105,9 +101,14 @@ class GetResourceTest extends \PHPUnit_Framework_TestCase
         $this->fields = new Fields();
         $this->fields->addField('superhero', 'power');
 
-        $this->resource = new GetResource($this->serializer, $this->fields, $this->included);
+        $this->resource = new GetResource(
+            $this->repository,
+            $this->serializer,
+            $this->fields,
+            $this->included
+        );
 
-        $response = $this->resource->get(10, Post::class, $this->findOneCallable);
+        $response = $this->resource->get(9, Post::class, $this->findOneCallable);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(400, $response->getStatusCode());
