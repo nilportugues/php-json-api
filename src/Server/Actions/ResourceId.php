@@ -4,12 +4,13 @@ namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use NilPortugues\Foundation\Domain\Model\Repository\Contracts\Identity;
 
-class EntityId implements Identity
+class ResourceId implements Identity
 {
     protected $id;
 
     /**
      * EntityId constructor.
+     *
      * @param $id
      */
     public function __construct($id)
@@ -22,7 +23,7 @@ class EntityId implements Identity
      */
     public function id()
     {
-         return $this->id;
+        return $this->id;
     }
 
     /**
@@ -33,4 +34,3 @@ class EntityId implements Identity
         return (string) $this->id;
     }
 }
-

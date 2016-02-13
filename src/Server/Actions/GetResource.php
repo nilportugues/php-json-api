@@ -26,7 +26,7 @@ use NilPortugues\Foundation\Domain\Model\Repository\Contracts\PageRepository;
 use NilPortugues\Foundation\Domain\Model\Repository\Contracts\ReadRepository;
 use NilPortugues\Foundation\Domain\Model\Repository\Contracts\Repository;
 use NilPortugues\Foundation\Domain\Model\Repository\Contracts\WriteRepository;
-use NilPortugues\Foundation\Domain\Model\Repository\Fields as EntityFields;
+use NilPortugues\Foundation\Domain\Model\Repository\Fields as ResourceFields;
 
 /**
  * Class GetResource.
@@ -62,10 +62,11 @@ class GetResource
 
     /**
      * GetResource constructor.
-     * @param Repository $repository
+     *
+     * @param Repository        $repository
      * @param JsonApiSerializer $serializer
-     * @param Fields $fields
-     * @param Included $included
+     * @param Fields            $fields
+     * @param Included          $included
      */
     public function __construct(
         Repository $repository,
@@ -91,11 +92,13 @@ class GetResource
         try {
             QueryObject::assert($this->serializer, $this->fields, $this->included, new Sorting(), $this->errorBag, $className);
 
-            $fields = new EntityFields($this->fields->get());
-            $data = $this->repository->find(new EntityId($id), $fields);
+            $resourceId = new ResourceId($id);
+            $resourceFields = new ResourceFields($this->fields->get());
+            $data = $this->repository->find($resourceId, $resourceFields);
 
-            if (null == $data) {
+            if (empty($data)) {
                 $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
+
                 return $this->resourceNotFound(new ErrorBag([new NotFoundError($mapping->getClassAlias(), $id)]));
             }
 

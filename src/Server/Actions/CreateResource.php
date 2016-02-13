@@ -17,6 +17,10 @@ use NilPortugues\Api\JsonApi\Server\Data\DataException;
 use NilPortugues\Api\JsonApi\Server\Data\DataObject;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\PageRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\ReadRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\Repository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\WriteRepository;
 
 /**
  * Class CreateResource.
@@ -34,11 +38,17 @@ class CreateResource
      * @var JsonApiSerializer
      */
     protected $serializer;
-
     /**
+     * @var Repository|ReadRepository|WriteRepository|PageRepository
+     */
+    protected $repository;
+    /**
+     * CreateResource constructor.
+     *
+     * @param Repository        $repository
      * @param JsonApiSerializer $serializer
      */
-    public function __construct(JsonApiSerializer $serializer)
+    public function __construct(Repository $repository, JsonApiSerializer $serializer)
     {
         $this->serializer = $serializer;
         $this->errorBag = new ErrorBag();

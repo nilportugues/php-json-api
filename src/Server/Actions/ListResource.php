@@ -24,6 +24,10 @@ use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\OufOfBoundsError;
 use NilPortugues\Api\JsonApi\Server\Query\QueryException;
 use NilPortugues\Api\JsonApi\Server\Query\QueryObject;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\PageRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\ReadRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\Repository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\WriteRepository;
 
 /**
  * Class ListResource.
@@ -65,14 +69,23 @@ class ListResource
     protected $serializer;
 
     /**
+     * @var Repository|ReadRepository|WriteRepository|PageRepository
+     */
+    protected $repository;
+
+    /**
+     * ListResource constructor.
+     *
+     * @param Repository        $repository
      * @param JsonApiSerializer $serializer
      * @param Page              $page
      * @param Fields            $fields
      * @param Sorting           $sorting
      * @param Included          $included
-     * @param array             $filters
+     * @param $filters
      */
     public function __construct(
+        Repository $repository,
         JsonApiSerializer $serializer,
         Page $page,
         Fields $fields,
@@ -80,6 +93,7 @@ class ListResource
         Included $included,
         $filters
     ) {
+        $this->repository = $repository;
         $this->serializer = $serializer;
         $this->errorBag = new ErrorBag();
         $this->page = $page;

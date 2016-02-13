@@ -18,6 +18,10 @@ use NilPortugues\Api\JsonApi\Server\Data\DataObject;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\PageRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\ReadRepository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\Repository;
+use NilPortugues\Foundation\Domain\Model\Repository\Contracts\WriteRepository;
 
 /**
  * Class PatchResource.
@@ -35,13 +39,21 @@ class PatchResource
      * @var JsonApiSerializer
      */
     protected $serializer;
+    /**
+     * @var Repository|ReadRepository|WriteRepository|PageRepository
+     */
+    protected $repository;
 
     /**
+     * PatchResource constructor.
+     *
+     * @param Repository        $repository
      * @param JsonApiSerializer $serializer
      */
-    public function __construct(JsonApiSerializer $serializer)
+    public function __construct(Repository $repository, JsonApiSerializer $serializer)
     {
         $this->serializer = $serializer;
+        $this->repository = $repository;
         $this->errorBag = new ErrorBag();
     }
 
@@ -58,7 +70,9 @@ class PatchResource
     {
         try {
             DataObject::assertPatch($data, $this->serializer, $className, $this->errorBag);
-            $model = $findOneCallable();
+
+            $resourceId = new ResourceId($id);
+            $model = $this->repository->find($resourceId);
 
             if (empty($model)) {
                 $mapping = $this->serializer->getTransformer()->getMappingByClassName($className);
