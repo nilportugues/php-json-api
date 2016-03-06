@@ -2,9 +2,8 @@
 =========================================
 
 [![Build Status](https://travis-ci.org/nilportugues/php-json-api.svg)](https://travis-ci.org/nilportugues/php-json-api)
-[![Coverage Status](https://coveralls.io/repos/nilportugues/json-api/badge.svg?branch=master&service=github?)](https://coveralls.io/github/nilportugues/json-api?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nilportugues/json-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nilportugues/json-api/?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/e39e4c0e-a402-495b-a763-6e0482e2083d/mini.png)](https://insight.sensiolabs.com/projects/e39e4c0e-a402-495b-a763-6e0482e2083d) [![Latest Stable Version](https://poser.pugx.org/nilportugues/json-api/v/stable)](https://packagist.org/packages/nilportugues/json-api) [![Total Downloads](https://poser.pugx.org/nilportugues/json-api/downloads)](https://packagist.org/packages/nilportugues/json-api) [![License](https://poser.pugx.org/nilportugues/json-api/license)](https://packagist.org/packages/nilportugues/json-api) 
-
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://paypal.me/nilportugues)
 
  - [Installation](#installation)
  - [Transfomer Classes](#transfomer-classes)
