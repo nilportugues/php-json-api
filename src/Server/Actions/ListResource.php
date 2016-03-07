@@ -130,7 +130,7 @@ class ListResource
             $results = $resultsCallable();
 
             $paginatedResource = new PaginatedResource(
-                $this->serializer->serialize($results),
+                $this->serializer->serialize($results, $this->fields, $this->included),
                 $this->page->number(),
                 $this->page->size(),
                 $totalAmount,
