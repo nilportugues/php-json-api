@@ -176,7 +176,7 @@ class ListResource
                 'self' => $pageNumber,
                 'first' => 1,
                 'next' => ($next <= $last) ? $next : null,
-                'previous' => ($previous > 1) ? $previous : null,
+                'previous' => ($previous >= 1) ? $previous : null,
                 'last' => $last,
             ]
         );
