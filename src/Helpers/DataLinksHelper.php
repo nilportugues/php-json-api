@@ -102,9 +102,7 @@ class DataLinksHelper
                                     $mappings,
                                     $d,
                                     $parentType
-                                );
-
-                                
+                                );                                
 
                                 if (!empty($mappings[$parentType]) && !empty($selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName))) {
                                     $href = \str_replace($idProperties, $idValues, $selfLink);
@@ -127,7 +125,7 @@ class DataLinksHelper
                                 $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
                                 //Removes relationships related to the current resource if filtering include resources has been set.
-                                if ($mappings[$parentType]->isFilteringIncludedResources()) {
+                                if (!empty($mappings[$parentType]) && !empty($mappings[$parentType]->isFilteringIncludedResources())) {
                                     foreach ($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] as $position => $includedResource) {
                                         if (false === in_array($type, $mappings[$parentType]->getIncludedResources(), true)) {
                                             unset($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][$position]);
@@ -234,9 +232,7 @@ class DataLinksHelper
             }
             $idValues = array_values($copy);
 
-            $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
-
-            if (!empty($selfLink)) {
+            if (!empty($mappings[$parentType]) && !empty($selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName))) {
                 $url = self::buildUrl($mappings, $idProperties, $idValues, $selfLink, $parentType);
 
                 if ($url !== $selfLink) {
@@ -259,10 +255,9 @@ class DataLinksHelper
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if (\is_scalar($parentType)) {
-                $relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName);
+            if (\is_scalar($parentType)) {                
 
-                if (!empty($relatedUrl)) {
+                if (!empty($mappings[$parentType]) && !empty($relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName))) {
                     $copy = $parent;
                     RecursiveFormatterHelper::formatScalarValues($copy);
                     if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
