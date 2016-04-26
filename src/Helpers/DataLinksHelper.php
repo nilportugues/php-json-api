@@ -104,9 +104,9 @@ class DataLinksHelper
                                     $parentType
                                 );
 
-                                $selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName);
+                                
 
-                                if (!empty($selfLink)) {
+                                if (!empty($mappings[$parentType]) && !empty($selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName))) {
                                     $href = \str_replace($idProperties, $idValues, $selfLink);
                                     if ($selfLink != $href) {
                                         $propertyNameKey = DataAttributesHelper::transformToValidMemberName($propertyName);
