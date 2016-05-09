@@ -52,9 +52,14 @@ class Request extends \Zend\Diactoros\Request
         $included = new Included();
 
         if (is_string($include)) {
-            $includeNames = \explode(',', $include);
-            foreach ($includeNames as $relationship) {
-                $included->add($relationship);
+            if (!strlen($include)) {
+                $included->setHidden();
+            }
+            else {
+                $includeNames = \explode(',', $include);
+                foreach ($includeNames as $relationship) {
+                    $included->add($relationship);
+                }
             }
         }
 

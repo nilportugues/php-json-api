@@ -37,4 +37,9 @@ class IncludedTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->included->isEmpty());
     }
+
+    public function testIsHidden()
+    {
+        $this->assertFalse($this->included->isHidden());
+    }
 }
