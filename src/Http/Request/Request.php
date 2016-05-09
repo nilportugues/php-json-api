@@ -53,15 +53,10 @@ class Request extends \Zend\Diactoros\Request
         $include = $this->getQueryParam('include', []);
         $included = new Included();
 
-        if (is_string($include)) {
-            if (!strlen($include)) {
-                $included->setHidden();
-            } else {
-                $includeNames = \explode(',', $include);
-                foreach ($includeNames as $relationship) {
-                    $included->add($relationship);
-                }
-            }
+        if (is_string($include) && strlen($include)) {
+            $includeNames = \explode(',', $include);
+            foreach ($includeNames as $relationship) {
+                $included->add($relationship);
         }
 
         return $included;
