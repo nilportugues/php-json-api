@@ -53,7 +53,7 @@ class DataObject
         $missing = self::missingCreationAttributes($data, $serializer);
         if (false === empty($missing)) {
             foreach ($missing as $attribute) {
-                $errorBag[] = new MissingAttributeError($attribute);
+                $errorBag->offsetSet(null, new MissingAttributeError($attribute));
             }
         }
 
@@ -136,7 +136,7 @@ class DataObject
                         $relationshipData[JsonApiTransformer::DATA_KEY]
                     )
                 ) {
-                    $errorBag[] = new MissingDataError();
+                    $errorBag->offsetSet(null, new MissingDataError());
                     break;
                 }
 
@@ -165,7 +165,7 @@ class DataObject
                 $relationshipData[JsonApiTransformer::TYPE_KEY]
             )
         ) {
-            $errorBag[] = new MissingTypeError();
+            $errorBag->offsetSet(null, new MissingTypeError());
 
             return;
         }
@@ -175,7 +175,7 @@ class DataObject
                 $relationshipData[JsonApiTransformer::TYPE_KEY]
             )
         ) {
-            $errorBag[] = new InvalidTypeError($relationshipData[JsonApiTransformer::TYPE_KEY]);
+            $errorBag->offsetSet(null, new InvalidTypeError($relationshipData[JsonApiTransformer::TYPE_KEY]));
 
             return;
         }
@@ -194,7 +194,7 @@ class DataObject
 
             foreach (array_keys($relationshipData[JsonApiTransformer::ATTRIBUTES_KEY]) as $property) {
                 if (false === in_array($property, $properties, true)) {
-                    $errorBag[] = new InvalidAttributeError($property, $relationshipData[JsonApiTransformer::TYPE_KEY]);
+                    $errorBag->offsetSet(null, new InvalidAttributeError($property, $relationshipData[JsonApiTransformer::TYPE_KEY]));
                 }
             }
         }

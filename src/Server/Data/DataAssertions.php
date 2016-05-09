@@ -47,7 +47,7 @@ class DataAssertions
     protected static function assertItIsArray($data, ErrorBag $errorBag)
     {
         if (empty($data) || !is_array($data)) {
-            $errorBag[] = new MissingDataError();
+            $errorBag->offsetSet(null, new MissingDataError());
             throw new DataException();
         }
     }
@@ -61,7 +61,7 @@ class DataAssertions
     protected static function assertItHasTypeMember(array $data, ErrorBag $errorBag)
     {
         if (empty($data[JsonApiTransformer::TYPE_KEY]) || !is_string($data[JsonApiTransformer::TYPE_KEY])) {
-            $errorBag[] = new MissingTypeError();
+            $errorBag->offsetSet(null, new MissingTypeError());
             throw new DataException();
         }
     }
@@ -83,7 +83,7 @@ class DataAssertions
         $mapping = $serializer->getTransformer()->getMappingByAlias($data[JsonApiTransformer::TYPE_KEY]);
 
         if (null === $mapping || $mapping->getClassName() !== $className) {
-            $errorBag[] = new InvalidTypeError($data[JsonApiTransformer::TYPE_KEY]);
+            $errorBag->offsetSet(null, new InvalidTypeError($data[JsonApiTransformer::TYPE_KEY]));
             throw new DataException();
         }
     }
@@ -97,7 +97,7 @@ class DataAssertions
     protected static function assertItHasAttributeMember($data, ErrorBag $errorBag)
     {
         if (empty($data[JsonApiTransformer::ATTRIBUTES_KEY]) || !is_array($data[JsonApiTransformer::ATTRIBUTES_KEY])) {
-            $errorBag[] = new MissingAttributesError();
+            $errorBag->offsetSet(null, new MissingAttributesError());
             throw new DataException();
         }
     }
@@ -127,7 +127,7 @@ class DataAssertions
         foreach ($inputAttributes as $property) {
             if (false === in_array($property, $properties)) {
                 $hasErrors = true;
-                $errorBag[] = new InvalidAttributeError($property, $data[JsonApiTransformer::TYPE_KEY]);
+                $errorBag->offsetSet(null, new InvalidAttributeError($property, $data[JsonApiTransformer::TYPE_KEY]));
             }
         }
 

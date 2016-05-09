@@ -79,7 +79,7 @@ class QueryObject
 
                     $invalidMembers = array_diff($fields->members($type), $members);
                     foreach ($invalidMembers as $extraField) {
-                        $errorBag[] = new InvalidParameterMemberError($extraField, $type, strtolower($paramName));
+                        $errorBag->offsetSet(null, new InvalidParameterMemberError($extraField, $type, strtolower($paramName)));
                     }
                     unset($validateFields[$key]);
                 }
@@ -87,7 +87,7 @@ class QueryObject
 
             if (false === empty($validateFields)) {
                 foreach ($validateFields as $type) {
-                    $errorBag[] = new InvalidParameterError($type, strtolower($paramName));
+                    $errorBag->offsetSet(null, new InvalidParameterError($type, strtolower($paramName)));
                 }
             }
         }
@@ -116,7 +116,7 @@ class QueryObject
             if (is_array($data)) {
                 foreach ($data as $subResource) {
                     if (null == $transformer->getMappingByAlias($subResource)) {
-                        $errorBag[] = new InvalidParameterError($subResource, strtolower($paramName));
+                        $errorBag->offsetSet(null, new InvalidParameterError($subResource, strtolower($paramName)));
                     }
                 }
             }
@@ -143,7 +143,7 @@ class QueryObject
                 $invalidProperties = array_diff($sortsFields, $mapping->getProperties());
 
                 foreach ($invalidProperties as $extraField) {
-                    $errorBag[] = new InvalidSortError($extraField);
+                    $errorBag->offsetSet(null, new InvalidSortError($extraField));
                 }
             }
         }
