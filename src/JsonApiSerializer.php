@@ -65,8 +65,8 @@ class JsonApiSerializer extends DeepCopySerializer
      */
     protected function filterOutIncludedResources(Included $included)
     {
-        if($included->isHidden()) {
-            foreach($this->serializationStrategy->getMappings() as $mapping) {
+        if ($included->isHidden()) {
+            foreach ($this->serializationStrategy->getMappings() as $mapping) {
                 $mapping->filteringIncludedResources(true);
             }
         }

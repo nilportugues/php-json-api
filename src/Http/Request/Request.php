@@ -52,7 +52,7 @@ class Request extends \Zend\Diactoros\Request
         $included = new Included();
 
         if (is_string($include)) {
-            if(!strlen($include)) {
+            if (!strlen($include)) {
                 $included->setHidden();
             }
             else {
