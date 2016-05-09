@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi\Http\Request;
 
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
@@ -54,8 +53,7 @@ class Request extends \Zend\Diactoros\Request
         if (is_string($include)) {
             if (!strlen($include)) {
                 $included->setHidden();
-            }
-            else {
+            } else {
                 $includeNames = \explode(',', $include);
                 foreach ($includeNames as $relationship) {
                     $included->add($relationship);

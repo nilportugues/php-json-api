@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi;
 
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
@@ -69,8 +68,7 @@ class JsonApiSerializer extends DeepCopySerializer
             foreach ($this->serializationStrategy->getMappings() as $mapping) {
                 $mapping->filteringIncludedResources(true);
             }
-        }
-        else if (false === $included->isEmpty()) {
+        } elseif (false === $included->isEmpty()) {
             foreach ($included->get() as $resource => $includeData) {
                 foreach ($this->serializationStrategy->getMappings() as $mapping) {
                     $mapping->filteringIncludedResources(true);

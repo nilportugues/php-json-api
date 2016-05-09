@@ -8,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -102,7 +101,7 @@ class DataLinksHelper
                                     $mappings,
                                     $d,
                                     $parentType
-                                );                                
+                                );
 
                                 if (!empty($mappings[$parentType]) && !empty($selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName))) {
                                     $href = \str_replace($idProperties, $idValues, $selfLink);
@@ -255,8 +254,7 @@ class DataLinksHelper
         if (!empty($parent[Serializer::CLASS_IDENTIFIER_KEY]) && !empty($data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
             $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if (\is_scalar($parentType)) {                
-
+            if (\is_scalar($parentType)) {
                 if (!empty($mappings[$parentType]) && !empty($relatedUrl = $mappings[$parentType]->getRelatedUrl($propertyName))) {
                     $copy = $parent;
                     RecursiveFormatterHelper::formatScalarValues($copy);
