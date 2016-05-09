@@ -23,6 +23,9 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  */
 class Request extends \Zend\Diactoros\Request
 {
+    /** @var ServerRequestInterface|\Zend\Diactoros\ServerRequest */
+    protected $request;
+
     /**
      * @param ServerRequestInterface $request
      */
