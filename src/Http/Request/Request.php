@@ -55,7 +55,7 @@ class Request extends \Zend\Diactoros\Request
 
         if (is_string($include) && strlen($include)) {
             $includeNames = \explode(',', $include);
-            foreach($includeNames as $relationship) {
+            foreach ($includeNames as $relationship) {
                 $included->add($relationship);
             }
         }
