@@ -1,5 +1,4 @@
 bin/
-.idea/
 vendor/
 composer.lock
 build/

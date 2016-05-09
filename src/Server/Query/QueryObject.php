@@ -108,14 +108,14 @@ class QueryObject
         $transformer = $serializer->getTransformer();
 
         foreach ($included->get() as $resource => $data) {
-            if (null == $transformer->getMappingByAlias($resource)) {
-                $errorBag[] = new InvalidParameterError($resource, strtolower($paramName));
+            if (null === $transformer->getMappingByAlias($resource)) {
+                $errorBag->offsetSet(null, new InvalidParameterError($resource, strtolower($paramName)));
                 continue;
             }
 
             if (is_array($data)) {
                 foreach ($data as $subResource) {
-                    if (null == $transformer->getMappingByAlias($subResource)) {
+                    if (null === $transformer->getMappingByAlias($subResource)) {
                         $errorBag->offsetSet(null, new InvalidParameterError($subResource, strtolower($paramName)));
                     }
                 }

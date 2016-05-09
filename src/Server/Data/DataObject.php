@@ -81,7 +81,7 @@ class DataObject
      *
      * @return array
      */
-    protected static function missingCreationAttributes(array $data, $serializer)
+    protected static function missingCreationAttributes(array $data, JsonApiSerializer $serializer)
     {
         $inputAttributes = array_keys($data[JsonApiTransformer::ATTRIBUTES_KEY]);
 

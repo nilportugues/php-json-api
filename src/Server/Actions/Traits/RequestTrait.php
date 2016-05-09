@@ -12,7 +12,6 @@ namespace NilPortugues\Api\JsonApi\Server\Actions\Traits;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Included;
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
-use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterError;
 use NilPortugues\Api\JsonApi\Server\Errors\InvalidParameterMemberError;
 use NilPortugues\Api\Mapping\Mapping;
@@ -23,12 +22,12 @@ use NilPortugues\Api\Mapping\Mapping;
 trait RequestTrait
 {
     /**
-     * @var Error[]
+     * @var \NilPortugues\Api\JsonApi\Server\Errors\Error[]
      */
     protected $queryParamErrorBag = [];
 
     /**
-     * @return Error[]
+     * @return \NilPortugues\Api\JsonApi\Server\Errors\Error[]
      */
     protected function getQueryParamsErrors()
     {
@@ -42,7 +41,7 @@ trait RequestTrait
      *
      * @return bool
      */
-    protected function hasValidQueryParams($serializer, Fields $fields, Included $included)
+    protected function hasValidQueryParams(JsonApiSerializer $serializer, Fields $fields, Included $included)
     {
         $this->validateFieldsQueryParams($serializer, $fields, 'Fields');
         $this->validateIncludeQueryParamsTypes($serializer, $included, 'Include');
@@ -55,7 +54,7 @@ trait RequestTrait
      * @param Fields            $fields
      * @param string            $paramName
      */
-    protected function validateFieldsQueryParams($serializer, Fields $fields, $paramName)
+    protected function validateFieldsQueryParams(JsonApiSerializer $serializer, Fields $fields, $paramName)
     {
         if (false === $fields->isEmpty()) {
             $validateFields = $fields->types();
@@ -121,7 +120,7 @@ trait RequestTrait
      * @param Included          $included
      * @param string            $paramName
      */
-    protected function validateIncludeQueryParamsTypes($serializer, Included $included, $paramName)
+    protected function validateIncludeQueryParamsTypes(JsonApiSerializer $serializer, Included $included, $paramName)
     {
         if (false === $included->isEmpty()) {
             $validateFields = array_keys($included->get());
