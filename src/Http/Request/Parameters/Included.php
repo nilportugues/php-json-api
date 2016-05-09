@@ -21,6 +21,11 @@ class Included
     protected $included = [];
 
     /**
+     * @var bool
+     */
+    protected $hidden = false;
+
+    /**
      * @param string $relationship
      */
     public function add($relationship)
@@ -53,5 +58,21 @@ class Included
     public function isEmpty()
     {
         return 0 === count($this->included);
+    }
+    
+    /**
+     * @param bool $hidden
+     */
+    public function setHidden($hidden = true)
+    {
+        $this->hidden = $hidden;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
     }
 }
