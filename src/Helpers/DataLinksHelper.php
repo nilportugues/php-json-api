@@ -133,8 +133,8 @@ class DataLinksHelper
                                 }
 
                                 $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] = array_filter($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName]);
-                                if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName])) {
-                                    $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyNameKey][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName];
+                                if (!empty($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::DATA_KEY])) {
+                                    $data[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyNameKey][JsonApiTransformer::DATA_KEY][] = $newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][JsonApiTransformer::DATA_KEY];
                                 }
                             }
                         }
