@@ -125,7 +125,7 @@ class JsonApiTransformer extends Transformer
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if (\is_scalar($type)) {
+            if (\is_scalar($type) && !empty($this->mappings[$type])) {
                 $urls = $this->mappings[$type]->getUrls();
 
                 $data[self::LINKS_KEY] = \array_filter(
