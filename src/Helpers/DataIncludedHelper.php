@@ -43,7 +43,7 @@ class DataIncludedHelper
 
                             //Remove those resources that do not to appear in the getIncludedResources array.
                             foreach ($inArrayValue as $position => $includableValue) {
-                                if ($mappings[$parentType]->isFilteringIncludedResources()
+                                if (!empty($mappings[$parentType]) && $mappings[$parentType]->isFilteringIncludedResources()
                                     && false === in_array(
                                         $includableValue[Serializer::CLASS_IDENTIFIER_KEY],
                                         $mappings[$parentType]->getIncludedResources(),
@@ -73,7 +73,7 @@ class DataIncludedHelper
         if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $copy[Serializer::CLASS_IDENTIFIER_KEY];
 
-            if (\is_scalar($type)) {
+            if (\is_scalar($type) && !empty($mappings[$type])) {
                 foreach ($mappings[$type]->getIdProperties() as $propertyName) {
                     unset($copy[$propertyName]);
                 }
