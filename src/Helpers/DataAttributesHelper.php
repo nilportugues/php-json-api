@@ -119,7 +119,7 @@ class DataAttributesHelper
             }
 
             if (\is_array($value) && !array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
-                if (self::containsClassIdentifierKey($value)) {
+                if (self::containsClassIdentifierKey($value) || self::arrayWithScalarValue($value)) {
                     $attributes[$keyName] = $value;
                 }
             }
@@ -185,5 +185,29 @@ class DataAttributesHelper
         }
 
         return !$foundIdentifierKey;
+    }
+
+    /**
+     * @param array $input
+     *
+     * @return bool
+     */
+    protected static function arrayWithScalarValue(array $input)
+    {
+        if (!is_array($input)) {
+            return false;
+        }
+
+        if (!empty($input[Serializer::SCALAR_VALUE])) {
+            $input = $input[Serializer::SCALAR_VALUE];
+
+            if (\is_array($input)) {
+                foreach ($input as $value) {
+                    return self::isScalarValue($value);
+                }
+            }
+        }
+
+        return false;
     }
 }
