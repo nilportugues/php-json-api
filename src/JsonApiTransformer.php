@@ -213,7 +213,6 @@ class JsonApiTransformer extends Transformer
         $data = array_filter($data);
 
         $this->setResponseLinks($value, $data);
-        $this->setResponseMeta($data);
         $this->setResponseVersion($data);
 
         return (empty($data['data'])) ? array_merge(['data' => []], $data) : $data;
