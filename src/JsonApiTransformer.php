@@ -14,9 +14,9 @@ use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
 
 /**
- * This Transformer follows the http://JsonApi.org specification.
+ * This Transformer follows the http://jsonapi.org specification.
  *
- * @link http://JsonApi.org/format/#document-structure
+ * @link http://jsonapi.org/format/#document-structure
  */
 class JsonApiTransformer extends Transformer
 {
@@ -123,7 +123,6 @@ class JsonApiTransformer extends Transformer
             )
         );
 
-
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
@@ -136,7 +135,6 @@ class JsonApiTransformer extends Transformer
                         (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
                     )
                 );
-
 
                 /*
                  * Adds the _links:self:href link to the response.
@@ -156,17 +154,12 @@ class JsonApiTransformer extends Transformer
                 if ($href != $this->mappings[$type]->getResourceUrl()) {
                     $data[self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = $href;
                 }
-
             }
         }
-
-
-
 
         if (empty($data[self::LINKS_KEY])) {
             unset($data[self::LINKS_KEY]);
         }
-
     }
 
     /**

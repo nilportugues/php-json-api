@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Tests\JsonApi;
 
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
@@ -83,14 +84,14 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                "id":"1"
             }
          },
-        "comments": {
+         "comments": {
             "data": [
                 {
                     "type": "comment",
                     "id": "1000"
                 }
             ]
-        }
+         }
       }
    },
    "included":[
@@ -188,15 +189,10 @@ JSON;
         );
         $transformer->addMeta('is_devel', true);
 
-        print_r(\json_decode((new JsonApiSerializer($transformer))->serialize($post), true));
-
         $this->assertEquals(
             \json_decode($expected, true),
             \json_decode((new JsonApiSerializer($transformer))->serialize($post), true)
         );
-
-
-        die();
     }
 
     /**
@@ -265,12 +261,6 @@ JSON;
       "self":{
          "href":"http://example.com/posts/9"
       },
-      "first":{
-         "href":"http://example.com/posts/1"
-      },
-      "next":{
-         "href":"http://example.com/posts/10"
-      },
       "comments":{
          "href":"http://example.com/posts/9/comments"
       }
@@ -302,7 +292,6 @@ JSON;
 
         $included = new Included();
         $included->add('user.post');
-
 
         $this->assertEquals(
             \json_decode($expected, true),
@@ -540,12 +529,14 @@ JSON;
             "self": { "href": "/post/1" }
         }
     },
+    "links": {
+        "self": { "href": "/post/1" }
+    },
     "jsonapi": {
         "version": "1.0"
     }
 }
 JSON;
-
         $this->assertEquals(
             \json_decode($expected, true),
             \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
@@ -612,6 +603,9 @@ JSON;
         "links": {
             "self": { "href": "/post/1" }
         }
+    },
+    "links": {
+        "self": { "href": "/post/1" }
     },
     "jsonapi": {
         "version": "1.0"
@@ -684,6 +678,9 @@ JSON;
             "self": { "href": "/post/1" }
         }
     },
+    "links": {
+        "self": { "href": "/post/1" }
+    },
     "jsonapi": {
         "version": "1.0"
     }
@@ -754,6 +751,9 @@ JSON;
             "self": { "href": "/post/1"}
         }
     },
+    "links": {
+        "self": { "href": "/post/1" }
+    },
     "jsonapi": {
         "version": "1.0"
     }
@@ -790,6 +790,9 @@ JSON;
         "links": {
             "self": { "href": "/post/1"}
         }
+    },
+    "links": {
+        "self": { "href": "/post/1" }
     },
     "jsonapi": {
         "version": "1.0"
@@ -923,6 +926,9 @@ JSON;
             "self": { "href": "/post/1" }
         }
     },
+    "links": {
+        "self": { "href": "/post/1" }
+    },
     "jsonapi": {
         "version": "1.0"
     }
@@ -971,6 +977,9 @@ JSON;
          }
       }
    },
+    "links": {
+        "self": { "href": "/comment/1" }
+    },
    "jsonapi":{
       "version":"1.0"
    }
