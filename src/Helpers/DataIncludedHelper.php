@@ -41,17 +41,7 @@ class DataIncludedHelper
                 if (\is_array($value)) {
                     foreach ($value as $inArrayValue) {
                         if (\is_array($inArrayValue)) {
-
-                            //Remove those resources that do not to appear in the getIncludedResources array.
-                            foreach ($inArrayValue as $position => $includableValue) {
-                                if (!empty($mappings[$parentType])
-                                    && count($mappings[$parentType]->getIncludedResources()) > 0
-                                    && false === in_array($includableValue[Serializer::CLASS_IDENTIFIER_KEY], $mappings[$parentType]->getIncludedResources(), true)
-                                ) {
-                                    unset($inArrayValue[$position]);
-                                }
-                            }
-
+                            $inArrayValue = self::removeResourcesNotIncluded($mappings, $parentType, $inArrayValue);
                             self::setResponseDataIncluded($mappings, $inArrayValue, $data, $parentType);
                         }
                     }
@@ -109,10 +99,7 @@ class DataIncludedHelper
                         DataLinksHelper::setResponseDataLinks($mappings, $attribute),
                         [
                             JsonApiTransformer::DATA_KEY => [
-                                $propertyName => PropertyHelper::setResponseDataTypeAndId(
-                                        $mappings,
-                                        $attribute
-                                    ),
+                                $propertyName => PropertyHelper::setResponseDataTypeAndId($mappings, $attribute),
                             ],
                         ],
                         $mappings[$type]->getRelationships()
@@ -152,8 +139,7 @@ class DataIncludedHelper
                     $mappings,
                     $relationshipData,
                     $value,
-                    $value[Serializer::CLASS_IDENTIFIER_KEY],
-                    $attributes
+                    $value[Serializer::CLASS_IDENTIFIER_KEY]
                 );
 
                 if ($relationshipData) {
@@ -162,17 +148,7 @@ class DataIncludedHelper
                         $relationshipData
                     );
 
-                    //Enforce with this check that each property leads to a data element.
-                    $relationships = [];
-                    foreach ($arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] as $attribute => $value) {
-                        //if $value[data] is not found, get next level where [data] should exist.
-                        if (!array_key_exists(JsonApiTransformer::DATA_KEY, $value)) {
-                            array_shift($value);
-                            $relationships[$attribute] = $value;
-                        } else {
-                            $relationships[$attribute] = $value;
-                        }
-                    }
+                    $relationships = self::normalizeRelationshipData($value, $arrayData);
                     $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = $relationships;
                 }
 
@@ -185,6 +161,17 @@ class DataIncludedHelper
                 \array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
             );
         }
+    }
+
+    /**
+     * @param array $includedData
+     *
+     * @return bool
+     */
+    protected static function hasIdKey(array &$includedData)
+    {
+        return \array_key_exists(JsonApiTransformer::ID_KEY, $includedData)
+        && !empty($includedData[JsonApiTransformer::ID_KEY]);
     }
 
     /**
@@ -216,13 +203,65 @@ class DataIncludedHelper
     }
 
     /**
-     * @param array $includedData
+     * Enforce with this check that each property leads to a data element.
+     *
+     * @param array $value
+     * @param array $arrayData
+     *
+     * @return array
+     */
+    protected static function normalizeRelationshipData(array &$value, array $arrayData)
+    {
+        $relationships = [];
+        foreach ($arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] as $attribute => $value) {
+
+            //if $value[data] is not found, get next level where [data] should exist.
+            if (!array_key_exists(JsonApiTransformer::DATA_KEY, $value)) {
+                array_shift($value);
+            }
+
+            //If one value in $value[data], remove the array and make it object only.
+            if (1 === count($value[JsonApiTransformer::DATA_KEY])) {
+                $value = reset($value[JsonApiTransformer::DATA_KEY]);
+            }
+
+            $relationships[$attribute] = $value;
+        }
+
+        return $relationships;
+    }
+
+    /**
+     * Remove those resources that do not to appear in the getIncludedResources array.
+     *
+     * @param array  $mappings
+     * @param string $parentType
+     * @param array  $inArrayValue
+     *
+     * @return array
+     */
+    protected static function removeResourcesNotIncluded(array &$mappings, $parentType, array $inArrayValue)
+    {
+        foreach ($inArrayValue as $position => $includeValue) {
+            if (self::isDeleteableIncludedResource($mappings, $parentType, $includeValue)) {
+                unset($inArrayValue[$position]);
+            }
+        }
+
+        return $inArrayValue;
+    }
+
+    /**
+     * @param array $mappings
+     * @param $parentType
+     * @param $includeValue
      *
      * @return bool
      */
-    protected static function hasIdKey(array &$includedData)
+    protected static function isDeleteableIncludedResource(array &$mappings, $parentType, $includeValue)
     {
-        return \array_key_exists(JsonApiTransformer::ID_KEY, $includedData)
-        && !empty($includedData[JsonApiTransformer::ID_KEY]);
+        return !empty($mappings[$parentType])
+        && count($mappings[$parentType]->getIncludedResources()) > 0
+        && false === in_array($includeValue[Serializer::CLASS_IDENTIFIER_KEY], $mappings[$parentType]->getIncludedResources(), true);
     }
 }
