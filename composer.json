@@ -19,10 +19,7 @@
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",
-        "fabpot/php-cs-fixer": "^1.9",
-        "nilportugues/php_backslasher": "^0.2.1",
-        "mmoreram/php-formatter": "dev-master",
-        "satooshi/php-coveralls": "dev-master"
+        "friendsofphp/php-cs-fixer": "^1.9"
     },
     "autoload": {
         "psr-4": {
