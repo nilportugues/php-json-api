@@ -287,7 +287,7 @@ class DataLinksHelper
      *
      * @return mixed
      */
-    protected static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
+    public static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
     {
         self::removeArraysFromKeyValueReplacement($idProperties, $idValues);
 

@@ -159,12 +159,6 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
       "self":{
          "href":"http://example.com/posts/9"
       },
-      "first":{
-         "href":"http://example.com/posts/1"
-      },
-      "next":{
-         "href":"http://example.com/posts/10"
-      },
       "comments":{
          "href":"http://example.com/posts/9/comments"
       }
@@ -193,14 +187,16 @@ JSON;
             ]
         );
         $transformer->addMeta('is_devel', true);
-        $transformer->setSelfUrl('http://example.com/posts/9');
-        $transformer->setFirstUrl('http://example.com/posts/1');
-        $transformer->setNextUrl('http://example.com/posts/10');
+
+        print_r(\json_decode((new JsonApiSerializer($transformer))->serialize($post), true));
 
         $this->assertEquals(
             \json_decode($expected, true),
             \json_decode((new JsonApiSerializer($transformer))->serialize($post), true)
         );
+
+
+        die();
     }
 
     /**
@@ -303,12 +299,10 @@ JSON;
             ]
         );
         $transformer->addMeta('is_devel', true);
-        $transformer->setSelfUrl('http://example.com/posts/9');
-        $transformer->setFirstUrl('http://example.com/posts/1');
-        $transformer->setNextUrl('http://example.com/posts/10');
 
         $included = new Included();
         $included->add('user.post');
+
 
         $this->assertEquals(
             \json_decode($expected, true),
@@ -381,12 +375,6 @@ JSON;
       "self":{
          "href":"http://example.com/posts/9"
       },
-      "first":{
-         "href":"http://example.com/posts/1"
-      },
-      "next":{
-         "href":"http://example.com/posts/10"
-      },
       "comments":{
          "href":"http://example.com/posts/9/comments"
       }
@@ -415,9 +403,6 @@ JSON;
             ]
         );
         $transformer->addMeta('is_devel', true);
-        $transformer->setSelfUrl('http://example.com/posts/9');
-        $transformer->setFirstUrl('http://example.com/posts/1');
-        $transformer->setNextUrl('http://example.com/posts/10');
 
         $included = new Included();
         $included->add('user');
@@ -457,12 +442,6 @@ JSON;
       "self":{
          "href":"http://example.com/posts/9"
       },
-      "first":{
-         "href":"http://example.com/posts/1"
-      },
-      "next":{
-         "href":"http://example.com/posts/10"
-      },
       "comments":{
          "href":"http://example.com/posts/9/comments"
       }
@@ -491,9 +470,6 @@ JSON;
             ]
         );
         $transformer->addMeta('is_devel', true);
-        $transformer->setSelfUrl('http://example.com/posts/9');
-        $transformer->setFirstUrl('http://example.com/posts/1');
-        $transformer->setNextUrl('http://example.com/posts/10');
 
         $fields = new Fields();
         $fields->addField('post', 'title');

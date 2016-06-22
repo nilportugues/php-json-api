@@ -45,24 +45,11 @@ class HelperMapping
                     'author' => [
                         'related' => ['name' => 'http://example.com/posts/{postId}/author'],
                         'self' => ['name' => 'http://example.com/posts/{postId}/relationships/author'],
+                        'comment' => ['name' => 'http://example.com/posts/{postId}/relationships/comments'],
                     ],
                 ],
             ],
-            [
-                'class' => PostId::class,
-                'alias' => '',
-                'aliased_properties' => [],
-                'hide_properties' => [],
-                'id_properties' => [
-                    'postId',
-                ],
-                'urls' => [
-                    'self' => ['name' => 'http://example.com/posts/{postId}'],
-                    'relationships' => [
-                        Comment::class => ['name' => 'http://example.com/posts/{postId}/relationships/comments'],
-                    ],
-                ],
-            ],
+
             [
                 'class' => User::class,
                 'alias' => '',

@@ -8,6 +8,7 @@ use NilPortugues\Api\JsonApi\Helpers\DataLinksHelper;
 use NilPortugues\Api\JsonApi\Helpers\PropertyHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
@@ -122,6 +123,7 @@ class JsonApiTransformer extends Transformer
             )
         );
 
+
         if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])) {
             $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
@@ -134,12 +136,37 @@ class JsonApiTransformer extends Transformer
                         (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
                     )
                 );
+
+
+                /*
+                 * Adds the _links:self:href link to the response.
+                 */
+                list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
+                    $this->mappings,
+                    $value,
+                    $type
+                );
+                $href = DataLinksHelper::buildUrl(
+                    $this->mappings,
+                    $idProperties,
+                    $idValues,
+                    $this->mappings[$type]->getResourceUrl(),
+                    $type
+                );
+                if ($href != $this->mappings[$type]->getResourceUrl()) {
+                    $data[self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = $href;
+                }
+
             }
         }
+
+
+
 
         if (empty($data[self::LINKS_KEY])) {
             unset($data[self::LINKS_KEY]);
         }
+
     }
 
     /**

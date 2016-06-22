@@ -43,12 +43,9 @@ class DataIncludedHelper
 
                             //Remove those resources that do not to appear in the getIncludedResources array.
                             foreach ($inArrayValue as $position => $includableValue) {
-                                if (!empty($mappings[$parentType]) && $mappings[$parentType]->isFilteringIncludedResources()
-                                    && false === in_array(
-                                        $includableValue[Serializer::CLASS_IDENTIFIER_KEY],
-                                        $mappings[$parentType]->getIncludedResources(),
-                                        true
-                                    )
+                                if (!empty($mappings[$parentType])
+                                    && count($mappings[$parentType]->getIncludedResources()) > 0
+                                    && false === in_array($includableValue[Serializer::CLASS_IDENTIFIER_KEY], $mappings[$parentType]->getIncludedResources(), true)
                                 ) {
                                     unset($inArrayValue[$position]);
                                 }
