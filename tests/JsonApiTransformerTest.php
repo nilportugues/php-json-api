@@ -991,4 +991,8 @@ JSON;
             \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($comment), true)
         );
     }
+
+    public function testItHasRelationships()
+    {
+    }
 }

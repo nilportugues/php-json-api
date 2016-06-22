@@ -161,6 +161,19 @@ class DataIncludedHelper
                         $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY],
                         $relationshipData
                     );
+
+                    //Enforce with this check that each property leads to a data element.
+                    $relationships = [];
+                    foreach ($arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] as $attribute => $value) {
+                        //if $value[data] is not found, get next level where [data] should exist.
+                        if (!array_key_exists(JsonApiTransformer::DATA_KEY, $value)) {
+                            array_shift($value);
+                            $relationships[$attribute] = $value;
+                        } else {
+                            $relationships[$attribute] = $value;
+                        }
+                    }
+                    $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = $relationships;
                 }
 
                 $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
