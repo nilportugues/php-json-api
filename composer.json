@@ -30,8 +30,5 @@
         "psr-4": {
             "NilPortugues\\Tests\\Api\\JsonApi\\": "tests/"
         }
-    },
-    "config": {
-        "bin-dir": "bin/"
     }
 }
