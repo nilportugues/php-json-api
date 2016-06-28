@@ -28,9 +28,7 @@ class PropertyHelper
      */
     public static function setResponseDataTypeAndId(array &$mappings, array &$value)
     {
-        $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-
-        if (empty($mappings[$type])) {
+        if (empty($type = $value[Serializer::CLASS_IDENTIFIER_KEY]) || (empty($mappings[$type]))) {
             return [];
         }
 
