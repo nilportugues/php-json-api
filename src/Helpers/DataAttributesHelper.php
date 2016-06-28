@@ -120,7 +120,7 @@ class DataAttributesHelper
             }
 
             if (\is_array($value) && !array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
-                if (self::containsClassIdentifierKey($value)) {
+                if (self::notContainsClassIdentifierKey($value)) {
                     $attributes[$keyName] = $value;
                 }
             }
@@ -162,16 +162,8 @@ class DataAttributesHelper
      *
      * @return bool
      */
-    protected static function containsClassIdentifierKey(array $input, $foundIdentifierKey = false)
+    protected static function notContainsClassIdentifierKey(array $input, $foundIdentifierKey = false)
     {
-        if (!is_array($input)) {
-            return $foundIdentifierKey || false;
-        }
-
-        if (\in_array(Serializer::CLASS_IDENTIFIER_KEY, $input, true)) {
-            return true;
-        }
-
         if (!empty($input[Serializer::SCALAR_VALUE])) {
             $input = $input[Serializer::SCALAR_VALUE];
 
@@ -179,12 +171,12 @@ class DataAttributesHelper
                 foreach ($input as $value) {
                     if (\is_array($value)) {
                         $foundIdentifierKey = $foundIdentifierKey
-                            || self::containsClassIdentifierKey($value, $foundIdentifierKey);
+                            || self::notContainsClassIdentifierKey($value, $foundIdentifierKey);
                     }
                 }
             }
         }
 
-        return !$foundIdentifierKey;
+        return false === $foundIdentifierKey;
     }
 }
