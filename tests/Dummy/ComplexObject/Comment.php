@@ -30,17 +30,23 @@ class Comment
     private $comment;
 
     /**
+     * @var \DateTime
+     */
+    private $oneDate;
+
+    /**
      * @param CommentId $id
      * @param           $comment
      * @param User      $user
      * @param array     $dates
      */
-    public function __construct(CommentId $id, $comment, User $user, array $dates)
+    public function __construct(CommentId $id, $comment, User $user, array $dates, \DateTime $d = null)
     {
         $this->commentId = $id;
         $this->comment = $comment;
         $this->user = $user;
         $this->dates = $dates;
+        $this->oneDate = $d;
     }
 
     /**
