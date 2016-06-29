@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Api\JsonApi\Http\Response\JsonApi;
+namespace NilPortugues\Tests\Api\JsonApi\Http\Response;
 
 use NilPortugues\Api\JsonApi\Http\Response\ResourceProcessing;
 

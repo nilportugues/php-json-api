@@ -62,6 +62,6 @@ class DataException extends \InvalidArgumentException
     */
     public function hasErrors()
     {
-        return (bool)$this->errors->count();
+        return (bool) $this->errors->count();
     }
 }

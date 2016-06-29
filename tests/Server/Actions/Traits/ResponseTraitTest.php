@@ -13,7 +13,7 @@ namespace NilPortugues\Tests\Api\JsonApi\Server\Actions\Traits;
 use NilPortugues\Api\JsonApi\Http\PaginatedResource;
 use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Request\ResponseInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class ResponseTraitTest extends \PHPUnit_Framework_TestCase

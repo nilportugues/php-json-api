@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi;
+namespace NilPortugues\Tests\Api\JsonApi\Http\Request;
 
 use NilPortugues\Api\JsonApi\Http\Request\Request;
 use Zend\Diactoros\ServerRequestFactory;

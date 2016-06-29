@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace NilPortugues\Tests\Api\JsonApi\Http\Message\JsonApi\Parameters;
+namespace NilPortugues\Tests\Api\JsonApi\Http\Request\Parameters;
 
 use NilPortugues\Api\JsonApi\Http\Request\Parameters\Fields;
 
