@@ -154,6 +154,7 @@ class DataIncludedHelper
 
                 $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
             }
+
         }
 
         if (!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
@@ -214,7 +215,6 @@ class DataIncludedHelper
     {
         $relationships = [];
         foreach ($arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] as $attribute => $value) {
-
             //if $value[data] is not found, get next level where [data] should exist.
             if (!array_key_exists(JsonApiTransformer::DATA_KEY, $value)) {
                 array_shift($value);
@@ -225,7 +225,9 @@ class DataIncludedHelper
                 $value = reset($value[JsonApiTransformer::DATA_KEY]);
             }
 
-            $relationships[$attribute] = $value;
+            if (count($value[JsonApiTransformer::DATA_KEY])>0) {
+                $relationships[$attribute] = $value;
+            }
         }
 
         return $relationships;

@@ -84,12 +84,12 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                "id":"1"
             }
          },
-         "comments": {
-            "data": [
-                {
-                    "type": "comment",
-                    "id": "1000"
-                }
+         "comments":{
+            "data":[
+               {
+                  "type":"comment",
+                  "id":"1000"
+               }
             ]
          }
       }
@@ -139,8 +139,7 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                "created_at":"2015-07-18T12:13:00+00:00",
                "accepted_at":"2015-07-19T00:00:00+00:00"
             },
-            "comment":"Have no fear, sers, your king is safe.",
-        	"oneDate":"2015-07-18T12:13:00+00:00"
+            "comment":"Have no fear, sers, your king is safe."
          },
          "relationships":{
             "user":{
@@ -158,11 +157,11 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
       }
    ],
    "links":{
-      "self":{
-         "href":"http://example.com/posts/9"
-      },
       "comments":{
          "href":"http://example.com/posts/9/comments"
+      },
+      "self":{
+         "href":"http://example.com/posts/9"
       }
    },
    "meta":{

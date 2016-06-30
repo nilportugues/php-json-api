@@ -130,7 +130,6 @@ class DataLinksHelper
                                         if (count($mappings[$parentType]->getIncludedResources()) > 0 &&
                                             false === in_array($type, $mappings[$parentType]->getIncludedResources(), true)
                                         ) {
-                                            //---------
                                             unset($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][$position]);
                                         }
                                     }
