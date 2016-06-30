@@ -25,25 +25,6 @@ use NilPortugues\Tests\Api\JsonApi\HelperMapping;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetTransformerReturnsJsonApiTransformer()
-    {
-        $serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
-
-        $this->assertInstanceOf(JsonApiTransformer::class, $serializer->getTransformer());
-    }
-
-    /**
-     *
-     */
-    public function testItWillThrowExceptionIfNoMappingsAreProvided()
-    {
-        $mapper = new Mapper();
-        $mapper->setClassMap([]);
-
-        $this->setExpectedException(TransformerException::class);
-        (new JsonApiSerializer(new JsonApiTransformer($mapper)))->serialize(new \stdClass());
-    }
-
     /**
      *
      */
@@ -139,7 +120,12 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
                "created_at":"2015-07-18T12:13:00+00:00",
                "accepted_at":"2015-07-19T00:00:00+00:00"
             },
-            "comment":"Have no fear, sers, your king is safe."
+            "comment":"Have no fear, sers, your king is safe.",
+            "oneDate" : {
+                "date" : "2015-07-18 12:13:00.000000",
+                "timezone_type": 1,
+                "timezone" : "+00:00"
+            }
          },
          "relationships":{
             "user":{
@@ -193,6 +179,25 @@ JSON;
             \json_decode($expected, true),
             \json_decode((new JsonApiSerializer($transformer))->serialize($post), true)
         );
+    }
+
+    public function testGetTransformerReturnsJsonApiTransformer()
+    {
+        $serializer = new JsonApiSerializer(new JsonApiTransformer(new Mapper(HelperMapping::complex())));
+
+        $this->assertInstanceOf(JsonApiTransformer::class, $serializer->getTransformer());
+    }
+
+    /**
+     *
+     */
+    public function testItWillThrowExceptionIfNoMappingsAreProvided()
+    {
+        $mapper = new Mapper();
+        $mapper->setClassMap([]);
+
+        $this->setExpectedException(TransformerException::class);
+        (new JsonApiSerializer(new JsonApiTransformer($mapper)))->serialize(new \stdClass());
     }
 
     /**

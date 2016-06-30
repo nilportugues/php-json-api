@@ -89,6 +89,7 @@ class DataLinksHelper
                 self::addRelationshipData($mappings, $parent, $value, $propertyName, $data);
                 if (\array_key_exists(Serializer::MAP_TYPE, $value)) {
                     $newData = [];
+
                     foreach ($value[Serializer::SCALAR_VALUE] as $d) {
                         self::addRelationshipData($mappings, $parent, $d, $propertyName, $newData);
 

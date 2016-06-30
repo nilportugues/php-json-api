@@ -61,6 +61,7 @@ class JsonApiTransformer extends Transformer
      */
     protected function serializeObject(array $value)
     {
+        $value = $this->transformUnmappedObjectsToArray($value);
         $value = $this->preSerialization($value);
         $data = $this->serialization($value);
 
@@ -236,5 +237,15 @@ class JsonApiTransformer extends Transformer
         $this->setResponseVersion($data);
 
         return (empty($data['data'])) ? array_merge(['data' => []], $data) : $data;
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    protected function transformUnmappedObjectsToArray(array $value)
+    {
+        return RecursiveRenamerHelper::serializedObjectToArray($value, $this->mappings);
     }
 }

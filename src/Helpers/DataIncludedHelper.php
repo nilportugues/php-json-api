@@ -42,6 +42,7 @@ class DataIncludedHelper
                     foreach ($value as $inArrayValue) {
                         if (\is_array($inArrayValue)) {
                             $inArrayValue = self::removeResourcesNotIncluded($mappings, $parentType, $inArrayValue);
+
                             self::setResponseDataIncluded($mappings, $inArrayValue, $data, $parentType);
                         }
                     }
