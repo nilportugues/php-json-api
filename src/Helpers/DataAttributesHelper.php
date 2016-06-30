@@ -101,11 +101,20 @@ class DataAttributesHelper
         $idProperties = RecursiveFormatterHelper::getIdProperties($mappings, $type);
 
         foreach ($array as $propertyName => $value) {
+            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
+
             if (\in_array($propertyName, $idProperties, true)) {
                 continue;
             }
-
-            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
+            if (\in_array($propertyName, $idProperties, true)) {
+                $copy = $value;
+                $ids = PropertyHelper::getIdValues($mappings, $copy, $type);
+                if (1 === count($ids)) {
+                    $ids = reset($ids);
+                }
+                $attributes[$keyName] = $ids;
+                continue;
+            }
 
             if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY]) && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])) {
                 $copy = $value;

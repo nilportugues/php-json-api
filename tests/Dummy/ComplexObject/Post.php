@@ -26,8 +26,8 @@ class Post
      * @param PostId $id
      * @param $title
      * @param $content
-     * @param User   $user
-     * @param array  $comments
+     * @param User  $user
+     * @param array $comments
      */
     public function __construct(PostId $id, $title, $content, User $user, array $comments)
     {

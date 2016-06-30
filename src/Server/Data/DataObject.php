@@ -59,7 +59,7 @@ class DataObject
         }
 
         if ($errorBag->count() > 0) {
-            throw new DataException("An error with the provided data occured.", $errorBag);
+            throw new DataException('An error with the provided data occured.', $errorBag);
         }
     }
 

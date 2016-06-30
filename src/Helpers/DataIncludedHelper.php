@@ -154,7 +154,6 @@ class DataIncludedHelper
 
                 $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
             }
-
         }
 
         if (!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
@@ -225,7 +224,7 @@ class DataIncludedHelper
                 $value = reset($value[JsonApiTransformer::DATA_KEY]);
             }
 
-            if (count($value[JsonApiTransformer::DATA_KEY])>0) {
+            if (count($value[JsonApiTransformer::DATA_KEY]) > 0) {
                 $relationships[$attribute] = $value;
             }
         }
