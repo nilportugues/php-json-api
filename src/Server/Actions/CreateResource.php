@@ -17,6 +17,7 @@ use NilPortugues\Api\JsonApi\Server\Data\DataException;
 use NilPortugues\Api\JsonApi\Server\Data\DataObject;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
+use NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException;
 
 /**
  * Class CreateResource.
@@ -76,6 +77,9 @@ class CreateResource
     protected function getErrorResponse(Exception $e, ErrorBag $errorBag)
     {
         switch (get_class($e)) {
+            case ForbiddenException::class:
+                $response = $this->forbidden($errorBag);
+                break;
             case DataException::class:
                 $response = $this->unprocessableEntity($errorBag);
                 break;

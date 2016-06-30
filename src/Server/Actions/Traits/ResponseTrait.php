@@ -21,6 +21,7 @@ use NilPortugues\Api\JsonApi\Http\Response\ResourceUpdated;
 use NilPortugues\Api\JsonApi\Http\Response\Response;
 use NilPortugues\Api\JsonApi\Http\Response\UnprocessableEntity;
 use NilPortugues\Api\JsonApi\Http\Response\UnsupportedAction;
+use NilPortugues\Api\JsonApi\Http\Response\Forbidden;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
@@ -137,5 +138,15 @@ trait ResponseTrait
     protected function unprocessableEntity(ErrorBag $errorBag)
     {
         return (new HttpFoundationFactory())->createResponse($this->addHeaders(new UnprocessableEntity($errorBag)));
+    }
+
+    /**
+     * @param ErrorBag $errorBag
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function forbidden(ErrorBag $errorBag)
+    {
+        return (new HttpFoundationFactory())->createResponse($this->addHeaders(new Forbidden($errorBag)));
     }
 }

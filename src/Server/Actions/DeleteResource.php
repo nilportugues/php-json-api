@@ -16,6 +16,7 @@ use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
+use NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException;
 
 /**
  * Class DeleteResource.
@@ -65,7 +66,30 @@ class DeleteResource
 
             return $this->resourceDeleted();
         } catch (Exception $e) {
-            return $this->errorResponse(new ErrorBag([new Error('Bad Request', 'Request could not be served.')]));
+            return $this->getErrorResponse($e, $this->errorBag);
         }
+    }
+
+    /**
+     * @param Exception $e
+     * @param ErrorBag  $errorBag
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function getErrorResponse(Exception $e, ErrorBag $errorBag)
+    {
+        switch (get_class($e)) {
+            case ForbiddenException::class:
+                $response = $this->forbidden(
+                    new ErrorBag([new Error($e->getTitle(), $e->getMessage())])
+                );
+                break;
+            default:
+                $response = $this->errorResponse(
+                    new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
+                );
+        }
+
+        return $response;
     }
 }
