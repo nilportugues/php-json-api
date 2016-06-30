@@ -40,7 +40,8 @@ class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
       "id":"9",
       "attributes":{
          "title":"Hello World",
-         "content":"Your first post"
+         "content":"Your first post",
+         "post_id": 9
       },
       "links":{
          "self":{
@@ -215,7 +216,8 @@ JSON;
       "id":"9",
       "attributes":{
          "title":"Hello World",
-         "content":"Your first post"
+         "content":"Your first post",
+         "post_id": 9
       },
       "links":{
          "self":{
@@ -318,7 +320,8 @@ JSON;
       "id":"9",
       "attributes":{
          "title":"Hello World",
-         "content":"Your first post"
+         "content":"Your first post",
+         "post_id": 9
       },
       "links":{
          "self":{
@@ -421,7 +424,8 @@ JSON;
       "type":"post",
       "id":"9",
       "attributes":{
-         "title":"Hello World"
+         "title":"Hello World",
+         "post_id": 9
       },
       "links":{
          "self":{
@@ -494,6 +498,7 @@ JSON;
         "type": "post",
         "id": "1",
         "attributes": {
+            "post_id": 1,
             "title": "post title",
             "body": "post body",
             "author_id": 2,
@@ -542,6 +547,7 @@ JSON;
     }
 }
 JSON;
+
         $this->assertEquals(
             \json_decode($expected, true),
             \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
@@ -568,7 +574,8 @@ JSON;
     "data": {
         "type": "post",
         "id": "1",
-        "attributes": {
+        "attributes": {        
+            "some_id": 1,
             "headline": "post title",
             "post": "post body",
             "author_id": 2,
@@ -644,7 +651,8 @@ JSON;
     "data": {
         "type": "post",
         "id": "1",
-        "attributes": {
+        "attributes": {        
+            "post_id": 1,
             "author_id": 2,
             "comments": [
                 {
@@ -715,7 +723,8 @@ JSON;
     "data": {
         "type": "message",
         "id": "1",
-        "attributes": {
+        "attributes": {        
+            "post_id": 1,
             "title": "post title",
             "body": "post body",
             "author_id": 2,
@@ -789,7 +798,8 @@ JSON;
     "data": {
         "type": "post",
         "id": "1",
-        "attributes": {
+        "attributes": {        
+            "post_id": 1,
             "body": "post body"
         },
         "links": {
@@ -838,7 +848,8 @@ JSON;
          "id":"1",
          "attributes":{
             "title":"post title 1",
-            "body":"post body 1"
+            "body":"post body 1",            
+            "post_id": 1
          },
          "links":{
             "self":{
@@ -851,7 +862,8 @@ JSON;
          "id":"2",
          "attributes":{
             "title":"post title 2",
-            "body":"post body 2"
+            "body":"post body 2",            
+            "post_id": 2
          },
          "links":{
             "self":{
@@ -925,7 +937,8 @@ JSON;
                     "user_id": "User 25",
                     "created_at": "2015-07-23T12:48:00+02:00"
                 }
-            ]
+            ], 
+            "post_id": 1
         },
         "links": {
             "self": { "href": "/post/1" }
@@ -974,7 +987,8 @@ JSON;
          "comment":{
             "user_name":"Joe",
             "comment_body":"Hello World"
-         }
+         },
+         "id": 1
       },
       "links":{
          "self":{

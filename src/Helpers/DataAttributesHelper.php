@@ -103,18 +103,24 @@ class DataAttributesHelper
         foreach ($array as $propertyName => $value) {
             $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
-            if (\in_array($propertyName, $idProperties, true)) {
-                continue;
-            }
+            //----------Adds back the id. Better approach would be not deleting it.
             if (\in_array($propertyName, $idProperties, true)) {
                 $copy = $value;
                 $ids = PropertyHelper::getIdValues($mappings, $copy, $type);
-                if (1 === count($ids)) {
-                    $ids = reset($ids);
+
+                if (count($ids) > 0) {
+                    if (1 === count($ids)) {
+                        $ids = array_pop($ids);
+                    }
+                    $attributes[$keyName] = $ids;
+                } else {
+                    RecursiveFormatterHelper::formatScalarValues($copy);
+                    $attributes[$keyName] = $copy;
                 }
-                $attributes[$keyName] = $ids;
+
                 continue;
             }
+            //---------
 
             if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY]) && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])) {
                 $copy = $value;
