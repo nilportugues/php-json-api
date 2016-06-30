@@ -141,6 +141,9 @@ class DataAttributesHelper
             }
         }
 
+        //Guarantee it always returns the same attribute order. No matter what.
+        ksort($attributes, SORT_STRING);
+
         return [JsonApiTransformer::ATTRIBUTES_KEY => $attributes];
     }
 
