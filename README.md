@@ -624,6 +624,14 @@ Because the JSON API specification lists a set of behaviours, specific Response 
 - `NilPortugues\Api\JsonApi\Http\Response\UnprocessableEntity`
 - `NilPortugues\Api\JsonApi\Http\Response\UnsupportedAction`
 
+**Forbidden Access**
+
+It is also possible to fire a `Forbidden` response by throwing the following Exception in your code:
+
+- `NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException`
+
+Access control logic is not provided.
+
 
 ## Action Objects
 
