@@ -18,6 +18,7 @@ use NilPortugues\Api\JsonApi\Server\Data\DataObject;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
+use NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException;
 
 /**
  * Class PatchResource.
@@ -85,6 +86,9 @@ class PatchResource
     protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
+            case ForbiddenException::class:
+                $response = $this->forbidden($errorBag);
+                break;
             case DataException::class:
                 $response = $this->unprocessableEntity($this->errorBag);
                 break;
