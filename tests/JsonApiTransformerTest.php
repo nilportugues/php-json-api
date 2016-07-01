@@ -25,6 +25,46 @@ use NilPortugues\Tests\Api\JsonApi\HelperMapping;
 
 class JsonApiTransformerTest extends \PHPUnit_Framework_TestCase
 {
+    public function testItIfFilteringOutKeys()
+    {
+        $post = HelperFactory::simplePost();
+
+        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
+        $postMapping->setProperties(['postId', 'title', 'body', 'authorId', 'comments']);
+        $postMapping->setFilterKeys(['body']);
+
+        $mapper = new Mapper();
+        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
+
+        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
+
+        $expected = <<<JSON
+{
+    "data": {
+        "type": "post",
+        "id": "1",
+        "attributes": {    
+            "body": "post body"
+        },
+        "links": {
+            "self": { "href": "/post/1"}
+        }
+    },
+    "links": {
+        "self": { "href": "/post/1" }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}
+JSON;
+
+        $this->assertEquals(
+            \json_decode($expected, true),
+            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
+        );
+    }
+
     /**
      *
      */
@@ -424,8 +464,7 @@ JSON;
       "type":"post",
       "id":"9",
       "attributes":{
-         "title":"Hello World",
-         "post_id": 9
+         "title":"Hello World"
       },
       "links":{
          "self":{
@@ -780,47 +819,6 @@ JSON;
         );
     }
 
-    public function testItIfFilteringOutKeys()
-    {
-        $post = HelperFactory::simplePost();
-
-        $postMapping = new Mapping(SimplePost::class, '/post/{postId}', ['postId']);
-        $postMapping->setProperties(['postId', 'title', 'body', 'authorId', 'comments']);
-        $postMapping->setFilterKeys(['body']);
-
-        $mapper = new Mapper();
-        $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
-
-        $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
-
-        $expected = <<<JSON
-{
-    "data": {
-        "type": "post",
-        "id": "1",
-        "attributes": {        
-            "post_id": 1,
-            "body": "post body"
-        },
-        "links": {
-            "self": { "href": "/post/1"}
-        }
-    },
-    "links": {
-        "self": { "href": "/post/1" }
-    },
-    "jsonapi": {
-        "version": "1.0"
-    }
-}
-JSON;
-
-        $this->assertEquals(
-            \json_decode($expected, true),
-            \json_decode((new JsonApiSerializer($jsonApiJsonApiSerializer))->serialize($post), true)
-        );
-    }
-
     /**
      *
      */
@@ -848,8 +846,7 @@ JSON;
          "id":"1",
          "attributes":{
             "title":"post title 1",
-            "body":"post body 1",            
-            "post_id": 1
+            "body":"post body 1"
          },
          "links":{
             "self":{
@@ -862,8 +859,7 @@ JSON;
          "id":"2",
          "attributes":{
             "title":"post title 2",
-            "body":"post body 2",            
-            "post_id": 2
+            "body":"post body 2"
          },
          "links":{
             "self":{

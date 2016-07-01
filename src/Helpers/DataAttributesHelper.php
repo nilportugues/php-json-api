@@ -70,25 +70,6 @@ class DataAttributesHelper
     ];
 
     /**
-     * Changes all array keys to under_score format using recursion.
-     *
-     * @param array $array
-     */
-    protected static function recursiveSetKeysToUnderScore(array &$array)
-    {
-        $newArray = [];
-        foreach ($array as $key => &$value) {
-            $underscoreKey = RecursiveFormatterHelper::camelCaseToUnderscore($key);
-            $newArray[$underscoreKey] = $value;
-
-            if (\is_array($value)) {
-                self::recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
-            }
-        }
-        $array = $newArray;
-    }
-
-    /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $array
      *
@@ -103,26 +84,14 @@ class DataAttributesHelper
         foreach ($array as $propertyName => $value) {
             $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
-            //----------Adds back the id. Better approach would be not deleting it.
             if (\in_array($propertyName, $idProperties, true)) {
-                $copy = $value;
-                $ids = PropertyHelper::getIdValues($mappings, $copy, $type);
-
-                if (count($ids) > 0) {
-                    if (1 === count($ids)) {
-                        $ids = array_pop($ids);
-                    }
-                    $attributes[$keyName] = $ids;
-                } else {
-                    RecursiveFormatterHelper::formatScalarValues($copy);
-                    $attributes[$keyName] = $copy;
-                }
-
+                self::addIdPropertiesInAttribute($mappings, $type, $keyName, $value, $attributes);
                 continue;
             }
-            //---------
 
-            if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY]) && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])) {
+            if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])
+                && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])
+            ) {
                 $copy = $value;
                 self::recursiveSetKeysToUnderScore($copy);
                 $attributes[$keyName] = $copy;
@@ -160,6 +129,60 @@ class DataAttributesHelper
         $attributeName = \rtrim($attributeName, \implode('', self::$forbiddenAsFirstOrLastCharacter));
 
         return $attributeName;
+    }
+
+    /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param string                              $type
+     * @param string                              $keyName
+     * @param array                               $value
+     * @param array                               $attributes
+     */
+    protected static function addIdPropertiesInAttribute(array &$mappings, $type, $keyName, array $value, array &$attributes)
+    {
+        $keepKeys = str_replace(
+            array_values($mappings[$type]->getAliasedProperties()),
+            array_keys($mappings[$type]->getAliasedProperties()),
+            $mappings[$type]->getFilterKeys()
+        );
+
+        $keepIdKeys = (0 === count($keepKeys));
+        if (false !== array_search($keyName, $keepKeys, true)) {
+            $keepIdKeys = false;
+        }
+
+        if ($keepIdKeys) {
+            $ids = PropertyHelper::getIdValues($mappings, $value, $type);
+
+            if (count($ids) > 0) {
+                if (1 === count($ids)) {
+                    $ids = array_pop($ids);
+                }
+                $attributes[$keyName] = $ids;
+            } else {
+                RecursiveFormatterHelper::formatScalarValues($value);
+                $attributes[$keyName] = $value;
+            }
+        }
+    }
+
+    /**
+     * Changes all array keys to under_score format using recursion.
+     *
+     * @param array $array
+     */
+    protected static function recursiveSetKeysToUnderScore(array &$array)
+    {
+        $newArray = [];
+        foreach ($array as $key => &$value) {
+            $underscoreKey = RecursiveFormatterHelper::camelCaseToUnderscore($key);
+            $newArray[$underscoreKey] = $value;
+
+            if (\is_array($value)) {
+                self::recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
+            }
+        }
+        $array = $newArray;
     }
 
     /**
