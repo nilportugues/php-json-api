@@ -34,7 +34,9 @@ class DataIncludedHelper
                     $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
                     self::addToRelationshipsArray($mappings, $data, $value, $type, $relationships, $attributes);
-                    self::addToIncludedArray($mappings, $data, $attributes, $value);
+                    if(!(self::isDeleteableIncludedResource($mappings, $parentType, $value))){
+                    	self::addToIncludedArray($mappings, $data, $attributes, $value);
+                    }
                     continue;
                 }
 
