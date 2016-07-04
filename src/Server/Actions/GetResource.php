@@ -104,7 +104,7 @@ class GetResource
     {
         switch (get_class($e)) {
             case ForbiddenException::class:
-                $response = $this->forbidden($errorBag);
+                $response = $this->forbidden($this->errorBag);
                 break;
             case QueryException::class:
                 $response = $this->errorResponse($this->errorBag);

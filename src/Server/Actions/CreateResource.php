@@ -78,7 +78,7 @@ class CreateResource
     {
         switch (get_class($e)) {
             case ForbiddenException::class:
-                $response = $this->forbidden($errorBag);
+                $response = $this->forbidden($this->errorBag);
                 break;
             case DataException::class:
                 $response = $this->unprocessableEntity($errorBag);

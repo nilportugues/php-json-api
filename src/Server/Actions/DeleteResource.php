@@ -66,22 +66,21 @@ class DeleteResource
 
             return $this->resourceDeleted();
         } catch (Exception $e) {
-            return $this->getErrorResponse($e, $this->errorBag);
+            return $this->getErrorResponse($e);
         }
     }
 
     /**
      * @param Exception $e
-     * @param ErrorBag  $errorBag
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function getErrorResponse(Exception $e, ErrorBag $errorBag)
+    protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
             case ForbiddenException::class:
                 $response = $this->forbidden(
-                    new ErrorBag([new Error($e->getTitle(), $e->getMessage())])
+                    new ErrorBag([new Error('Forbidden', $e->getMessage())])
                 );
                 break;
             default:
