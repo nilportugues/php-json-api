@@ -1,0 +1,18 @@
+AppBundle\Entity\Customer:
+    type: entity
+    table: customers
+    repositoryClass: AppBundle\Repository\CustomersRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+        active:
+            type: boolean
+                  
+    lifecycleCallbacks: {  }

@@ -8,6 +8,8 @@ namespace NilPortugues\Tests\Api\JsonApi\Doctrine;
 
 use Doctrine\ORM\Tools\SchemaTool;
 
+require_once 'bootstrap.php';
+
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
 	/**
