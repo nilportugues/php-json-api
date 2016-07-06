@@ -1,8 +1,6 @@
 <?php
 
-namespace NilPortugues\Tests\Api\JsonApi\Doctrine\Entity;
-
-use Doctrine\ORM\Mapping as ORM;
+namespace Doctrine\Entity;
 
 /**
  * Customer
@@ -10,25 +8,25 @@ use Doctrine\ORM\Mapping as ORM;
 class Customer
 {
     /**
-     * @var int
+     * @var integer
      */
-    protected $id;
+    private $id;
 
     /**
      * @var string
      */
-    protected $name;
+    private $name;
 
     /**
-     * @var bool
+     * @var boolean
      */
-    protected $active;
+    private $active;
 
 
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -39,6 +37,7 @@ class Customer
      * Set name
      *
      * @param string $name
+     *
      * @return Customer
      */
     public function setName($name)
@@ -51,7 +50,7 @@ class Customer
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -62,11 +61,12 @@ class Customer
      * Set active
      *
      * @param boolean $active
+     *
      * @return Customer
      */
     public function setActive($active)
     {
-        $this->activo = $activo;
+        $this->active = $active;
 
         return $this;
     }
@@ -74,7 +74,7 @@ class Customer
     /**
      * Get active
      *
-     * @return boolean 
+     * @return boolean
      */
     public function getActive()
     {

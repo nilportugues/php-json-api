@@ -1,7 +1,7 @@
-AppBundle\Entity\Customer:
+Doctrine\Entity\Customer:
     type: entity
     table: customers
-    repositoryClass: AppBundle\Repository\CustomersRepository
+    repositoryClass: Doctrine\Entity\CustomerRepository
     id:
         id:
             type: integer

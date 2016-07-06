@@ -5,7 +5,7 @@ require_once "vendor/autoload.php";
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
-$paths = array("Entity");
+$paths = array(__DIR__."/yml/");
 $isDevMode = false;
 
 // the connection configuration
@@ -18,5 +18,12 @@ $dbParams = array(
     'memory'   => 'true'
 );
 
+// $config instanceof Doctrine\ORM\Configuration
 $config = Setup::createYAMLMetadataConfiguration($paths, $isDevMode);
+$namespaces = array(
+		__DIR__."/yml/" => 'Doctrine\\Entity',
+);
+$driver = new \Doctrine\ORM\Mapping\Driver\SimplifiedYamlDriver($namespaces);
+$config->setMetadataDriverImpl($driver);//replace default driver
+
 $entityManager = EntityManager::create($dbParams, $config);
