@@ -12,9 +12,9 @@ class DoctrineTest extends AbstractTestCase {
 		$newCustomer->setActive(true);
 		$newCustomer->setName('Name 1');
 		
-		$this->entityManager->persist($newCustomer);
-		$this->entityManager->flush();
-		$repoCustomer = $this->entityManager->getRepository('Doctrine\\Entity\\Customer');
+		self::$entityManager->persist($newCustomer);
+		self::$entityManager->flush();
+		$repoCustomer = self::$entityManager->getRepository('Doctrine\\Entity\\Customer');
 		$savedCustomer = $repoCustomer->findAll();
 		
 		$this->assertEquals($newCustomer->getId(), $savedCustomer[0]->getId());

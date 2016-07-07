@@ -15,31 +15,31 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 	/**
 	 * @var Doctrine\ORM\EntityManager
 	 */
-	protected $entityManager;
+	protected static $entityManager;
 
-	public function setUp()
+	public static function setUpBeforeClass()
 	{
 		global $entityManager;
-		$this->entityManager = $entityManager;//global value from bootstrap.php
+		self::$entityManager = $entityManager;//global value from bootstrap.php
 		// Build the schema for sqlite
-		$this->generateSchema();
+		self::generateSchema();
 
-		parent::setUp();
+		parent::setUpBeforeClass();
 	}
 
-	public function tearDown()
+	public static function tearDownAfterClass()
 	{
-		parent::tearDown();
+		parent::tearDownAfterClass();
 	}
 
-	protected function generateSchema()
+	protected static function generateSchema()
 	{
 		// Get the metadata of the application to create the schema.
-		$metadata = $this->getMetadata();
+		$metadata = self::getMetadata();
 
 		if ( ! empty($metadata)) {
 			// Create SchemaTool
-			$tool = new SchemaTool($this->entityManager);
+			$tool = new SchemaTool(self::$entityManager);
 			$tool->createSchema($metadata);
 		} else {
 			throw new Doctrine\DBAL\Schema\SchemaException('No Metadata Classes to process.');
@@ -51,8 +51,8 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 	 *
 	 * @return Array
 	 */
-	protected function getMetadata()
+	protected static function getMetadata()
 	{
-		return $this->entityManager->getMetadataFactory()->getAllMetadata();
+		return self::$entityManager->getMetadataFactory()->getAllMetadata();
 	}
 }
