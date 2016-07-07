@@ -19,8 +19,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
 	public static function setUpBeforeClass()
 	{
-		global $entityManager;
-		self::$entityManager = $entityManager;//global value from bootstrap.php
+		self::$entityManager = GetEntityManager();
 		// Build the schema for sqlite
 		self::generateSchema();
 

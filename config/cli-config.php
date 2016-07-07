@@ -8,4 +8,4 @@ use Doctrine\ORM\Tools\Console\ConsoleRunner;
 require_once 'Tests/Doctrine/bootstrap.php';
 
 //global $entityManager from boostrap.php
-return ConsoleRunner::createHelperSet($entityManager);
+return ConsoleRunner::createHelperSet(GetEntityManager());
