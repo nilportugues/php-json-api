@@ -1,7 +1,7 @@
 <?php
 /**
  * Based on https://www.theodo.fr/blog/2011/09/symfony2-unit-database-tests/
- * from Benjamin Grandfond
+ * from Benjamin Grandfond.
  */
 
 namespace NilPortugues\Tests\Api\JsonApi\Doctrine;
@@ -12,46 +12,46 @@ require_once 'bootstrap.php';
 
 abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 {
-	/**
-	 * @var Doctrine\ORM\EntityManager
-	 */
-	protected static $entityManager;
+    /**
+     * @var Doctrine\ORM\EntityManager
+     */
+    protected static $entityManager;
 
-	public static function setUpBeforeClass()
-	{
-		self::$entityManager = GetEntityManager();
-		// Build the schema for sqlite
-		self::generateSchema();
+    public static function setUpBeforeClass()
+    {
+        self::$entityManager = GetEntityManager();
+        // Build the schema for sqlite
+        self::generateSchema();
 
-		parent::setUpBeforeClass();
-	}
+        parent::setUpBeforeClass();
+    }
 
-	public static function tearDownAfterClass()
-	{
-		parent::tearDownAfterClass();
-	}
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+    }
 
-	protected static function generateSchema()
-	{
-		// Get the metadata of the application to create the schema.
-		$metadata = self::getMetadata();
+    protected static function generateSchema()
+    {
+        // Get the metadata of the application to create the schema.
+        $metadata = self::getMetadata();
 
-		if ( ! empty($metadata)) {
-			// Create SchemaTool
-			$tool = new SchemaTool(self::$entityManager);
-			$tool->createSchema($metadata);
-		} else {
-			throw new Doctrine\DBAL\Schema\SchemaException('No Metadata Classes to process.');
-		}
-	}
+        if (!empty($metadata)) {
+            // Create SchemaTool
+            $tool = new SchemaTool(self::$entityManager);
+            $tool->createSchema($metadata);
+        } else {
+            throw new Doctrine\DBAL\Schema\SchemaException('No Metadata Classes to process.');
+        }
+    }
 
-	/**
-	 * Overwrite this method to get specific metadata.
-	 *
-	 * @return Array
-	 */
-	protected static function getMetadata()
-	{
-		return self::$entityManager->getMetadataFactory()->getAllMetadata();
-	}
+    /**
+     * Overwrite this method to get specific metadata.
+     *
+     * @return array
+     */
+    protected static function getMetadata()
+    {
+        return self::$entityManager->getMetadataFactory()->getAllMetadata();
+    }
 }

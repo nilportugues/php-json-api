@@ -3,12 +3,12 @@
 namespace Doctrine\Entity;
 
 /**
- * Customer
+ * Customer.
  */
 class Customer
 {
     /**
-     * @var integer
+     * @var int
      */
     private $id;
 
@@ -18,15 +18,14 @@ class Customer
     private $name;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $active;
 
-
     /**
-     * Get id
+     * Get id.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -34,7 +33,7 @@ class Customer
     }
 
     /**
-     * Set name
+     * Set name.
      *
      * @param string $name
      *
@@ -48,7 +47,7 @@ class Customer
     }
 
     /**
-     * Get name
+     * Get name.
      *
      * @return string
      */
@@ -58,9 +57,9 @@ class Customer
     }
 
     /**
-     * Set active
+     * Set active.
      *
-     * @param boolean $active
+     * @param bool $active
      *
      * @return Customer
      */
@@ -72,9 +71,9 @@ class Customer
     }
 
     /**
-     * Get active
+     * Get active.
      *
-     * @return boolean
+     * @return bool
      */
     public function getActive()
     {

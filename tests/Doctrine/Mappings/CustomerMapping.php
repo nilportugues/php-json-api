@@ -1,4 +1,5 @@
 <?php
+
 namespace NilPortugues\Tests\Api\JsonApi\Doctrine\Mappings;
 
 use NilPortugues\Api\Mappings\JsonApiMapping;
@@ -6,9 +7,9 @@ use NilPortugues\Api\Mappings\JsonApiMapping;
 class CustomerMapping implements JsonApiMapping
 {
     /**
-     * {@inhertidoc}
+     * {@inhertidoc}.
      */
-    public function getClass() 
+    public function getClass()
     {
         return \Doctrine\Entity\Customer::class;
     }
@@ -22,19 +23,22 @@ class CustomerMapping implements JsonApiMapping
     /**
      * {@inheritdoc}
      */
-    public function getAliasedProperties() {
+    public function getAliasedProperties()
+    {
         return [];
     }
     /**
      * {@inheritdoc}
      */
-    public function getHideProperties(){
+    public function getHideProperties()
+    {
         return [];
     }
     /**
      * {@inheritdoc}
      */
-    public function getIdProperties(){
+    public function getIdProperties()
+    {
         return [
             'id',
         ];
@@ -46,7 +50,7 @@ class CustomerMapping implements JsonApiMapping
     {
         return [
             'self' => 'http://example.com/customer/{id}',
-            
+
         ];
     }
     /**
@@ -54,6 +58,6 @@ class CustomerMapping implements JsonApiMapping
      */
     public function getRelationships()
     {
-    	return [];
+        return [];
     }
 }
