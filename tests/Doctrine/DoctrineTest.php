@@ -46,7 +46,6 @@ class DoctrineTest extends AbstractTestCase
 					}
 			}
 JSON;
-        var_dump($classConfig);
         $mapper = new Mapper($classConfig);
         $transformer = new JsonApiTransformer($mapper);
         $serializer = new JsonApiSerializer($transformer);
