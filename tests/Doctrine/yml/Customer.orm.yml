@@ -1,0 +1,18 @@
+Doctrine\Entity\Customer:
+    type: entity
+    table: customers
+    repositoryClass: Doctrine\Entity\CustomerRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        name:
+            type: string
+            length: 255
+        active:
+            type: boolean
+                  
+    lifecycleCallbacks: {  }
