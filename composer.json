@@ -19,7 +19,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "4.*",
-        "friendsofphp/php-cs-fixer": "^1.9"
+        "friendsofphp/php-cs-fixer": "^1.9",
+        "doctrine/orm": "^2.5"
     },
     "autoload": {
         "psr-4": {
@@ -28,7 +29,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "NilPortugues\\Tests\\Api\\JsonApi\\": "tests/"
+            "NilPortugues\\Tests\\Api\\JsonApi\\": "tests/",
+            "Doctrine\\Entity\\": "tests/Integrations/Doctrine/Entity/"
         }
     }
 }
