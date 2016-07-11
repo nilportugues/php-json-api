@@ -74,7 +74,7 @@ class PatchResourceTest extends \PHPUnit_Framework_TestCase
             return new Post(new PostId(10), 'Old title', 'Old Content', $user, []);
         };
 
-        $this->updateCallable = function (Post $post, array $values, ErrorBag $errorBag) {
+        $this->updateCallable = function (Post $post, array $data, array $values, ErrorBag $errorBag) {
             $post->setTitle($values['title']);
             $post->setContent($values['content']);
 
