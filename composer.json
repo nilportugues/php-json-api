@@ -29,8 +29,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "NilPortugues\\Tests\\Api\\JsonApi\\": "tests/",
-            "Doctrine\\Entity\\": "tests/Integrations/Doctrine/Entity/"
+            "NilPortugues\\Tests\\Api\\JsonApi\\": "tests/"
         }
     }
 }
