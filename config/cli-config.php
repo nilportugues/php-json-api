@@ -5,7 +5,7 @@
  */
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 
-require_once 'Tests/Doctrine/bootstrap.php';
+require_once __DIR__.'/../tests/Integrations/Doctrine/bootstrap.php';
 
 //global $entityManager from boostrap.php
 return ConsoleRunner::createHelperSet(GetEntityManager());
