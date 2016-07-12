@@ -1,0 +1,31 @@
+NilPortugues\Tests\Api\JsonApi\Integrations\Doctrine\Entity\Comment:
+    type: entity
+    table: comments
+    repositoryClass: NilPortugues\Tests\Api\JsonApi\Integrations\Doctrine\Entity\CommentRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:        
+        comment:
+            type: string
+            length: 255        
+        parent_id:
+            type: integer
+            nullable: true
+    manyToOne:
+        parentComment:
+            fetch: EAGER
+            targetEntity: Comment
+            joinColumn:
+                name: parent_id
+                referencedColumnName: id
+        post:
+            fetch: EAGER
+            targetEntity: Post
+            joinColumn:
+                name: post_id
+                referencedColumnName: id                
+    lifecycleCallbacks: {  }

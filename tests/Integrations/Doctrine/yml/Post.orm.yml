@@ -1,0 +1,26 @@
+NilPortugues\Tests\Api\JsonApi\Integrations\Doctrine\Entity\Post:
+    type: entity
+    table: posts
+    repositoryClass: NilPortugues\Tests\Api\JsonApi\Integrations\Doctrine\Entity\PostRepository
+    id:
+        id:
+            type: integer
+            id: true
+            generator:
+                strategy: AUTO
+    fields:
+        date:
+            type: date
+        description:
+            type: string
+            length: 255
+            nullable: true
+            
+    manyToOne:
+        customer:
+            fetch: EAGER
+            targetEntity: Customer
+            joinColumn:
+                name: customer_id
+                referencedColumnName: id         
+    lifecycleCallbacks: {  }
