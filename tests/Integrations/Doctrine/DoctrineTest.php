@@ -24,9 +24,9 @@ class DoctrineTest extends AbstractTestCase
         self::$entityManager->flush();
         $repoCustomer = self::$entityManager->getRepository(Customer::class);
         $savedCustomer = $repoCustomer->findAll();
-        
+
         $classConfig = [
-            CustomerMapping::class,	
+            CustomerMapping::class,
         ];
 
         $expected = <<<JSON
@@ -61,39 +61,39 @@ JSON;
         $this->assertEquals($newCustomer->getName(), $savedCustomer[0]->getName());
         $this->assertEquals(json_decode($expected, true), json_decode($customerSerialize, true));
     }
-    
+
     public function testPersistAndSerializeComplexEntity()
     {
-    	$newCustomer = new Customer();
-    	$newCustomer->setActive(true);
-    	$newCustomer->setName('Name 1');
-    
-    	self::$entityManager->persist($newCustomer);
-    	self::$entityManager->flush();
-    
-    	$newPost = new Post();
-    	$newPost->setCustomer($newCustomer);
-    	$newPost->setDate(new \DateTime());
-    	$newPost->setDescription("Description test");
-    	self::$entityManager->persist($newPost);
-    	self::$entityManager->flush();
-    
-    	$newComment = new Comment();
-    	$newComment->setPost($newPost);
-    	$newComment->setComment("Comment 1");
-    	self::$entityManager->persist($newComment);
-    	self::$entityManager->flush();
-    
-    	$repoCustomer = self::$entityManager->getRepository(Comment::class);
-    	$savedComment= $repoCustomer->findAll();
-    
-    	$classConfig = [
-    			CustomerMapping::class,
-    			PostMapping::class,
-    			CommentMapping::class,
-    	];
-    
-    	$expected = <<<JSON
+        $newCustomer = new Customer();
+        $newCustomer->setActive(true);
+        $newCustomer->setName('Name 1');
+
+        self::$entityManager->persist($newCustomer);
+        self::$entityManager->flush();
+
+        $newPost = new Post();
+        $newPost->setCustomer($newCustomer);
+        $newPost->setDate(new \DateTime('2016-07-12 16:30:12.000000'));
+        $newPost->setDescription('Description test');
+        self::$entityManager->persist($newPost);
+        self::$entityManager->flush();
+
+        $newComment = new Comment();
+        $newComment->setPost($newPost);
+        $newComment->setComment('Comment 1');
+        self::$entityManager->persist($newComment);
+        self::$entityManager->flush();
+
+        $repoCustomer = self::$entityManager->getRepository(Comment::class);
+        $savedComment = $repoCustomer->findAll();
+
+        $classConfig = [
+                CustomerMapping::class,
+                PostMapping::class,
+                CommentMapping::class,
+        ];
+
+        $expected = <<<JSON
         {
         		"data":
 		[{
@@ -107,7 +107,7 @@ JSON;
 					"parent_id":null
 				},
 			"links":
-				{"self":{"href":"http//example.com/comment/1"}},
+				{"self":{"href":"http://example.com/comment/1"}},
 			"relationships":
 				{
 					"post":
@@ -125,13 +125,13 @@ JSON;
 				[
 					{
 						"type":"customer",
-						"id":"1",
+						"id":"2",
 						"attributes":
 							{
-								"name":Name 1",
+								"name":"Name 1",
 								"active":true
 							},
-						"links":{"self":{"href":"http://example.com/customer/1"}}
+						"links":{"self":{"href":"http://example.com/customer/2"}}
 					},
 					{	"type":"post",
 						"id":"1",
@@ -144,10 +144,10 @@ JSON;
 							{
 								"customer":
 									{
-										"datas":
+										"data":
 											{
 												"type":"customer",
-												"id":"1"
+												"id":"2"
 											}
 									}
 							},
@@ -157,11 +157,11 @@ JSON;
 			"jsonapi":{"version":"1.0"}
 }
 JSON;
-    	$mapper = new Mapper($classConfig);
-    	$transformer = new JsonApiTransformer($mapper);
-    	$serializer = new JsonApiSerializer($transformer);
-    	$customerSerialize = $serializer->serialize($savedComment);
-    	
-    	$this->assertEquals(json_decode($expected, true), json_decode($customerSerialize, true));
+        $mapper = new Mapper($classConfig);
+        $transformer = new JsonApiTransformer($mapper);
+        $serializer = new JsonApiSerializer($transformer);
+        $customerSerialize = $serializer->serialize($savedComment);
+
+        $this->assertEquals(json_decode($expected, true), json_decode($customerSerialize, true));
     }
 }

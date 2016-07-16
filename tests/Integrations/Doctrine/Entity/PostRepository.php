@@ -4,7 +4,6 @@ namespace NilPortugues\Tests\Api\JsonApi\Integrations\Doctrine\Entity;
 
 use Doctrine\ORM\EntityRepository;
 
-
 /**
  * PostRepository.
  *
