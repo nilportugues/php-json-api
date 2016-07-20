@@ -32,7 +32,7 @@ class DataLinksHelper
         $data = [];
         $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
 
-        if (\is_scalar($type)) {
+        if (\is_scalar($type) && !empty($mappings[$type])) {
             $copy = $value;
             RecursiveFormatterHelper::formatScalarValues($copy);
             if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
@@ -105,7 +105,7 @@ class DataLinksHelper
                                     $parentType
                                 );
 
-                                if (!empty($selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName))) {
+                                if (!empty($mappings[$parentType]) && !empty($selfLink = $mappings[$parentType]->getRelationshipSelfUrl($propertyName))) {
                                     $href = \str_replace($idProperties, $idValues, $selfLink);
                                     if ($selfLink != $href) {
                                         $propertyNameKey = DataAttributesHelper::transformToValidMemberName($propertyName);
@@ -126,7 +126,7 @@ class DataLinksHelper
                                 $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
                                 //Removes relationships related to the current resource if filtering include resources has been set.
-                                if (!empty($mappings[$parentType]->isFilteringIncludedResources())) {
+                                if (!empty($mappings[$parentType]) && !empty($mappings[$parentType]->isFilteringIncludedResources())) {
                                     foreach ($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] as $position => $includedResource) {
                                         if (count($mappings[$parentType]->getIncludedResources()) > 0 &&
                                             false === in_array($type, $mappings[$parentType]->getIncludedResources(), true)
@@ -222,7 +222,7 @@ class DataLinksHelper
         $data = [];
         $parentType = $parent[Serializer::CLASS_IDENTIFIER_KEY];
 
-        if (\is_scalar($parentType)) {
+        if (\is_scalar($parentType) && !empty($mappings[$parentType])) {
             $copy = $parent;
             RecursiveFormatterHelper::formatScalarValues($copy);
             if (!empty($copy[Serializer::CLASS_IDENTIFIER_KEY])) {
