@@ -91,10 +91,10 @@ class DataObject
         $diff = [];
         if (null !== $mapping) {
             $required = $mapping->getRequiredProperties();
-            $properties = !empty($required) ? $required : str_replace(
+            $properties = str_replace(
                 array_keys($mapping->getAliasedProperties()),
                 array_values($mapping->getAliasedProperties()),
-                $mapping->getProperties()
+                !empty($required) ? $required : $mapping->getProperties()
             );
             $properties = array_diff($properties, $mapping->getIdProperties());
 
