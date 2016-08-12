@@ -61,4 +61,11 @@ class CommentMapping implements JsonApiMapping
     {
         return [];
     }
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }
 }

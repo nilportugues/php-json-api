@@ -122,6 +122,14 @@ class PostMapping  implements JsonApiMapping
             ]
         ];
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return ['author', 'title', 'body'];
+    }
 }
 ```
 
@@ -188,6 +196,14 @@ class PostIdMapping implements JsonApiMapping
             ],
         ];
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }
 }
 ```
 
@@ -243,7 +259,15 @@ class UserMapping implements JsonApiMapping
             'friends' => 'http://example.com/users/{userId}/friends',
             'comments' => 'http://example.com/users/{userId}/comments',
         ];
-    }
+    }    
+   
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }    
 }
 ```
 
@@ -285,7 +309,7 @@ class UserIdMapping implements JsonApiMapping
      * {@inheritdoc}
      */
     public function getIdProperties()
-        return [ 'userId',];
+        return ['userId'];
     }
     /**
      * {@inheritdoc}
@@ -298,6 +322,14 @@ class UserIdMapping implements JsonApiMapping
             'comments' => 'http://example.com/users/{userId}/comments',
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }        
 }
 ```
 
@@ -362,6 +394,14 @@ class CommendMapping implements JsonApiMapping
             ]
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }        
 }
 ```
 
@@ -425,6 +465,14 @@ class CommentId implements JsonApiMapping
             ]
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }        
 }
 ```
 

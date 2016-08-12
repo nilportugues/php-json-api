@@ -61,4 +61,12 @@ class CustomerMapping implements JsonApiMapping
     {
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }
 }

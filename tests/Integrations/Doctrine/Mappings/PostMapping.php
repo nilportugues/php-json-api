@@ -61,4 +61,12 @@ class PostMapping implements JsonApiMapping
     {
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }
 }
