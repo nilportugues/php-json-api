@@ -487,7 +487,7 @@ use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Http\Message\Response;
 use NilPortugues\Api\Mapping\Mapper;
 
-$classConfig = [
+$mappings = [
     \AcmeProject\Infrastructure\Api\Mappings\PostMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\PostIdMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\UserMapping::class,
