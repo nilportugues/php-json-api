@@ -95,7 +95,7 @@ class PostMapping  implements JsonApiMapping
     /**
      * {@inheritdoc}
      */
-    public function getIdProperties()
+    public function getIdProperties() {
         return [ 
             'postId',
         ];
