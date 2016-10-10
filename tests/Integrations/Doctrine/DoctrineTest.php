@@ -191,7 +191,12 @@ JSON;
 		         "type":"post",
 		         "id":"1",
 		         "attributes":{  
-		            "description":"Description test"
+		            "description":"Description test",
+		            "date":{  
+		               "date":"2016-07-12 16:30:12.000000",
+		               "timezone_type":3,
+		               "timezone":"Europe/Madrid"
+		            }
 		         },
 		         "relationships":{  
 		            "customer":{  
@@ -226,31 +231,6 @@ JSON;
 		         "links":{  
 		            "self":{  
 		               "href":"http://example.com/comment/1"
-		            }
-		         }
-		      },
-		      {  
-		         "type":"post",
-		         "id":"1",
-		         "attributes":{  
-		            "date":{  
-		               "date":"2016-07-12 16:30:12.000000",
-		               "timezone_type":3,
-		               "timezone":"Europe/Madrid"
-		            },
-		            "description":"Description test"
-		         },
-		         "relationships":{  
-		            "customer":{  
-		               "data":{  
-		                  "type":"customer",
-		                  "id":"1"
-		               }
-		            }
-		         },
-		         "links":{  
-		            "self":{  
-		               "href":"http://example.com/post/1"
 		            }
 		         }
 		      }

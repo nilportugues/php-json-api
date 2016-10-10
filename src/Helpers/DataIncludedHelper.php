@@ -155,15 +155,27 @@ class DataIncludedHelper
                     $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = $relationships;
                 }
 
-                $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
+                $existingIndex = false;
+                if (array_key_exists(JsonApiTransformer::INCLUDED_KEY, $data)) {
+                    $existingIndex = self::findIncludedIndex($data[JsonApiTransformer::INCLUDED_KEY], $arrayData[JsonApiTransformer::ID_KEY], $arrayData[JsonApiTransformer::TYPE_KEY]);
+                }
+                if ($existingIndex !== false) {
+                    $data[JsonApiTransformer::INCLUDED_KEY][$existingIndex] = \array_filter(\array_merge($data[JsonApiTransformer::INCLUDED_KEY][$existingIndex], $arrayData));
+                } else {
+                    $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
+                }
             }
         }
 
-        if (!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
-            $data[JsonApiTransformer::INCLUDED_KEY] = \array_values(
-                \array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
-            );
-        }
+    }
+
+    protected static function findIncludedIndex($includedData, $idNeedle, $typeNeedle) {
+       foreach ($includedData as $key => $value) {
+           if ($value[JsonApiTransformer::ID_KEY] === $idNeedle && $value[JsonApiTransformer::TYPE_KEY] === $typeNeedle) {
+               return $key;
+           }
+       }
+       return false;
     }
 
     /**
