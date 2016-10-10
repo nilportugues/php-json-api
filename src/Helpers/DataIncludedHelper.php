@@ -166,16 +166,17 @@ class DataIncludedHelper
                 }
             }
         }
-
     }
 
-    protected static function findIncludedIndex($includedData, $idNeedle, $typeNeedle) {
-       foreach ($includedData as $key => $value) {
-           if ($value[JsonApiTransformer::ID_KEY] === $idNeedle && $value[JsonApiTransformer::TYPE_KEY] === $typeNeedle) {
-               return $key;
-           }
-       }
-       return false;
+    protected static function findIncludedIndex($includedData, $idNeedle, $typeNeedle)
+    {
+        foreach ($includedData as $key => $value) {
+            if ($value[JsonApiTransformer::ID_KEY] === $idNeedle && $value[JsonApiTransformer::TYPE_KEY] === $typeNeedle) {
+                return $key;
+            }
+        }
+
+        return false;
     }
 
     /**
