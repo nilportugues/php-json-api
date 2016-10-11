@@ -340,7 +340,7 @@ namespace AcmeProject\Infrastructure\Api\Mappings;
 
 use NilPortugues\Api\Mappings\JsonApiMapping;
 
-class CommendMapping implements JsonApiMapping
+class CommentMapping implements JsonApiMapping
 {
     /**
      * {@inhertidoc}
@@ -389,7 +389,7 @@ class CommendMapping implements JsonApiMapping
     public function getRelationships()
     {
         return [
-            'post' => [ //this key must match with the property or alias of the same name in Commend class.
+            'post' => [ //this key must match with the property or alias of the same name in Comment class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
         ];
@@ -460,7 +460,7 @@ class CommentId implements JsonApiMapping
     public function getRelationships()
     {
         return [
-            'post' => [ //this key must match with the property or alias of the same name in CommendId class.
+            'post' => [ //this key must match with the property or alias of the same name in CommentId class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
         ];
@@ -492,7 +492,7 @@ $mappings = [
     \AcmeProject\Infrastructure\Api\Mappings\PostIdMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\UserMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\UserIdMapping::class,
-    \AcmeProject\Infrastructure\Api\Mappings\CommendMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\CommentMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\CommentId::class,
 ];
 
