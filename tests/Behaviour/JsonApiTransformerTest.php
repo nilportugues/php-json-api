@@ -162,7 +162,7 @@ JSON;
                "accepted_at":"2015-07-19T00:00:00+00:00"
             },
             "comment":"Have no fear, sers, your king is safe.",
-            "oneDate" : {
+            "one_date" : {
                 "date" : "2015-07-18 12:13:00.000000",
                 "timezone_type": 1,
                 "timezone" : "+00:00"

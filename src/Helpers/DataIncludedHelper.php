@@ -12,6 +12,7 @@
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Serializer\Serializer;
 
 class DataIncludedHelper
@@ -93,7 +94,7 @@ class DataIncludedHelper
     ) {
         foreach ($value as $propertyName => $attribute) {
             if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
-                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+                $propertyName = DataAttributesHelper::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
                 if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
                     self::setResponseDataIncluded($mappings, $value, $data);
@@ -191,7 +192,7 @@ class DataIncludedHelper
     ) {
         foreach ($value as $propertyName => $attribute) {
             if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
-                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+                $propertyName = DataAttributesHelper::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
 
                 if (\is_array($attribute) && \array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
                     $data[$propertyName][JsonApiTransformer::DATA_KEY] = PropertyHelper::setResponseDataTypeAndId(

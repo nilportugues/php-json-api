@@ -213,7 +213,7 @@ JSON;
 		         "attributes":{  
 		            "comment":"Comment 1",
 		            "parent_id":null,
-		            "parentComment":null
+		            "parent_comment":null
 		         },
 		         "relationships":{  
 		            "post":{  
