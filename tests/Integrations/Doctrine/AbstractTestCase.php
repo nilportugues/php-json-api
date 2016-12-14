@@ -33,7 +33,7 @@ abstract class AbstractTestCase extends \PHPUnit_Framework_TestCase
 
         $newCustomer = new Customer();
         $newCustomer->setActive(true);
-        $newCustomer->setName('Name 1');
+        $newCustomer->setPersonName('Name 1');
         self::$entityManager->persist($newCustomer);
 
         $newPost = new Post();
