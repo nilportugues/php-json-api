@@ -166,9 +166,10 @@ class DataIncludedHelper
                     $existingIndex = self::findIncludedIndex($data[JsonApiTransformer::INCLUDED_KEY], $arrayData[JsonApiTransformer::ID_KEY], $arrayData[JsonApiTransformer::TYPE_KEY]);
                 }
                 if ($existingIndex !== false) {
-                    $data[JsonApiTransformer::INCLUDED_KEY][$existingIndex] = \array_filter(\array_merge($data[JsonApiTransformer::INCLUDED_KEY][$existingIndex], $arrayData));
+                    $data[JsonApiTransformer::INCLUDED_KEY][$existingIndex] = \array_filter(\array_merge($data[JsonApiTransformer::INCLUDED_KEY][$existingIndex],
+                        \array_filter($arrayData, self::filterEmptyArray())), self::filterEmptyArray());
                 } else {
-                    $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
+                    $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData, self::filterEmptyArray());
                 }
             }
         }
@@ -177,6 +178,13 @@ class DataIncludedHelper
                 \array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
             );
         }
+    }
+
+    protected static function filterEmptyArray()
+    {
+        return function($value) {
+            return $value !== null && (!is_array($value) || count($value) > 0);
+        };
     }
 
     protected static function findIncludedIndex($includedData, $idNeedle, $typeNeedle)
