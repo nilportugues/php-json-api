@@ -172,6 +172,11 @@ class DataIncludedHelper
                 }
             }
         }
+        if (!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
+            $data[JsonApiTransformer::INCLUDED_KEY] = \array_values(
+                \array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
+            );
+        }
     }
 
     protected static function findIncludedIndex($includedData, $idNeedle, $typeNeedle)
