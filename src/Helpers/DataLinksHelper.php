@@ -413,7 +413,7 @@ class DataLinksHelper
      *
      * @return string
      */
-    protected static function camelCaseToUnderscore($camel, $splitter = '_')
+    public static function camelCaseToUnderscore($camel, $splitter = '_')
     {
         $camel = \preg_replace(
             '/(?!^)[[:upper:]][[:lower:]]/',
