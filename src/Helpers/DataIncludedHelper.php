@@ -94,7 +94,14 @@ class DataIncludedHelper
     ) {
         foreach ($value as $propertyName => $attribute) {
             if (PropertyHelper::isAttributeProperty($mappings, $propertyName, $type)) {
-                $propertyName = DataAttributesHelper::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
+
+                $propertyName = DataAttributesHelper::transformToValidMemberName($propertyName);
+                if (\array_key_exists(Serializer::MAP_TYPE, $attribute)
+                    && count(array_values($attribute[Serializer::SCALAR_VALUE])) > 0
+                    && \array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, array_values($attribute[Serializer::SCALAR_VALUE])[0])) {
+                    self::setResponseDataIncluded($mappings, $value, $data);
+                    continue;
+                }
 
                 if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $attribute)) {
                     self::setResponseDataIncluded($mappings, $value, $data);
@@ -156,15 +163,41 @@ class DataIncludedHelper
                     $arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] = $relationships;
                 }
 
-                $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData);
+                $existingIndex = false;
+                if (array_key_exists(JsonApiTransformer::INCLUDED_KEY, $data)) {
+                    $existingIndex = self::findIncludedIndex($data[JsonApiTransformer::INCLUDED_KEY], $arrayData[JsonApiTransformer::ID_KEY], $arrayData[JsonApiTransformer::TYPE_KEY]);
+                }
+                if ($existingIndex !== false) {
+                    $data[JsonApiTransformer::INCLUDED_KEY][$existingIndex] = \array_filter(\array_merge($data[JsonApiTransformer::INCLUDED_KEY][$existingIndex],
+                        \array_filter($arrayData, self::filterEmptyArray())), self::filterEmptyArray());
+                } else {
+                    $data[JsonApiTransformer::INCLUDED_KEY][] = \array_filter($arrayData, self::filterEmptyArray());
+                }
             }
         }
-
         if (!empty($data[JsonApiTransformer::INCLUDED_KEY])) {
             $data[JsonApiTransformer::INCLUDED_KEY] = \array_values(
                 \array_unique($data[JsonApiTransformer::INCLUDED_KEY], SORT_REGULAR)
             );
         }
+    }
+
+    protected static function filterEmptyArray()
+    {
+        return function($value) {
+            return $value !== null && (!is_array($value) || count($value) > 0);
+        };
+    }
+
+    protected static function findIncludedIndex($includedData, $idNeedle, $typeNeedle)
+    {
+        foreach ($includedData as $key => $value) {
+            if ($value[JsonApiTransformer::ID_KEY] === $idNeedle && $value[JsonApiTransformer::TYPE_KEY] === $typeNeedle) {
+                return $key;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -202,6 +235,20 @@ class DataIncludedHelper
 
                     continue;
                 }
+
+                if (\is_array($attribute) && \array_key_exists(Serializer::MAP_TYPE, $attribute)) {
+                    $relations = [];
+                    $elements = $attribute[Serializer::SCALAR_VALUE];
+                    foreach ($elements as $arrayValue) {
+                        if (\array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $arrayValue)) {
+                            $relations[] = PropertyHelper::setResponseDataTypeAndId($mappings, $arrayValue);
+                        }
+                    }
+                    if (count($relations) > 0) {
+                        $data[DataLinksHelper::camelCaseToUnderscore($propertyName)][JsonApiTransformer::DATA_KEY] = $relations;
+                    }
+                    continue;
+                }
             }
         }
     }
@@ -209,7 +256,6 @@ class DataIncludedHelper
     /**
      * Enforce with this check that each property leads to a data element.
      *
-     * @param array $value
      * @param array $arrayData
      *
      * @return array
@@ -217,19 +263,15 @@ class DataIncludedHelper
     protected static function normalizeRelationshipData(array &$value, array $arrayData)
     {
         $relationships = [];
-        foreach ($arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] as $attribute => $value) {
+        foreach ($arrayData[JsonApiTransformer::RELATIONSHIPS_KEY] as $attribute => $attributeValue) {
             //if $value[data] is not found, get next level where [data] should exist.
-            if (!array_key_exists(JsonApiTransformer::DATA_KEY, $value)) {
-                array_shift($value);
+            if (!array_key_exists(JsonApiTransformer::DATA_KEY, $attributeValue)) {
+                array_shift($attributeValue);
             }
 
-            //If one value in $value[data], remove the array and make it object only.
-            if (1 === count($value[JsonApiTransformer::DATA_KEY])) {
-                $value = reset($value[JsonApiTransformer::DATA_KEY]);
-            }
 
-            if (count($value[JsonApiTransformer::DATA_KEY]) > 0) {
-                $relationships[$attribute] = $value;
+            if (count($attributeValue[JsonApiTransformer::DATA_KEY]) > 0) {
+                $relationships[$attribute] = $attributeValue;
             }
         }
 

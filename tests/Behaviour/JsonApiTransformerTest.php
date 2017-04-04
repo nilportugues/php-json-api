@@ -137,6 +137,42 @@ JSON;
       },
       {
          "type":"user",
+         "id":"3",
+         "attributes":{
+            "name":"First Liker"
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/users/3"
+            },
+            "friends":{
+               "href":"http://example.com/users/3/friends"
+            },
+            "comments":{
+               "href":"http://example.com/users/3/comments"
+            }
+         }
+      },
+      {
+         "type":"user",
+         "id":"4",
+         "attributes":{
+            "name":"Second Liker"
+         },
+         "links":{
+            "self":{
+               "href":"http://example.com/users/4"
+            },
+            "friends":{
+               "href":"http://example.com/users/4/friends"
+            },
+            "comments":{
+               "href":"http://example.com/users/4/comments"
+            }
+         }
+      },
+      {
+         "type":"user",
          "id":"2",
          "attributes":{
             "name":"Barristan Selmy"
@@ -174,6 +210,18 @@ JSON;
                   "type":"user",
                   "id":"2"
                }
+             },
+            "likes": {
+               "data": [
+                  { 
+                    "type": "user",
+                    "id":"3"
+                  },
+                  {  
+                    "type": "user",
+                    "id":"4"
+                  }
+                ]
             }
          },
          "links":{

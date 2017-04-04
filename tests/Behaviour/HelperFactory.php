@@ -46,7 +46,17 @@ class HelperFactory
                         'created_at' => (new DateTime('2015-07-18T12:13:00+00:00'))->format('c'),
                         'accepted_at' => (new DateTime('2015-07-19T00:00:00+00:00'))->format('c'),
                     ],
-                    new DateTime('2015-07-18T12:13:00+00:00')
+                    new DateTime('2015-07-18T12:13:00+00:00'),
+                    [
+                        new User(
+                            new UserId(3),
+                            'First Liker'
+                        ),
+                        new User(
+                            new UserId(4),
+                            'Second Liker'
+                        )
+                        ]
                 ),
             ]
         );
