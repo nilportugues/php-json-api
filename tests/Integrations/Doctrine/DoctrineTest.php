@@ -24,7 +24,7 @@ class DoctrineTest extends AbstractTestCase
 		      "attributes":{  
 		         "active":true,
 		         "id":1,
-		         "name":"Name 1"
+		         "person_name":"Name 1"
 		      },
 		      "links":{  
 		         "self":{  
@@ -85,7 +85,7 @@ JSON;
 		         "type":"customer",
 		         "id":"1",
 		         "attributes":{  
-		            "name":"Name 1",
+		            "person_name":"Name 1",
 		            "active":true
 		         },
 		         "links":{  
@@ -178,7 +178,7 @@ JSON;
 		         "type":"customer",
 		         "id":"1",
 		         "attributes":{  
-		            "name":"Name 1",
+		            "person_name":"Name 1",
 		            "active":true
 		         },
 		         "links":{  
@@ -218,7 +218,7 @@ JSON;
 		         "attributes":{  
 		            "comment":"Comment 1",
 		            "parent_id":null,
-		            "parentComment":null
+		            "parent_comment":null
 		         },
 		         "relationships":{  
 		            "post":{  

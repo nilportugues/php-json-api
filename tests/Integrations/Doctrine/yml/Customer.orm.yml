@@ -9,7 +9,7 @@ NilPortugues\Tests\Api\JsonApi\Integrations\Doctrine\Entity\Customer:
             generator:
                 strategy: AUTO
     fields:
-        name:
+        personName:
             type: string
             length: 255
         active:

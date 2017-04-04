@@ -15,7 +15,7 @@ class Customer
     /**
      * @var string
      */
-    private $name;
+    private $personName;
 
     /**
      * @var bool
@@ -35,13 +35,13 @@ class Customer
     /**
      * Set name.
      *
-     * @param string $name
+     * @param string $personName
      *
      * @return Customer
      */
-    public function setName($name)
+    public function setPersonName($personName)
     {
-        $this->name = $name;
+        $this->personName = $personName;
 
         return $this;
     }
@@ -51,9 +51,9 @@ class Customer
      *
      * @return string
      */
-    public function getName()
+    public function getPersonName()
     {
-        return $this->name;
+        return $this->personName;
     }
 
     /**
