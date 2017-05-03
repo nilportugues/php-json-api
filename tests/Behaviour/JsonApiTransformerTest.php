@@ -885,6 +885,15 @@ JSON;
         $mapper->setClassMap([$postMapping->getClassName() => $postMapping]);
 
         $jsonApiJsonApiSerializer = new JsonApiTransformer($mapper);
+        $jsonApiJsonApiSerializer->setMeta(
+            [
+                'author' => [
+                    'name' => 'Nil Portugués Calderó',
+                    'email' => 'contact@nilportugues.com',
+                ],
+            ]
+        );
+        $jsonApiJsonApiSerializer->addMeta('is_devel', true);
 
         $expected = <<<JSON
 {
@@ -916,6 +925,13 @@ JSON;
          }
       }
    ],
+   "meta":{
+      "author":{
+         "name":"Nil Portugués Calderó",
+         "email":"contact@nilportugues.com"
+      },
+      "is_devel":true
+   },
    "jsonapi":{
       "version":"1.0"
    }
