@@ -236,6 +236,7 @@ class JsonApiTransformer extends Transformer
         $this->setResponseLinks($value, $data);
         $this->setResponseMeta($data);
         $this->setResponseVersion($data);
+        $this->setResponseMeta($data);
 
         return (empty($data['data'])) ? array_merge(['data' => []], $data) : $data;
     }
