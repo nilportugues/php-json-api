@@ -307,6 +307,10 @@ class DataIncludedHelper
      */
     protected static function isDeleteableIncludedResource(array &$mappings, $parentType, $includeValue)
     {
+        if (!isset($includeValue[Serializer::CLASS_IDENTIFIER_KEY])) {
+            return true;
+        }
+
         return !empty($mappings[$parentType])
         && count($mappings[$parentType]->getIncludedResources()) > 0
         && false === in_array($includeValue[Serializer::CLASS_IDENTIFIER_KEY], $mappings[$parentType]->getIncludedResources(), true);
