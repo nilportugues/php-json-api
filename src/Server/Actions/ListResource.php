@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
@@ -23,6 +24,7 @@ use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\OufOfBoundsError;
 use NilPortugues\Api\JsonApi\Server\Query\QueryException;
 use NilPortugues\Api\JsonApi\Server\Query\QueryObject;
+use NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException;
 
 /**
  * Class ListResource.
@@ -255,6 +257,9 @@ class ListResource
     protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
+            case ForbiddenException::class:
+                $response = $this->forbidden($this->errorBag);
+                break;
             case QueryException::class:
                 $response = $this->errorResponse($this->errorBag);
                 break;
@@ -263,8 +268,6 @@ class ListResource
                 $response = $this->errorResponse(
                     new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
                 );
-
-                return $response;
         }
 
         return $response;

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Server\Data;
 
 use NilPortugues\Api\JsonApi\JsonApiSerializer;
@@ -58,7 +59,7 @@ class DataObject
         }
 
         if ($errorBag->count() > 0) {
-            throw new DataException();
+            throw new DataException('An error with the provided data occured.', $errorBag);
         }
     }
 
@@ -89,10 +90,11 @@ class DataObject
 
         $diff = [];
         if (null !== $mapping) {
+            $required = $mapping->getRequiredProperties();
             $properties = str_replace(
                 array_keys($mapping->getAliasedProperties()),
                 array_values($mapping->getAliasedProperties()),
-                $mapping->getProperties()
+                !empty($required) ? $required : $mapping->getProperties()
             );
             $properties = array_diff($properties, $mapping->getIdProperties());
 

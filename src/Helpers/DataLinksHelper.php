@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -88,6 +89,7 @@ class DataLinksHelper
                 self::addRelationshipData($mappings, $parent, $value, $propertyName, $data);
                 if (\array_key_exists(Serializer::MAP_TYPE, $value)) {
                     $newData = [];
+
                     foreach ($value[Serializer::SCALAR_VALUE] as $d) {
                         self::addRelationshipData($mappings, $parent, $d, $propertyName, $newData);
 
@@ -126,7 +128,9 @@ class DataLinksHelper
                                 //Removes relationships related to the current resource if filtering include resources has been set.
                                 if (!empty($mappings[$parentType]) && !empty($mappings[$parentType]->isFilteringIncludedResources())) {
                                     foreach ($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName] as $position => $includedResource) {
-                                        if (false === in_array($type, $mappings[$parentType]->getIncludedResources(), true)) {
+                                        if (count($mappings[$parentType]->getIncludedResources()) > 0 &&
+                                            false === in_array($type, $mappings[$parentType]->getIncludedResources(), true)
+                                        ) {
                                             unset($newData[JsonApiTransformer::RELATIONSHIPS_KEY][$propertyName][$position]);
                                         }
                                     }
@@ -287,8 +291,12 @@ class DataLinksHelper
      *
      * @return mixed
      */
-    protected static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
+    public static function buildUrl(array &$mappings, $idProperties, $idValues, $url, $type)
     {
+        if (!is_array($idValues)) {
+            $idValues = [$idValues];
+        }
+
         self::removeArraysFromKeyValueReplacement($idProperties, $idValues);
 
         if (is_array($url) && !empty($url['name'])) {
@@ -405,7 +413,7 @@ class DataLinksHelper
      *
      * @return string
      */
-    protected static function camelCaseToUnderscore($camel, $splitter = '_')
+    public static function camelCaseToUnderscore($camel, $splitter = '_')
     {
         $camel = \preg_replace(
             '/(?!^)[[:upper:]][[:lower:]]/',

@@ -8,14 +8,15 @@ use NilPortugues\Api\JsonApi\Helpers\DataLinksHelper;
 use NilPortugues\Api\JsonApi\Helpers\PropertyHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveDeleteHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveFilterHelper;
+use NilPortugues\Api\Transformer\Helpers\RecursiveFormatterHelper;
 use NilPortugues\Api\Transformer\Helpers\RecursiveRenamerHelper;
 use NilPortugues\Api\Transformer\Transformer;
 use NilPortugues\Serializer\Serializer;
 
 /**
- * This Transformer follows the http://JsonApi.org specification.
+ * This Transformer follows the http://jsonapi.org specification.
  *
- * @link http://JsonApi.org/format/#document-structure
+ * @link http://jsonapi.org/format/#document-structure
  */
 class JsonApiTransformer extends Transformer
 {
@@ -60,6 +61,7 @@ class JsonApiTransformer extends Transformer
      */
     protected function serializeObject(array $value)
     {
+        $value = $this->transformUnmappedObjectsToArray($value);
         $value = $this->preSerialization($value);
         $data = $this->serialization($value);
 
@@ -134,6 +136,25 @@ class JsonApiTransformer extends Transformer
                         (!empty($urls)) ? $this->addHrefToLinks($this->getResponseAdditionalLinks($value, $type)) : []
                     )
                 );
+
+                /*
+                 * Adds the _links:self:href link to the response.
+                 */
+                list($idValues, $idProperties) = RecursiveFormatterHelper::getIdPropertyAndValues(
+                    $this->mappings,
+                    $value,
+                    $type
+                );
+                $href = DataLinksHelper::buildUrl(
+                    $this->mappings,
+                    $idProperties,
+                    $idValues,
+                    $this->mappings[$type]->getResourceUrl(),
+                    $type
+                );
+                if ($href != $this->mappings[$type]->getResourceUrl()) {
+                    $data[self::LINKS_KEY][self::SELF_LINK][self::LINKS_HREF] = $href;
+                }
             }
         }
 
@@ -213,8 +234,20 @@ class JsonApiTransformer extends Transformer
         $data = array_filter($data);
 
         $this->setResponseLinks($value, $data);
+        $this->setResponseMeta($data);
         $this->setResponseVersion($data);
+        $this->setResponseMeta($data);
 
         return (empty($data['data'])) ? array_merge(['data' => []], $data) : $data;
+    }
+
+    /**
+     * @param array $value
+     *
+     * @return array
+     */
+    protected function transformUnmappedObjectsToArray(array $value)
+    {
+        return RecursiveRenamerHelper::serializedObjectToArray($value, $this->mappings);
     }
 }

@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -27,9 +28,7 @@ class PropertyHelper
      */
     public static function setResponseDataTypeAndId(array &$mappings, array &$value)
     {
-        $type = $value[Serializer::CLASS_IDENTIFIER_KEY];
-
-        if (empty($mappings[$type])) {
+        if (empty($type = $value[Serializer::CLASS_IDENTIFIER_KEY]) || (empty($mappings[$type]))) {
             return [];
         }
 
@@ -38,7 +37,23 @@ class PropertyHelper
         }
 
         $finalType = ($mappings[$type]->getClassAlias()) ? $mappings[$type]->getClassAlias() : $type;
+        $ids = self::getIdValues($mappings, $value, $type);
 
+        return [
+            JsonApiTransformer::TYPE_KEY => RecursiveFormatterHelper::namespaceAsArrayKey($finalType),
+            JsonApiTransformer::ID_KEY => \implode(JsonApiTransformer::ID_SEPARATOR, $ids),
+        ];
+    }
+
+    /**
+     * @param array $mappings
+     * @param array $value
+     * @param $type
+     *
+     * @return array
+     */
+    public static function getIdValues(array $mappings, array $value, $type)
+    {
         $ids = [];
         foreach (\array_keys($value) as $propertyName) {
             if (\in_array($propertyName, RecursiveFormatterHelper::getIdProperties($mappings, $type), true)) {
@@ -47,10 +62,7 @@ class PropertyHelper
             }
         }
 
-        return [
-            JsonApiTransformer::TYPE_KEY => RecursiveFormatterHelper::namespaceAsArrayKey($finalType),
-            JsonApiTransformer::ID_KEY => \implode(JsonApiTransformer::ID_SEPARATOR, $ids),
-        ];
+        return $ids;
     }
 
     /**

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
@@ -17,6 +18,7 @@ use NilPortugues\Api\JsonApi\Server\Data\DataObject;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
+use NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException;
 
 /**
  * Class PatchResource.
@@ -66,7 +68,7 @@ class PatchResource
             }
 
             $values = DataObject::getAttributes($data, $this->serializer);
-            $update($model, $values, $this->errorBag);
+            $update($model, $data, $values, $this->errorBag);
 
             $response = $this->resourceUpdated($this->serializer->serialize($model));
         } catch (Exception $e) {
@@ -84,6 +86,9 @@ class PatchResource
     protected function getErrorResponse(Exception $e)
     {
         switch (get_class($e)) {
+            case ForbiddenException::class:
+                $response = $this->forbidden($this->errorBag);
+                break;
             case DataException::class:
                 $response = $this->unprocessableEntity($this->errorBag);
                 break;

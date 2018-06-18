@@ -95,7 +95,7 @@ class PostMapping  implements JsonApiMapping
     /**
      * {@inheritdoc}
      */
-    public function getIdProperties()
+    public function getIdProperties() {
         return [ 
             'postId',
         ];
@@ -121,6 +121,14 @@ class PostMapping  implements JsonApiMapping
                 'self' => 'http://example.com/posts/{postId}/relationships/author',
             ]
         ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return ['author', 'title', 'body'];
     }
 }
 ```
@@ -188,6 +196,14 @@ class PostIdMapping implements JsonApiMapping
             ],
         ];
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }
 }
 ```
 
@@ -243,7 +259,15 @@ class UserMapping implements JsonApiMapping
             'friends' => 'http://example.com/users/{userId}/friends',
             'comments' => 'http://example.com/users/{userId}/comments',
         ];
-    }
+    }    
+   
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }    
 }
 ```
 
@@ -285,7 +309,7 @@ class UserIdMapping implements JsonApiMapping
      * {@inheritdoc}
      */
     public function getIdProperties()
-        return [ 'userId',];
+        return ['userId'];
     }
     /**
      * {@inheritdoc}
@@ -298,6 +322,14 @@ class UserIdMapping implements JsonApiMapping
             'comments' => 'http://example.com/users/{userId}/comments',
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }        
 }
 ```
 
@@ -308,7 +340,7 @@ namespace AcmeProject\Infrastructure\Api\Mappings;
 
 use NilPortugues\Api\Mappings\JsonApiMapping;
 
-class CommendMapping implements JsonApiMapping
+class CommentMapping implements JsonApiMapping
 {
     /**
      * {@inhertidoc}
@@ -357,11 +389,19 @@ class CommendMapping implements JsonApiMapping
     public function getRelationships()
     {
         return [
-            'post' => [ //this key must match with the property or alias of the same name in Commend class.
+            'post' => [ //this key must match with the property or alias of the same name in Comment class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }        
 }
 ```
 
@@ -420,11 +460,19 @@ class CommentId implements JsonApiMapping
     public function getRelationships()
     {
         return [
-            'post' => [ //this key must match with the property or alias of the same name in CommendId class.
+            'post' => [ //this key must match with the property or alias of the same name in CommentId class.
                 'self' => 'http://example.com/posts/{postId}/relationships/comments',
             ]
         ];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRequiredProperties()
+    {
+        return [];
+    }        
 }
 ```
 
@@ -439,12 +487,12 @@ use NilPortugues\Api\JsonApi\JsonApiTransformer;
 use NilPortugues\Api\JsonApi\Http\Message\Response;
 use NilPortugues\Api\Mapping\Mapper;
 
-$classConfig = [
+$mappings = [
     \AcmeProject\Infrastructure\Api\Mappings\PostMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\PostIdMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\UserMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\UserIdMapping::class,
-    \AcmeProject\Infrastructure\Api\Mappings\CommendMapping::class,
+    \AcmeProject\Infrastructure\Api\Mappings\CommentMapping::class,
     \AcmeProject\Infrastructure\Api\Mappings\CommentId::class,
 ];
 
@@ -623,6 +671,14 @@ Because the JSON API specification lists a set of behaviours, specific Response 
 - `NilPortugues\Api\JsonApi\Http\Response\TooManyRequests`
 - `NilPortugues\Api\JsonApi\Http\Response\UnprocessableEntity`
 - `NilPortugues\Api\JsonApi\Http\Response\UnsupportedAction`
+
+**Forbidden Access**
+
+It is also possible to fire a `Forbidden` response by throwing the following Exception in your code:
+
+- `NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException`
+
+Access control logic is not provided.
 
 
 ## Action Objects

@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Server\Actions;
 
 use Exception;
@@ -15,6 +16,7 @@ use NilPortugues\Api\JsonApi\Server\Actions\Traits\ResponseTrait;
 use NilPortugues\Api\JsonApi\Server\Errors\Error;
 use NilPortugues\Api\JsonApi\Server\Errors\ErrorBag;
 use NilPortugues\Api\JsonApi\Server\Errors\NotFoundError;
+use NilPortugues\Api\JsonApi\Server\Actions\Exceptions\ForbiddenException;
 
 /**
  * Class DeleteResource.
@@ -64,7 +66,29 @@ class DeleteResource
 
             return $this->resourceDeleted();
         } catch (Exception $e) {
-            return $this->errorResponse(new ErrorBag([new Error('Bad Request', 'Request could not be served.')]));
+            return $this->getErrorResponse($e);
         }
+    }
+
+    /**
+     * @param Exception $e
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function getErrorResponse(Exception $e)
+    {
+        switch (get_class($e)) {
+            case ForbiddenException::class:
+                $response = $this->forbidden(
+                    new ErrorBag([new Error('Forbidden', $e->getMessage())])
+                );
+                break;
+            default:
+                $response = $this->errorResponse(
+                    new ErrorBag([new Error('Bad Request', 'Request could not be served.')])
+                );
+        }
+
+        return $response;
     }
 }

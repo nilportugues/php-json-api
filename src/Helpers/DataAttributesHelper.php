@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace NilPortugues\Api\JsonApi\Helpers;
 
 use NilPortugues\Api\JsonApi\JsonApiTransformer;
@@ -69,25 +70,6 @@ class DataAttributesHelper
     ];
 
     /**
-     * Changes all array keys to under_score format using recursion.
-     *
-     * @param array $array
-     */
-    protected static function recursiveSetKeysToUnderScore(array &$array)
-    {
-        $newArray = [];
-        foreach ($array as $key => &$value) {
-            $underscoreKey = RecursiveFormatterHelper::camelCaseToUnderscore($key);
-            $newArray[$underscoreKey] = $value;
-
-            if (\is_array($value)) {
-                self::recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
-            }
-        }
-        $array = $newArray;
-    }
-
-    /**
      * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
      * @param array                               $array
      *
@@ -100,13 +82,16 @@ class DataAttributesHelper
         $idProperties = RecursiveFormatterHelper::getIdProperties($mappings, $type);
 
         foreach ($array as $propertyName => $value) {
+            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
+
             if (\in_array($propertyName, $idProperties, true)) {
+                self::addIdPropertiesInAttribute($mappings, $type, $keyName, $value, $attributes);
                 continue;
             }
 
-            $keyName = self::transformToValidMemberName(RecursiveFormatterHelper::camelCaseToUnderscore($propertyName));
-
-            if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY]) && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])) {
+            if (!empty($value[Serializer::CLASS_IDENTIFIER_KEY])
+                && empty($mappings[$value[Serializer::CLASS_IDENTIFIER_KEY]])
+            ) {
                 $copy = $value;
                 self::recursiveSetKeysToUnderScore($copy);
                 $attributes[$keyName] = $copy;
@@ -119,11 +104,14 @@ class DataAttributesHelper
             }
 
             if (\is_array($value) && !array_key_exists(Serializer::CLASS_IDENTIFIER_KEY, $value)) {
-                if (self::containsClassIdentifierKey($value)) {
+                if (false === self::hasClassIdentifierKey($value)) {
                     $attributes[$keyName] = $value;
                 }
             }
         }
+
+        //Guarantee it always returns the same attribute order. No matter what.
+        ksort($attributes, SORT_STRING);
 
         return [JsonApiTransformer::ATTRIBUTES_KEY => $attributes];
     }
@@ -144,6 +132,60 @@ class DataAttributesHelper
     }
 
     /**
+     * @param \NilPortugues\Api\Mapping\Mapping[] $mappings
+     * @param string                              $type
+     * @param string                              $keyName
+     * @param array                               $value
+     * @param array                               $attributes
+     */
+    protected static function addIdPropertiesInAttribute(array &$mappings, $type, $keyName, array $value, array &$attributes)
+    {
+        $keepKeys = str_replace(
+            array_values($mappings[$type]->getAliasedProperties()),
+            array_keys($mappings[$type]->getAliasedProperties()),
+            $mappings[$type]->getFilterKeys()
+        );
+
+        $keepIdKeys = (0 === count($keepKeys));
+        if (false !== array_search($keyName, $keepKeys, true)) {
+            $keepIdKeys = false;
+        }
+
+        if ($keepIdKeys) {
+            $ids = PropertyHelper::getIdValues($mappings, $value, $type);
+
+            if (count($ids) > 0) {
+                if (1 === count($ids)) {
+                    $ids = array_pop($ids);
+                }
+                $attributes[$keyName] = $ids;
+            } else {
+                RecursiveFormatterHelper::formatScalarValues($value);
+                $attributes[$keyName] = $value;
+            }
+        }
+    }
+
+    /**
+     * Changes all array keys to under_score format using recursion.
+     *
+     * @param array $array
+     */
+    protected static function recursiveSetKeysToUnderScore(array &$array)
+    {
+        $newArray = [];
+        foreach ($array as $key => &$value) {
+            $underscoreKey = RecursiveFormatterHelper::camelCaseToUnderscore($key);
+            $newArray[$underscoreKey] = $value;
+
+            if (\is_array($value)) {
+                self::recursiveSetKeysToUnderScore($newArray[$underscoreKey]);
+            }
+        }
+        $array = $newArray;
+    }
+
+    /**
      * @param mixed $value
      *
      * @return bool
@@ -157,33 +199,27 @@ class DataAttributesHelper
 
     /**
      * @param array $input
-     * @param bool  $foundIdentifierKey
      *
      * @return bool
      */
-    protected static function containsClassIdentifierKey(array $input, $foundIdentifierKey = false)
+    protected static function hasClassIdentifierKey(array $input)
     {
-        if (!is_array($input)) {
-            return $foundIdentifierKey || false;
-        }
-
-        if (\in_array(Serializer::CLASS_IDENTIFIER_KEY, $input, true)) {
+        if (!empty($input[Serializer::CLASS_IDENTIFIER_KEY])) {
             return true;
         }
 
-        if (!empty($input[Serializer::SCALAR_VALUE])) {
+        $foundIdentifierKey = false;
+        if (!empty($input[Serializer::SCALAR_VALUE]) && !empty($input[Serializer::MAP_TYPE])) {
             $input = $input[Serializer::SCALAR_VALUE];
-
             if (\is_array($input)) {
                 foreach ($input as $value) {
                     if (\is_array($value)) {
-                        $foundIdentifierKey = $foundIdentifierKey
-                            || self::containsClassIdentifierKey($value, $foundIdentifierKey);
+                        $foundIdentifierKey = $foundIdentifierKey || self::hasClassIdentifierKey($value);
                     }
                 }
             }
         }
 
-        return !$foundIdentifierKey;
+        return $foundIdentifierKey;
     }
 }
